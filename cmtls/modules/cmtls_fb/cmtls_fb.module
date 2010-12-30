@@ -1,0 +1,275 @@
+<?php
+
+include_once('cmtls_fb.features.inc');
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_fb_menu()
+{
+	$items = array();
+
+	/*
+	 * Admin pages
+	 */
+	$items['admin/settings/cmtls-authentication/facebook'] = array(
+		'title' => 'Facebook',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('cmtls_fb_admin'),
+		'access arguments' => array('administer cmtls'),
+		'type' => MENU_LOCAL_TASK, // TODO: needs some checking, currently half-operational
+	);
+
+	/*
+	 * Public pages
+	 */
+
+	$items['cmtls/login/facebook'] = array(
+		'title' => 'Connect with Facebook',
+		'page callback' => 'cmtls_fb_login',
+		'page arguments' => array(),
+	    'access callback' => 'user_is_anonymous',
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+
+/**
+ * Implementation of hook_user()
+ */
+function cmtls_fb_user($op, &$edit, &$account, $category = NULL){
+	
+	if('cmtls_fb' != cmtls_auth_authentication_module()){ return; }
+	
+	switch($op){
+		case 'login':
+			// Check if the user was authenticated by this module
+			if('cmtls_fb' == cmtls_auth_authentication_module()){
+				// Pull in fresh data from Facebook
+				if($account->use_facebook_avatar !== FALSE){
+					$local_image_path = file_create_path('fb_avatars');
+
+					if(file_check_directory($local_image_path, TRUE)){
+						// Deal with Graph API requirement that requests from https should be made to https
+						$protocol = !empty($_SERVER['HTTPS']) ? 'https' : 'http';
+						$remote_image_path = "$protocol://graph.facebook.com/{$account->euid}/picture?type=large";
+
+						$image = file_get_contents($remote_image_path);
+						$file = file_save_data($image, "$local_image_path/{$account->euid}.jpg", FILE_EXISTS_REPLACE);
+						
+						if($file){
+							// If use_fb_avatar flag is set for user, use existing setting, else default to true (when user has freshly registered for example)
+							$use_fb_avatar = $account->use_fb_avatar ? $account->use_fb_avatar : 1;
+							user_save($account, array('fb_avatar' => $file, 'use_fb_avatar' => $use_fb_avatar)); // If user save should fail, it fails silently intentionally
+						}
+					}
+				}
+			}
+			break;
+		case 'logout':
+			// If logged in by this module (get_user_authmaps), log user out from FB
+			break;
+	}
+}
+
+
+/**
+ * Implementation of hook_form_alter()
+ */
+function cmtls_fb_form_alter(&$form, &$form_state, $form_id){
+	switch($form_id){
+		/**
+		 * User login form
+		 */
+		case 'user_login':
+			// Create Facebook login button
+			$form['fb_integration'] = array(
+				'#external_authentication' => TRUE,
+				'#type' => 'button',
+				'#value' => t("Connect with Facebook"),
+				'#submit' => array('cmtls_fb_user_login_submit'),
+				'#executes_submit_callback' => TRUE,
+			);
+
+			// Create container for Facebook's JSDK
+			$form['fb_jsdk_container'] = array(
+				'#type' => 'markup',
+				'#value' => '<div id="fb-root"></div>',
+				'#weight' => 500, // Sink the element
+			);
+
+			drupal_add_css(drupal_get_path('module', 'cmtls_fb') . '/css/cmtls_fb.css');
+			drupal_add_js(drupal_get_path('module', 'cmtls_fb') . '/js/fb.js');
+			drupal_add_js(array('cmtls' => array('Facebook' => array('appId' => variable_get('fb_app_id', ''), 'loginPage' => url('cmtls/login/facebook')))), 'setting');
+
+			break;
+
+		/**
+		 * User registration form
+		 */
+		case 'user_register':
+			// Do the authentication module check to see if we should display Facebook specific form fields with corresponding values
+			if('cmtls_fb' == cmtls_auth_authentication_module()){
+				$session = cmtls_fb_get_session();
+
+				if($session['status'] == 'success'){
+					// Populate form
+					$form['profile_cmtls_member_name']['#default_value'] = isset($session['nick']) ? $session['nick'] : '';
+					$form['name']['#default_value'] = cmtls_auth_recommend_user_name($session['nick']);
+					$form['mail']['#default_value'] = isset($session['email']) ? $session['email'] : '';
+	
+					// Attach some additional data to the form
+					$form['euid'] = array(
+						'#type' => 'value',
+						'#value' => $session['euid'],
+					);
+				}
+			}
+
+			break;
+
+		/**
+		 * User profile form
+		 */
+		case 'user_profile_form':
+			if('cmtls_fb' == cmtls_auth_authentication_module()){
+				// Add option for user to use or not use the Facebook avatar
+				$form['use_fb_avatar'] = array(
+					'#type' => 'checkbox',
+					'#title' => t("Use my Facebook avatar as my profile picture"),
+					'#default_value' => $form['#parameters'][2]->use_fb_avatar,
+					'#weight' => 3.5,
+				);
+				
+				// Remove password fields, since we were authenticated by other means than local username-password
+				unset($form['account']['pass']);
+			}
+			break;
+	}
+}
+
+
+/**
+ * FB admin settings page callback
+ */
+function cmtls_fb_admin(){
+	$form = array();
+	
+	$form['fb_app_id'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Application ID'),
+		'#default_value' => variable_get('fb_app_id', ''),
+		'#size' => 32,
+		'#description' => t("Your application's ID."),
+		'#required' => TRUE,
+	);
+	
+	$form['fb_secret_key'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Application Secret Key'),
+		'#default_value' => variable_get('fb_secret_key', ''),
+		'#size' => 32,
+		'#description' => t("Your application's secret key."),
+		'#required' => TRUE,
+	);
+
+	return system_settings_form($form);
+}
+
+
+/**
+ * Validation callback for cmtls_fb_admin form
+ */
+function cmtls_fb_admin_validate($form, &$form_state){
+	// Check app_id
+	if(preg_match('/[^0-9]/', $form_state['values']['fb_app_id'])){
+		form_set_error('fb_app_id', t("Application ID can contain only numeric characters."));
+	}
+
+	// Check secret_key
+	if(strlen($form_state['values']['fb_secret_key']) <> 32){
+		form_set_error('fb_secret_key', t("Invalid secret key."));
+	}
+}
+
+
+/**
+ * Submit callback for user_register
+ */
+function cmtls_fb_user_register_submit($form, &$form_state){
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+
+function cmtls_fb_user_login_submit($form, &$form_state){
+	$session = cmtls_fb_get_session();
+	
+	if($session['status'] == 'success'){
+		$form_state['redirect'] = 'cmtls/login/facebook';
+	}else{
+		$form_state['redirect'] = $facebook->getLoginUrl(array('scope' => 'email'));
+	}
+}
+
+
+/**
+ * Account login page callback
+ */
+function cmtls_fb_login(){
+	// Send the Modal Frame javascript for child windows to the page.
+	//modalframe_child_js();
+	$session = cmtls_fb_get_session();
+
+	// If we have session, try to log the user in
+	if($session['status'] == 'success'){
+  		return cmtls_auth_user_login($session['euid'], 'cmtls_fb');
+	// If we don't have a session, point browser at Facebook's authentication page
+	}else{
+		drupal_set_message(t("Error logging the user in.", 'error'));
+	}
+}
+
+
+/**
+ * Facebook session fetching helper
+ */
+function cmtls_fb_get_session(){
+	if(!isset($_SESSION['cmtls']['fb']) or empty($_SESSION['cmtls']['fb']) or $_SESSION['cmtls']['fb']['status'] == 'failed'){
+		$facebook = cmtls_fb_get_facebook();
+
+		if($session = $facebook->getSession()){
+			$fb_user = $facebook->api('/me');
+
+			$session['euid'] = $fb_user['id'];
+			$session['nick'] = $fb_user['name'];
+			$session['email'] = $fb_user['email'];
+			$session['status'] = 'success';
+		}else{
+			$session['status'] = 'failed';
+		}
+
+		$_SESSION['cmtls']['fb'] = $session;
+	}
+	
+	return $_SESSION['cmtls']['fb'];
+}
+
+
+/**
+ * Facebook API class fetching helper
+ */
+function cmtls_fb_get_facebook(){
+	module_load_include('php', 'cmtls_fb', 'lib/facebook');
+
+	return new Facebook(array(
+		'appId' => variable_get('fb_app_id', ''),
+		'secret' => variable_get('fb_secret_key', ''),
+		'cookie' => TRUE,
+	));
+}

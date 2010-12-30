@@ -1,0 +1,750 @@
+<?php
+
+include_once('cmtls_app.features.inc');
+
+/**
+ * Implements hook_cmtls_context()
+ * 
+ * The edit, delete, move buttons for apps
+ *
+ * @return array
+ */
+function cmtls_app_cmtls_context()
+{
+	return array(
+		'cmtls_app' => array(
+			'cmtls_app_edit' => array(
+				'title' => t('Edit'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update', 'node'),
+			),
+			'cmtls_app_moveup' => array(
+				'title' => t('Move up'),
+				'access callback' => 'cmtls_app_reorder_perm',
+				'access arguments' => array('node'),
+			),
+			'cmtls_app_movedown' => array(
+				'title' => t('Move down'),
+				'access callback' => 'cmtls_app_reorder_perm',
+				'access arguments' => array('node'),
+			),
+			'cmtls_app_delete' => array(
+				'title' => t('Delete'),
+				'access callback' => 'node_access',
+				'access arguments' => array('delete', 'node'),
+			),
+		),
+		'script' => drupal_get_path('module', 'cmtls_app').'/js/context_actions.js',
+	);
+}
+
+function cmtls_app_reorder_perm($node)
+{
+	if(is_array($node->og_groups) && sizeof($node->og_groups))
+	{
+		$group = node_load(array_shift(array_keys($node->og_groups)));
+		return og_is_group_admin($group);
+	}
+	else return FALSE;
+}
+
+/**
+ * Implements hook_init()
+ *
+ */
+function cmtls_app_init()
+{
+	// adds current app node to cmtls js space
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	drupal_add_js(array('cmtls' => array('currentApp' => _cmtls_node_json_prepare($current_app))), 'setting');
+}
+
+/**
+ * Implements hook_menu
+ *
+ * @return array menu items
+ */
+function cmtls_app_menu()
+{
+	$items = array();
+	
+	$items['cmtls/%node/%node'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_app_page',
+		'page arguments' => array(1, 2),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 2),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/edit'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_app', 2),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 2),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/delete'] = array(
+		'title' => 'Delete',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 2),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 2),
+	    'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/move/up'] = array(
+		'title' => 'Move up',
+		'page callback' => 'nodehierarchy_callback',
+		'page arguments' => array(2, 'up'),
+		'access callback' => 'user_access',
+		'access arguments' => array('reorder children'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/move/down'] = array(
+		'title' => 'Move down',
+		'page callback' => 'nodehierarchy_callback',
+		'page arguments' => array(2, 'down'),
+		'access callback' => 'user_access',
+		'access arguments' => array('reorder children'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/rss'] = array(
+		'title' => 'RSS',
+		'page callback' => 'cmtls_app_rss_page',
+		'page arguments' => array(1, 2),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 2),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/app/add'] = array(
+		'title' => 'App',
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_app'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_app')),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/app/config'] = array(
+		'title' => 'App',
+		'page callback' => 'cmtls_app_form_config_js',
+		'page arguments' => array(1),
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+/**
+ * App node page
+ *
+ * @param node $group
+ * @param node $app
+ * @return unknown
+ */
+function cmtls_app_page($group, $app)
+{
+	$output = '';
+	
+	if($app->type != 'cmtls_app')
+	{
+		$output .= t('This not an app.');
+	}
+	
+	if($app->field_cmtls_app_type[0]['value'] == 'custom_view')
+	{
+		if(!$app->field_cmtls_app_custom_view[0]['value'])
+		{
+			$output .= t('Custom view name not set!');
+		}
+		else 
+		{
+			$output .= views_embed_view($app->field_cmtls_app_custom_view[0]['value'], 'default');
+		}
+	}
+	else 
+	{
+		$app_configs = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_app');
+		
+		foreach ($app_configs as $module_name => &$app_config)
+		{
+			if($app_config['callback'])
+			{
+				$arguments = array();
+				
+				if($app_config['callback arguments'] && is_array($app_config['callback arguments']))
+				{
+					$arguments = $app_config['callback arguments'];
+				}
+				else 
+				{
+					$arguments[] = $app->nid;
+				}
+				
+				$output .= call_user_func_array($app_config['callback'], $arguments);
+			}
+			else 
+			{
+				$output .= t('No page callback set.');
+			}
+		}
+	}
+	
+	// alter hook for output alter, for example the map
+	foreach (module_implements('cmtls_app_callback_alter') as $module)
+	{
+		$function = $module.'_cmtls_app_callback_alter';
+		$output = $function($app, $output);
+	}	
+	
+	return $output;
+}
+
+/**
+ * Implents hook_nodeapi()
+ * Adds app default map stuff to app nodes
+ *
+ * @param node $node
+ * @param string $op
+ * @param unknown_type $a3
+ * @param unknown_type $a4
+ * @return array
+ */
+/*
+function cmtls_app_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
+{
+	global $user;
+	
+	if($op == 'load' && $node->type == 'cmtls_app')
+	{
+	}
+}
+*/
+
+/**
+ * Implements hook_preprocess()
+ * Adds current groups current app node to template variables
+ *
+ * @param unknown_type $vars
+ * @param unknown_type $hook
+ */
+function cmtls_app_preprocess(&$vars, $hook)
+{
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+
+	if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
+	
+	$vars['cmtls'] += array(
+		'current_app' => $current_app,
+	);
+}
+
+
+function cmtls_app_form_alter(&$form, &$form_state, $form_id)
+{
+	if($form_id == 'cmtls_app_node_form' && _cmtls_is())
+	//if($form_id == 'cmtls_app_node_form')
+	{
+		$form['name'] = $form['author']['name'];
+		$form['name']['#type'] = 'value';
+		$form['date'] = $form['author']['date'];
+		$form['date']['#type'] = 'value';
+		//$form['body'] = $form['body_field']['body'];
+		
+		$form['options'] = NULL;
+		$form['buttons']['preview'] = NULL;
+		$form['buttons']['delete'] = NULL;
+		$form['revision_information'] = NULL;
+		$form['author'] = NULL;
+		$form['body_field'] = NULL;
+		
+		$form['#after_build'][] = 'cmtls_app_node_form_after_build';
+		$form['#submit'][] = 'cmtls_app_form_submit';
+
+		$node = $form['#node'];
+		
+		if(!empty($form_state['values']['field_cmtls_app_type'][0]['value']))
+		{
+			$current_config = unserialize($form_state['values']['field_cmtls_app_type'][0]['value']);
+		}
+		elseif(!empty($node->field_cmtls_app_config[0]['value']))
+		{
+			$current_config = unserialize($node->field_cmtls_app_config[0]['value']);
+		}
+		else 
+		{
+			$current_config = array();
+		}
+		
+		if(!empty($form_state['values']['field_cmtls_app_type'][0]['value']))
+		{
+			$app_type = $form_state['values']['field_cmtls_app_type'][0]['value'];
+		}
+		elseif(!empty($node->field_cmtls_app_type[0]['value']))
+		{
+			$app_type = $node->field_cmtls_app_type[0]['value'];
+		}
+		else 
+		{
+			$app_type = NULL;
+		}
+		
+		$form['cmtls_app_config'] = array(
+			'#type' => 'markup',
+			'#title' => t('Configuration'),
+			'#value' => '&nbsp;',
+			'#prefix' => '<div id="cmtls-app-config">',
+			'#suffix' => '</div>',
+		);
+		
+		if($app_type)
+		{
+			// get other app's config hooks
+			if($app_config = module_invoke_all('cmtls_app_general_config', $app_type, $current_config))
+			{
+				$form['cmtls_app_config'] += $app_config;
+			}
+			
+			// get type config
+			if($app_config = module_invoke($app_type, 'cmtls_app_config', $current_config))
+			{
+				$form['cmtls_app_config'] += $app_config;
+			}
+		}
+		
+		//printr($form);
+	}
+}
+
+/**
+ * Clean up and defaults for app node
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function cmtls_app_node_form_after_build($form, &$form_state)
+{
+	$node = $form['#node'];
+	
+	$current_group = _cmtls_group_get_current();
+
+	cmtls_group_set_og_form_values(&$form, &$form_state);
+	
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+	
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_group->nid;
+	
+	$form['hierarchy'] = NULL;
+	$form['attachments'] = NULL;
+	$form['sections'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+
+	foreach ($form['field_cmtls_app_type']['value']['#options'] as $option => &$value)
+	{
+		$form['field_cmtls_app_type']['value'][$option]['#ahah'] = array(
+			'path' => 'cmtls/'.$current_group->nid.'/app/config',
+			'wrapper' => 'cmtls-app-config',
+			'method' => 'replace',
+		);
+		
+		$form['field_cmtls_app_type']['value'][$option] = form_expand_ahah($form['field_cmtls_app_type']['value'][$option]);
+	}
+	
+	$form['field_cmtls_app_config']['#type'] = 'hidden';
+	
+	//printr($form_state); exit;
+	$form['#cache'] = FALSE;
+	
+	return $form;
+}
+
+function cmtls_app_form_submit($form, &$form_state)
+{
+	$current_group = _cmtls_group_get_current();
+	
+	$node = $form['#node'];
+	
+	if(!$node->nid)
+	{
+		// hell, this is the way to find out what is going to be the new nodes ID ... I know ... as I said hell
+		$result = db_query("SHOW TABLE STATUS LIKE '{node}'");
+		$nid = db_fetch_array($result);
+		$nid = $nid['Auto_increment'];
+	}
+	else 
+	{
+		$nid = $node->nid;
+	}
+	
+	if(!empty($form['cmtls_app_config']))
+	{
+		// save app config
+		$app_config = array();
+		
+		foreach ($form['cmtls_app_config'] as $module => &$configs) if(strpos($module, '#') !== 0)
+		{
+			// for now only single level form values are counted
+			foreach ($form['cmtls_app_config'][$module] as $key => &$config) if(strpos($key, '#') !== 0)
+			{
+				$app_config[$module][$key] = $config['#value'];
+			}
+		}
+		
+		if(!empty($app_config))
+		{
+			$form['#node']->field_cmtls_app_config[0]['value'] = $form['field_cmtls_app_config']['#value'] = $form_state['values']['field_cmtls_app_config'][0]['value'] = serialize($app_config);
+		}
+	}
+	
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'redirect' => base_path().'cmtls/'.$current_group->nid.'/'.$nid,
+	));
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the app view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_app_theme($existing)
+{
+	return array(
+		// app container template
+		'cmtls_app_content' => array (
+			'arguments' => array('app_id' => NULL),
+			'template' => 'cmtls-app-content',
+			'path' => drupal_get_path('module', 'cmtls_app').'/theme',
+		),
+		// apps view
+		'views_view__cmtls_apps__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-apps--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_app').'/theme',
+		),
+		'views_view_unformatted__cmtls_apps__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-apps--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_app').'/theme',
+		),
+		'views_view_fields__cmtls_apps__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-apps--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_app').'/theme',
+		),
+	);
+}
+
+/**
+ * Helper function, gets the groups current app node. If none found return NULL
+ *
+ * @param node $group group node
+ * @return mixed
+ * 
+ * @todo caching so repeated calls would not load the whole function always
+ */
+function _cmtls_app_get_current($group)
+{
+	static $app;
+	
+	if($app) return $app;
+	
+	$app = menu_get_object('node', 2);
+
+	if($app->type != 'cmtls_app')
+	{
+		$result = db_query('SELECT nid FROM {nodehierarchy} WHERE parent = '.(int)$group->nid.' ORDER BY order_by LIMIT 1');
+		$aid = db_fetch_array($result);
+		$aid = $aid['nid'];
+		
+		$app = node_load($aid);
+		if($app->type != 'cmtls_app')
+		{
+			$app = NULL;
+		}
+	}
+	
+	return $app;
+}
+
+function hook_cmtls_app()
+{
+	return array(
+		'example_module' => array(
+			'title' => 'Example',
+			'callback' => 'example_module_page',
+			'callback arguments' => array(),
+		),
+	);
+}
+
+/**
+ * Invokes all hook_cmtls_app_config() implemetations and returns app types array for app edit form
+ *
+ * @return unknown
+ */
+function _cmtls_get_app_types()
+{
+	$app_types = array();
+	
+	$app_configs = module_invoke_all('cmtls_app');
+	
+	foreach($app_configs as $module => &$app_config)
+	{
+		$app_types[$module] = $app_config['title'];
+	}
+	
+	$app_types['custom_view'] = T('Custom view');
+	
+	return $app_types;
+}
+
+function _cmtls_app_get_path()
+{
+	static $path;
+	
+	if($path) return $path;
+	
+	$group = _cmtls_group_get_current();
+	$app = _cmtls_app_get_current($group);
+	
+	$path = 'cmtls/'.$group->nid.'/'.$app->nid;
+	
+	return $path;
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function cmtls_app_token_values($type, $object = NULL, $options = array())
+{
+	$values = array();
+	switch ($type)
+	{
+		case 'node':
+			
+			if ($object->type != 'cmtls_group' && strpos($object->type, 'cmtls_') === 0)
+			{
+				$object = node_load($object->parent);
+				
+				$i = 0;
+				
+				while($object->type != 'cmtls_app')			
+				{
+					$object = node_load($object->parent);
+					
+					// 2 steps up for now only
+					$i++;
+					if($i > 2) break;
+				}
+			}
+			
+			if($object->type == 'cmtls_app')
+			{
+				$values['cmtls-app-name'] = $object->title;
+				$values['cmtls-app-id'] = $object->nid;
+			}
+		
+		break;
+	}
+	return $values;
+}
+
+/**
+ * Implementation of hook_token_list().
+ */
+function cmtls_app_token_list($type = 'all')
+{
+	$tokens = array();
+	
+	if ($type == 'node' || $type == 'all')
+	{
+		$tokens['node']['cmtls-app-name'] = 'cmtls app';
+		$tokens['node']['cmtls-app-id'] = 'cmtls app id';
+	}
+		
+	return $tokens;
+}
+
+function cmtls_app_rss_page($group, $app)
+{
+	global $base_url, $language;
+	
+	$app_type = $app->field_cmtls_app_type[0]['value'];
+	
+	if(!$app_type) return FALSE;
+	
+	$rss_item_function = $app_type.'_rss_items';
+	
+	if(function_exists($rss_item_function))
+	{
+		$items = $rss_item_function($app);
+	}
+	else 
+	{
+		$items = cmtls_app_default_rss_items($app);
+	}
+	
+	$rss_items = '';
+
+	foreach ($items as &$item) if($item['wkt'])
+	{
+		$point = cmtls_map_parse_wkt($item['wkt']);
+		
+		if($point)
+		{
+			$point = array(
+				'geo:lat' => $point['lat'],
+				'geo:lon' => $point['lon'],
+			);
+			
+			if($item['args'])
+			{
+				$item['args'] = array_merge($item['args'], $point);
+			}
+			else 
+			{
+				$item['args'] = $point;
+			}
+		}
+		else 
+		{
+			$item['args'] = array();
+		}
+		
+		$rss_items .= format_rss_item($item['title'], $item['link'], $item['description'], $item['args']);
+	}
+	
+	//printr($rss_items); exit;
+	
+	$output = '<?xml version="1.0" encoding="utf-8"?>'."\n";
+	$output .= '<rss version="2.0" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">'."\n";
+	$output .= format_rss_channel(variable_get('site_name', 'Community Tools').' - '.$group->title.': '.$app->title, $base_url.'/cmtls/'.$group->nid.'/'.$app->nid, '', $rss_items, $language->language);
+	
+	$output .= '</rss>'."\n";
+	
+	drupal_set_header('Content-Type: application/rss+xml; charset=utf-8');
+	
+	print $output;
+}
+
+function cmtls_app_default_rss_items($app)
+{
+	$items = array();
+	
+	$result = db_query("SELECT node.nid FROM {node} LEFT JOIN {nodehierarchy} ON node.nid = nodehierarchy.nid WHERE nodehierarchy.parent = %d AND node.type = '%s' ORDER BY created DESC LIMIT 100", $app->nid, $app->field_cmtls_app_type[0]['value']);
+	
+	while ($nid = db_fetch_array($result))
+	{
+		$nid = $nid['nid'];		
+		$node = node_load($nid);
+		
+		if($node->nid)
+		{
+			$rss_item_function = $app->field_cmtls_app_type[0]['value'].'_rss_item';
+			
+			if(function_exists($rss_item_function))
+			{
+				$items[] = $rss_item_function($node);
+			}
+			else 
+			{
+				$items[] = cmtls_app_default_rss_item($node);
+			}
+		}
+	}
+	
+	return $items;
+}
+
+function cmtls_app_default_rss_item($node)
+{
+	global $base_url;
+	
+	return array(
+		'title' => $node->title,
+		'link' => $base_url.'/'.cmtls_path_to_node($node->nid),
+		'description' => $node->body,
+		'wkt' => $node->field_cmtls_geoinfo[0]['openlayers_wkt'],
+	);
+}
+
+/**
+ * Menu callback for AHAH additions.
+ */
+function cmtls_app_form_config_js($app)
+{
+	if($app->nid && !node_access('update', $app))
+	{
+		return FALSE;
+	}
+	
+	include_once(drupal_get_path('module', 'node').'/node.pages.inc');
+	
+	$form_state = array('storage' => NULL, 'rebuild' => TRUE);
+	$form_build_id = $_POST['form_build_id'];
+	// Get the form from the cache.
+	$form = form_get_cache($form_build_id, $form_state);
+	$args = $form['#parameters'];
+	$form_id = array_shift($args);
+	// We will run some of the submit handlers so we need to disable redirecting.
+	$form['#redirect'] = FALSE;
+	// We need to process the form, prepare for that by setting a few internals
+	// variables.
+	$form['#post'] = $_POST;
+	$form['#programmed'] = FALSE;
+	$form_state['post'] = $_POST;
+	// Build, validate and if possible, submit the form.
+	drupal_process_form($form_id, $form, $form_state);
+	// This call recreates the form relying solely on the form_state that the
+	// drupal_process_form set up.
+	$form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
+	
+	// Render the new output.
+	$_form['cmtls_app_config'] = $form['cmtls_app_config'];
+	
+	unset($_form['cmtls_app_config']['#prefix'], $_form['cmtls_app_config']['#suffix']); // Prevent duplicate wrappers.
+	
+	$output = theme('status_messages') . drupal_render($_form);
+	
+	drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+function cmtls_app_get_config($app_id)
+{
+	if(!is_object($app_id))
+	{
+		$app = node_load($app_id);
+	}
+	else 
+	{
+		$app = $app_id;
+	}
+	
+	return unserialize($app->field_cmtls_app_config[0]['value']);
+}

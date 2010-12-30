@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * Implements hook_install()
+ *
+ */
+function cmtls_event_install()
+{
+	cmtls_module_install('cmtls_event');
+}
+
+function cmtls_event_schema() {
+	$schema['cmtls_member_stance'] = array(
+		'fields' => array(
+			'uid' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => 0,
+				'length' => 11,
+				'description' => t('Id of the user'),
+			),
+			'parent' => array(
+				'type' => 'char',
+				'not null' => TRUE,
+				'default' => '',
+				'length' => 11,
+				'description' => t('Id of the parent node'),
+			),
+			'stance' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => '',
+				'length' => 11,
+				'description' => t('Users stance on the matter'),
+			),
+		),
+		'unique keys' => array(
+			'sid'     => array('uid', 'parent')
+		),
+	);
+
+	return $schema;
+}

@@ -1,0 +1,510 @@
+<?php
+
+include_once('cmtls_idea.features.inc');
+
+/**
+ * Implements hook_cmtls_context()
+ * 
+ * The edit button for ideas
+ *
+ * @return unknown
+ */
+function cmtls_idea_cmtls_context()
+{
+	return array(
+		'cmtls_idea' => array(
+			'cmtls_idea_edit' => array(
+				'title' => t('Edit idea'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update', 'node'),
+			),
+		),
+		'script' => drupal_get_path('module', 'cmtls_idea') . '/js/context_actions.js',
+	);
+}
+
+function cmtls_idea_cmtls_dashboard_block_content($group, $app)
+{
+	return views_embed_view('cmtls_ideas', 'block_2', $app->nid);
+}
+
+/**
+ * Implements hook_init()
+ * 
+ */
+function cmtls_idea_init()
+{
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	if($current_app->field_cmtls_app_type[0]['value'] == 'cmtls_idea')
+	{
+		drupal_add_feed(url('cmtls/' . $current_group->nid . '/' . $current_app->nid . '/rss', array('absolute' => TRUE)), $app->title);
+	}
+	
+	//drupal_add_js(drupal_get_path('module', 'cmtls_idea') . '/js/app.js');
+}
+
+/**
+ * Implementation of hook_cmtls_app()
+ *
+ * @return array
+ */
+function cmtls_idea_cmtls_app()
+{
+	return array(
+		'cmtls_idea' => array(
+			'title' => t('Ideas'),
+			'callback' => 'cmtls_ideas_page',
+		),
+	);
+}
+
+/**
+ * Implementation of hook_cmtls_map_config()
+ *
+ * @return array
+ */
+function cmtls_idea_cmtls_map_config()
+{
+	return array(
+		'cmtls_idea' => array(
+			'map views' => array(
+				CMTLS_MAP_NONE,
+				CMTLS_MAP_VIEW_HIDDEN,
+				CMTLS_MAP_VIEW_HALF_PAGE,
+				CMTLS_MAP_VIEW_FULL_PAGE,
+			),
+			'default map view' => CMTLS_MAP_VIEW_HALF_PAGE,
+			'map view changable' => TRUE,
+			'default map styles' => array(
+				'default' => 'cmtls-location-yellow',
+				'select' => 'cmtls-location-yellow-hover',
+				'temporary' => 'cmtls-location-yellow',
+			),			
+		),
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_idea_menu()
+{
+	$items = array();
+	
+	$items['cmtls/%node/%node/idea/%node'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_idea_page',
+		'page arguments' => array(1, 2, 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 4),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/idea/%node/edit'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_idea', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/idea/%node/delete'] = array(
+		'title' => 'Delete idea',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 4),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/idea/add'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_idea'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_idea')),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/idea/tag/%'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_idea_page_taxonomy',
+		'page arguments' => array(1, 2, 5),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 2),
+		'type' => MENU_CALLBACK,
+	);
+
+	return $items;
+}
+
+function cmtls_ideas_page($app_id)
+{
+	if($_POST['ajax'] == 1)
+	{
+		cmtls_ajax_response(views_embed_view('cmtls_ideas', 'default', $app_id));
+	}
+	
+	//return theme('cmtls_pager');
+	return theme('cmtls_ideas_content', $app_id, theme('cmtls_pager'));
+}
+
+/**
+ * ideas filtered by taxonomy term/tag view
+ *
+ * @param node $group
+ * @param node $app
+ * @param string $taxonomy
+ * @return string
+ */
+function cmtls_idea_page_taxonomy($group, $app, $taxonomy) {
+	return views_embed_view('cmtls_ideas', 'default', $app->nid, 'all', $taxonomy) . cmtls_map_page();
+}
+
+/**
+ * idea node form page
+ *
+ * @param node $group
+ * @param node $app
+ * @param node $idea
+ * @return unknown
+ */
+function cmtls_idea_page($group, $app, $idea)
+{
+	if($idea->type != 'cmtls_idea')
+	{
+		return t('This not a idea.');
+	}
+	
+	return views_embed_view('cmtls_ideas', 'default', $app->nid, $idea->nid) . cmtls_map_page();
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+
+function cmtls_idea_form_alter(&$form, &$form_state, $form_id)
+{
+	//return;
+	// prepare idea node form for cleanup
+	if($form_id == 'cmtls_idea_node_form' && _cmtls_is())
+	//if($form_id == 'cmtls_idea_node_form')
+	{
+		$form['name'] = $form['author']['name'];
+		$form['name']['#type'] = 'value';
+		$form['date'] = $form['author']['date'];
+		$form['date']['#type'] = 'value';
+		//$form['body'] = $form['body_field']['body'];
+		
+		$form['revision_information'] = NULL;
+		$form['author'] = NULL;
+		//$form['body_field'] = NULL;
+		$form['options'] = NULL;
+		$form['buttons']['preview'] = NULL;
+		
+		$group = _cmtls_group_get_current();
+		$app = _cmtls_app_get_current($group);
+		
+		if($form['buttons']['delete'])
+		{
+			$node = $form['#node'];
+			
+			$form['buttons']['delete']['#type'] = 'markup';
+			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/' . $group->nid . '/' . $app->nid . '/idea/' . $node->nid . '/delete', array('attributes' => array('class' => 'modalframe-processed')));
+		}
+
+		$form['#after_build'][] = 'cmtls_idea_node_form_after_build';
+		$form['#submit'][] = 'cmtls_idea_form_submit';
+	}
+	
+	//printr($form);
+}
+
+/**
+ * Clean up and defaults for idea node
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function cmtls_idea_node_form_after_build($form, &$form_state)
+{
+	global $user;
+
+	//printr($form); exit;
+	
+	$node = $form['#node'];
+	
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	cmtls_group_set_og_form_values($form, $form_state);
+	
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+	
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
+	
+	$form['hierarchy'] = NULL;
+	$form['sections'] = NULL;
+	$form['attachments'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+	
+	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
+	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
+
+	/*if (!user_access('administer'))
+	{
+		$form['field_cmtls_idea_status'] = NULL;
+	}*/
+
+	if (!$user->fbuid || $form['nid']['#value'])
+	{
+		$form['field_cmtls_idea_post_on_fb'] = NULL;
+	}
+
+	return $form;
+}
+
+/**
+ * Group node form submit, closes modalframe window
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_idea_form_submit($form, &$form_state)
+{
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the idea view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_idea_theme($existing)
+{
+	return array(
+		// ideas page
+		'cmtls_ideas_content' => array (
+			'arguments' => array('app_id' => NULL, 'pager' => NULL),
+			'template' => 'cmtls-ideas-content',
+			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
+		),
+		// ideas view
+		'views_view__cmtls_ideas__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-ideas--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
+		),
+		'views_view_unformatted__cmtls_ideas__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-ideas--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
+		),
+		'views_view_fields__cmtls_ideas__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-ideas--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
+		),
+		// ideas dashboard view
+		'views_view__cmtls_ideas__block_2' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-ideas--block-2',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
+		),
+		'views_view_unformatted__cmtls_ideas__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-ideas--block-2',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
+		),
+		'views_view_fields__cmtls_ideas__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-ideas--block-2',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
+		),
+	);
+}
+
+/**
+ * Creates the path to idea view
+ *
+ * @param unknown_type $idea
+ * @param unknown_type $group
+ * @return unknown
+ */
+function cmtls_idea_path($idea, $group = NULL)
+{
+	if(!$group) $group = _cmtls_group_get_current();
+	
+	return 'cmtls/' . $group->nid . '/' . $idea->parent . '/idea/' . $idea->nid;
+}
+
+function cmtls_idea_cmtls_map_popup_content($feature)
+{
+	$node = node_load($feature->nid);
+	
+	
+	$body = explode(' ', strip_tags(check_markup($node->body)));
+	
+	if(sizeof($body) > 25)
+	{
+		$body = array_slice($body, 0, 25);
+		$body[] = '...';
+	}
+	
+	$body = implode(' ', $body);
+	
+	$output = '<h1><a href="' . base_path() . cmtls_idea_path($node) . '">' . $node->title . '</a></h1>';
+	$output .= '<div class="content">'.$body.'</div>';
+	
+	return $output;
+}
+
+/**
+ * Implements hook_cmtls_stance_info()
+ *
+ */
+function cmtls_idea_cmtls_stance_info()
+{
+	return array(
+		'cmtls_idea' => array(
+			'stance choices' => array(
+				1 => t('For'),
+				2 => t('Against'),
+				0 => t('Abstain'),
+			),
+			'default stance choice' => 0,
+			'visible stance choices' => array(1, 2),
+			'stance form title' => t('Answer'),
+		),
+	);
+}
+
+
+/**
+ * Implents hook_nodeapi()
+ * Adds context menu edit actions (by invoking hook_cmtls_context) and adds cmtls_context_button attribute to nodes
+ *
+ * @param node $node
+ * @param string $op
+ * @param unknown_type $a3
+ * @param unknown_type $a4
+ * @return array
+ */
+function cmtls_idea_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
+{
+	global $user;
+
+	if ($op == 'insert' && $user->uid && strpos($node->type, 'cmtls_idea') === 0)
+	{
+		if ($node->field_cmtls_idea_post_on_fb[0]['value'] == '1')
+		{
+			$_SESSION['fbconnect_feed'] = array(
+				'type'    => 'node',
+				'title'   => $node->title,
+				'nodeurl' => url('node/' . $node->nid, array('absolute' => TRUE)),
+			);
+		}
+	}
+}
+
+/**
+ * Implements hook_cmtls_filter_info()
+ *
+ */
+function cmtls_idea_cmtls_filter_info()
+{
+	return array(
+		'cmtls_idea' => array(
+			'filter predefined options' => array(
+				array(
+					'title' => t('Latest posts'),
+					'default values' => array(
+						'sort' => 0,
+						'date from' => '-7 days',
+						'date to' => 'now',
+						'search' => '',
+					),
+					'where' => array(
+						'clauses' => array(),
+						'args' => array(),
+					), // where
+				),
+
+				array(
+					'title' => t('Most commented'),
+					'default values' => array(
+						'sort' => 0,
+						'date from' => '-7 days',
+						'date to' => 'now',
+						'search' => '',
+					),
+					'where' => array(
+						'clauses' => array(),
+						'args' => array(),
+					), // where
+				),
+			), // filter predefined options
+
+			'filter fields' => array(
+				'tag' => TRUE,
+				'search' => TRUE,
+				'date from' => TRUE,
+				'date to' => TRUE,
+				'sort' => TRUE,
+			), // filter fields
+
+			'taxonomy dictionary id' => NULL,
+
+			'sort options' => array(
+				array(
+					'field' => 'node_created',
+					'direction' => 'DESC',
+					'title' => t('Time added'),
+				),
+				array(
+					'field' => 'node_title',
+					'direction' => 'ASC',
+					'title' => t('Title'),
+				),
+			), // sort options
+
+			'default values' => array(
+				'sort' => 0,
+				'date from' => '-7 days',
+				'date to' => 'now',
+			),
+
+		), // node type
+	);
+}

@@ -1,0 +1,586 @@
+<?php
+
+include_once('cmtls_forum.features.inc');
+
+/**
+ * Implements hook_cmtls_context()
+ * 
+ * The edit, delete, move buttons for forums
+ *
+ * @return array
+ */
+function cmtls_forum_cmtls_context()
+{
+	return array(
+		'cmtls_forum' => array(
+			'cmtls_forum_edit' => array(
+				'title' => t('Edit'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update', 'node'),
+			),
+			'cmtls_forum_moveup' => array(
+				'title' => t('Move up'),
+				'access callback' => 'og_is_group_admin',
+				'access arguments' => array('node'),
+			),
+			'cmtls_forum_movedown' => array(
+				'title' => t('Move down'),
+				'access callback' => 'og_is_group_admin',
+				'access arguments' => array('node'),
+			),
+			/*
+			'cmtls_forum_delete' => array(
+				'title' => 'Delete',
+				'access callback' => 'node_access',
+				'access arguments' => array('delete', 'node'),
+			),
+			*/
+		),
+		'cmtls_thread' => array(
+			'cmtls_thread_edit' => array(
+				'title' => t('Edit'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update', 'node'),
+			),
+		),
+		'script' => drupal_get_path('module', 'cmtls_forum').'/js/context_actions.js',
+	);
+}
+
+/**
+ * Implements hook_init()
+ *
+ */
+function cmtls_forum_init()
+{
+	drupal_add_js(array('cmtls' => array('currentForum' => _cmtls_node_json_prepare(_cmtls_forum_get_current()))), 'setting');
+	drupal_add_js(array('cmtls' => array('currentForumThread' => _cmtls_node_json_prepare(_cmtls_forum_get_current_thread()))), 'setting');
+	
+	drupal_add_css(drupal_get_path('module', 'cmtls_forum') .'/css/forum.css');
+}
+
+function cmtls_forum_cmtls_app()
+{
+	return array(
+		'cmtls_forum' => array(
+			'title' => t('Forums'),
+			'callback' => 'views_embed_view',
+			'callback arguments' => array(
+				'cmtls_forums',
+				'default',
+				arg(2),
+			),
+		),
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_forum_menu()
+{
+	$items = array();
+	
+	$items['cmtls/%node/%node/forum/%node'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_forum_page',
+		'page arguments' => array(1, 2, 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 4),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/%node/edit'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_forum', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/%node/delete'] = array(
+		'title' => 'Delete forum',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 4),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/add'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_forum'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_forum')),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/%node/move/up'] = array(
+		'title' => 'Move up',
+		'page callback' => 'nodehierarchy_callback',
+		'page arguments' => array(4, 'up'),
+		'access callback' => 'user_access',
+		'access arguments' => array('reorder children'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/%node/move/down'] = array(
+		'title' => 'Move down',
+		'page callback' => 'nodehierarchy_callback',
+		'page arguments' => array(4, 'down'),
+		'access callback' => 'user_access',
+		'access arguments' => array('reorder children'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/%node/add'] = array(
+		'title' => 'Add thread',
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_thread'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_thread')),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/%node/%node'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_forum_thread_page',
+		'page arguments' => array(1, 2, 4, 5),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 5),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/forum/%node/%node/edit'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(5),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_thread', 5),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 5),
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+/**
+ * Forum node page
+ *
+ * @param node $group
+ * @param node $app
+ * @return unknown
+ */
+function cmtls_forum_page($group, $app, $forum)
+{
+	if($forum->type != 'cmtls_forum')
+	{
+		return t('This not a forum.');
+	}
+	
+	return views_embed_view('cmtls_threads', 'default', $forum->nid);
+}
+
+/**
+ * Forum thread node page
+ *
+ * @param node $group
+ * @param node $app
+ * @return unknown
+ */
+function cmtls_forum_thread_page($group, $app, $forum, $thread)
+{
+	if($thread->type != 'cmtls_thread')
+	{
+		return t('This not a thread.');
+	}
+	
+	return views_embed_view('cmtls_comments', 'block_1', $thread->nid);
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_forum_form_alter(&$form, &$form_state, $form_id)
+{
+	// prepare forum node form for cleanup
+	if($form_id == 'cmtls_forum_node_form' && _cmtls_is())
+	//if($form_id == 'cmtls_forum_node_form')
+	{
+		$form['name'] = $form['author']['name'];
+		$form['name']['#type'] = 'value';
+		$form['date'] = $form['author']['date'];
+		$form['date']['#type'] = 'value';
+		$form['body'] = $form['body_field']['body'];
+		
+		$form['revision_information'] = NULL;
+		$form['author'] = NULL;
+		$form['body_field'] = NULL;
+		$form['options'] = NULL;
+		$form['buttons']['preview'] = NULL;
+		
+		$group = _cmtls_group_get_current();
+		$app = _cmtls_app_get_current($group);
+		
+		if($form['buttons']['delete'])
+		{
+			$node = $form['#node'];
+			
+			$form['buttons']['delete']['#type'] = 'markup';
+			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$group->nid.'/'.$app->nid.'/forum/'.$node->nid.'/delete', array('attributes' => array('class' => 'modalframe-processed')));
+		}
+		
+		$form['#after_build'][] = 'cmtls_forum_node_form_after_build';
+		$form['#submit'][] = 'cmtls_forum_form_submit';
+	}
+	
+	if($form_id == 'cmtls_thread_node_form' && _cmtls_is())
+	//if($form_id == 'cmtls_forum_node_form')
+	{
+		$form['name'] = $form['author']['name'];
+		$form['name']['#type'] = 'value';
+		$form['date'] = $form['author']['date'];
+		$form['date']['#type'] = 'value';
+		$form['body'] = $form['body_field']['body'];
+		
+		$form['revision_information'] = NULL;
+		$form['author'] = NULL;
+		$form['body_field'] = NULL;
+		$form['options'] = NULL;
+		$form['buttons']['preview'] = NULL;
+		
+		$group = _cmtls_group_get_current();
+		$app = _cmtls_app_get_current($group);
+		
+		if($form['buttons']['delete'])
+		{
+			$node = $form['#node'];
+			
+			$form['buttons']['delete']['#type'] = 'markup';
+			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$group->nid.'/'.$app->nid.'/forum/'.$node->nid.'/delete', array('attributes' => array('class' => 'modalframe-processed')));
+		}
+		
+		$form['#after_build'][] = 'cmtls_forum_thread_node_form_after_build';
+		$form['#submit'][] = 'cmtls_forum_thread_form_submit';
+	}
+	
+	//printr($form);
+}
+
+/**
+ * Clean up and defaults for forum node
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function cmtls_forum_node_form_after_build($form, &$form_state)
+{
+	//printr($form); exit;
+	
+	$node = $form['#node'];
+	
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	cmtls_group_set_og_form_values($form, $form_state);
+	
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+	
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
+	
+	$form['hierarchy'] = NULL;
+	$form['sections'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['og_nodeapi'] = NULL;
+	$form['attachments'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+	
+	return $form;
+}
+
+/**
+ * Clean up and defaults for forum node
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function cmtls_forum_thread_node_form_after_build($form, &$form_state)
+{
+	//printr($form); exit;
+	
+	$node = $form['#node'];
+	
+	$current_forum = _cmtls_forum_get_current();
+	$current_group = _cmtls_group_get_current();
+	
+	cmtls_group_set_og_form_values($form, $form_state);
+	
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+	
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_forum->nid;
+	
+	$form['hierarchy'] = NULL;
+	$form['sections'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['og_nodeapi'] = NULL;
+	$form['attachments'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+	
+	return $form;
+}
+
+/**
+ * Group node form submit, closes modalframe window
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_forum_form_submit($form, &$form_state)
+{
+	//if ($form_state['values']['op'] == t('Save'))
+	{
+		// Tell the parent window to close the modal frame dialog.
+		modalframe_close_dialog(array(
+			'refresh' => TRUE,
+		));
+	}
+}
+
+/**
+ * Group node form submit, closes modalframe window
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_forum_thread_form_submit($form, &$form_state)
+{
+	//if ($form_state['values']['op'] == t('Save'))
+	{
+		// Tell the parent window to close the modal frame dialog.
+		modalframe_close_dialog(array(
+			'refresh' => TRUE,
+		));
+	}
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the forum view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_forum_theme($existing)
+{
+	return array(
+		// forums view
+		'views_view__cmtls_forums__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-forums--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		'views_view_unformatted__cmtls_forums__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-forums--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		'views_view_fields__cmtls_forums__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-forums--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		// threads view
+		'views_view__cmtls_threads__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-threads--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		'views_view_unformatted__cmtls_threads__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-threads--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		'views_view_fields__cmtls_threads__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-threads--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		// threads dashboard block content
+		'views_view__cmtls_threads__block_1' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-threads--block-1',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		'views_view_unformatted__cmtls_threads__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-threads--block-1',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+		'views_view_fields__cmtls_threads__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-threads--block-1',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_forum').'/theme',
+		),
+	);
+}
+
+function _cmtls_forum_get_current()
+{
+	static $forum;
+	
+	if($forum !== NULL) return $forum;
+	
+	$forum = menu_get_object('node', 4);
+	
+	$forum = ($forum->type == 'cmtls_forum' ? $forum : FALSE);
+
+	return $forum;
+}
+
+function _cmtls_forum_get_current_thread()
+{
+	static $thread;
+	
+	if($thread !== NULL) return $thread;
+	
+	$thread = menu_get_object('node', 5);
+	
+	$thread = ($thread->type == 'cmtls_thread' ? $thread : FALSE);
+
+	return $thread;
+}
+
+/**
+ * Implements hook_preprocess()
+ * Adds current groups current app node to template variables
+ *
+ * @param unknown_type $vars
+ * @param unknown_type $hook
+ */
+function cmtls_forum_preprocess(&$vars, $hook)
+{
+	if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
+	
+	$current_thread = _cmtls_forum_get_current_thread();
+	
+	$thread_author = NULL;
+	
+	if($current_thread)
+	{
+		$thread_author = user_load(array('uid' => $current_thread->uid));
+	}
+	
+	$vars['cmtls'] += array(
+		'current_forum' => _cmtls_forum_get_current(),
+		'current_thread' => $current_thread,
+		'current_thread_author' => $thread_author,
+	);
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function cmtls_forum_token_values($type, $object = NULL, $options = array())
+{
+	$values = array();
+	switch ($type)
+	{
+		case 'node':
+			
+			if($object->type == 'cmtls_thread')
+			{
+				$forum = node_load($object->parent);
+				
+				$values['cmtls-forum-name'] = $forum->title;
+				$values['cmtls-forum-id'] = $forum->nid;
+			}
+		
+		break;
+	}
+	return $values;
+}
+
+/**
+ * Implementation of hook_token_list().
+ */
+function cmtls_forum_token_list($type = 'all')
+{
+	$tokens = array();
+	
+	if ($type == 'node' || $type == 'all')
+	{
+		$tokens['node']['cmtls-forum-name'] = 'cmtls forum';
+		$tokens['node']['cmtls-forum-id'] = 'cmtls forum id';
+	}
+		
+	return $tokens;
+}
+
+function cmtls_thread_path($thread, $group = NULL)
+{
+	if(!$group) $group = _cmtls_group_get_current();
+	
+	$forum = node_load($thread->parent);
+	
+	return 'cmtls/'.$group->nid.'/'.$forum->parent.'/forum/'.$forum->nid.'/'.$thread->nid;
+}
+
+function cmtls_forum_path($forum, $group = NULL)
+{
+	if(!$group) $group = _cmtls_group_get_current();
+	
+	return 'cmtls/'.$group->nid.'/'.$forum->parent.'/forum/'.$forum->nid;
+}
+
+function cmtls_forum_cmtls_dashboard_block_content($group, $app)
+{
+	$forums = array();
+	
+	// get all forums
+	$result = db_query('SELECT nodehierarchy.nid FROM {nodehierarchy} nodehierarchy WHERE nodehierarchy.parent = %d ORDER BY order_by', $app->nid);
+	while($row = db_fetch_array($result))
+	{
+		$forums[] = $row['nid'];
+	}
+	
+	$arguments = array(
+		'cmtls_threads',
+		'block_1',
+	);
+	
+	$arguments = array_merge($arguments, $forums);
+	
+	return call_user_func_array('views_embed_view', $arguments);
+}

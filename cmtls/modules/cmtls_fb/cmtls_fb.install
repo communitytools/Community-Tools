@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * Implementation of hook_schema()
+ */
+function cmtls_fb_schema(){
+	$schema = array();
+
+	/**
+	 * Define base table for Facebook and local user relations
+	 */
+	$schema['cmtls_fb_users'] = array(
+		'description' => "Community Tools: Facebook's base table for Facebook and local user relations.",
+		'fields' => array(
+			'uid' => array(
+				'description' => 'Local user ID',
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'fbuid' => array(
+				'description' => 'Facebook user ID',
+				'type' => 'int',
+				'size' => 'big',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' => array('fbuid'),
+	);
+	
+	return $schema;
+}
+
+
+/**
+ * Implementation of hook_install()
+ */
+function cmtls_fb_install(){
+	drupal_install_schema('cmtls_fb');
+}
+
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function cmtls_fb_uninstall(){
+	drupal_uninstall_schema('cmtls_fb');
+	variable_del('fb_app_id');
+	variable_del('fb_secret_key');
+}

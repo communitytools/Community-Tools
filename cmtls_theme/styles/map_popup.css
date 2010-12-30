@@ -1,0 +1,43 @@
+/* MAP POPUP */
+.olPopup {
+	/* background:none repeat scroll 0 0 rgba(82, 82, 82, 0.698) !important; */
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	font-size: 12px;
+}
+
+.olFramedCloudPopupContent {
+	padding: 5px !important;
+}
+
+.cmtls-map-popup-pager {
+	position: absolute;
+	bottom: 5px;
+	right: 10px;
+	background: #fff;
+}
+
+.cmtls-map-popup-contents h1 {
+	font-size: 15px;
+}
+
+.cmtls-map-popup-contents a.cmtls-map-popup-close {
+	display: block;
+	background: url(../images/close-button-small.png) no-repeat;
+	width: 17px;
+	height: 17px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	border: none;
+	opacity: 0.6;
+	-moz-opacity: 0.6;
+	filter:alpha(opacity=60);
+}
+
+	.cmtls-map-popup-contents a.cmtls-map-popup-close:hover {
+		opacity: 1;
+		-moz-opacity: 1;
+		filter:alpha(opacity=1);
+	}

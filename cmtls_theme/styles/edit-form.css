@@ -1,0 +1,276 @@
+/* Buttons
+-------------------------------------------------------------- */
+input.form-submit {
+		background: #3c8a2e url(../images/alert-overlay.png) repeat-x;
+		display: inline-block;
+		padding: 8px 14px 8px;
+		color: #fff;
+		text-decoration: none;
+		font-weight: bold;
+		line-height: 1;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		text-shadow: 0 -1px 1px #222;
+		position: relative;
+		width: auto;
+		cursor: pointer;
+		border: 0;
+	}
+
+	input.form-submit:hover {
+		opacity: 0.85;
+		-moz-opacity: 0.85;
+		filter:alpha(opacity=85);
+	}
+
+	input.form-submit:active {
+		top: 1px;
+	}
+
+.comment-form input.form-submit {
+	background: #999 url(../images/alert-overlay.png) repeat-x;
+	text-shadow: none;
+	font-size: 12px;
+	font-weight: bolder;
+}
+
+		input.form-submit.disabled {
+			background-color: #ccc;
+			text-shadow: 0 -1px 1px #999;
+			cursor: default
+		}
+
+
+/* Form elements
+-------------------------------------------------------------- */
+.form-item {
+	margin-bottom: 20px;
+}
+	.form-item h1 {
+		font-size: 24px;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.form-item label {
+		display: inline-block;
+		font-weight: bolder !important;
+	}
+
+	.form-item input.form-text {
+		border: 1px solid #ccc;
+		padding: 5px;
+		margin-bottom: 3px;
+	}
+
+		.form-item input.form-text:focus {
+			border: 2px solid #AED9A7;
+			padding: 4px;
+		}
+
+	#edit-title-wrapper input {
+		font-weight: bold;
+	}
+
+	.form-item textarea.form-textarea {
+		border: 1px solid #ccc;
+		padding: 5px;
+		height: 150px;
+		margin-bottom: 5px;
+	}
+
+		.form-item textarea.form-textarea:focus {
+			border: 2px solid #AED9A7;
+			padding: 4px;
+		}
+
+	.form-item .description {
+		display: inline-block;
+		color: #999;
+		font-size: 11px !important;
+	}
+
+	/* reposition Drupal's default ajax gif for our input height */
+	.form-item input.form-autocomplete {
+		background-position: 100% 8px !important;
+	}
+	
+		.form-item input.form-autocomplete:focus {
+			background-position: 100% 7px !important;
+		}
+	
+	.form-item input.form-autocomplete.throbbing:focus {
+		background-position: 100% -13px !important;
+	}
+	
+.form-radios .form-item {
+	display: inline-block !important;
+}
+
+/* File uploads in most tool forms */
+
+#field-cmtls-files-items {
+	margin-bottom: 15px;
+}
+
+	#field-cmtls-files-items table thead {
+		font-weight: bolder;
+	}
+	
+	#field-cmtls-files-items input.form-submit {
+		background: #999 url(../images/alert-overlay.png) repeat-x;
+		text-shadow: none;
+		font-size: 12px;
+		font-weight: bolder;
+	}
+
+
+/* Events */
+.container-inline-date.date-clear-block {
+	display: inline-block !important;
+}
+
+
+/* To hide "Show summary in full view" */
+.teaser-checkbox {
+	display: none !important;
+}
+
+/* WYSIWYG
+-------------------------------------------------------------- */
+.cke_show_borders table {
+	border-collapse: separate;
+}
+
+/* Textarea resize
+-------------------------------------------------------------- */
+.resizable-textarea .grippie {
+	height: 5px !important;
+	border: none;
+}
+
+/* Multiple file upload, in gallery
+-------------------------------------------------------------- */
+
+.small-button {
+		display: inline-block;
+		padding: 8px 14px 8px;
+		color: #fff;
+		text-decoration: none;
+		line-height: 1;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		text-shadow: 0 -1px 1px #222;
+		position: relative;
+		width: auto;
+		cursor: pointer;
+		border: 0;
+                background: #999 url(../images/alert-overlay.png) repeat-x;
+                text-shadow: none;
+                font-size: 12px;
+                font-weight: bolder;
+}
+
+	.small-button:hover {
+		opacity: 0.85;
+		-moz-opacity: 0.85;
+		filter:alpha(opacity=85);
+	}
+
+	.small-button:active {
+		top: 1px;
+	}
+	
+	.small-button.disabled {
+		cursor: default;
+		opacity: 0.5;
+		-moz-opacity: 0.5;
+		filter:alpha(opacity=50);
+	}
+		.small-button.disabled:active {
+			top: 0;
+		}	
+
+
+#add-files {
+    margin-right: 10px;
+}
+
+	#add-files .swfupload {
+		left: 0;
+		position: absolute;
+		top: 0;		
+	}
+
+
+/* Modalframe
+-------------------------------------------------------------- */
+
+.modalframe .ui-dialog-title {
+	white-space: normal;
+	line-height: 1.1;
+}
+
+.modalframe-page-container {
+	-moz-border-radius-bottomleft: 20px;
+	-webkit-border-bottom-left-radius: 20px;
+	border-bottom-left-radius: 20px;
+	-moz-border-radius-bottomright: 20px;
+	-webkit-border-bottom-right-radius: 20px;
+	border-bottom-right-radius: 20px;
+}
+
+.upload-progressbar-wrapper {
+	padding: 2px;
+	border:3px solid #ccc;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+	border-radius:8px;
+}
+
+.upload-progressbar {
+	width:0;
+	height:20px;
+	background:#ccc;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+}
+
+.upload-status-message {
+	text-align:center
+}
+
+
+.ol-map-input-widget {
+	border: 1px solid #ccc;
+	padding: 10px;
+	width: 300px
+}
+
+.ol-map-input-widget input {
+	background-image: none !important;
+}
+
+.openlayers-cck-hide-link, .wysiwyg-toggle-wrapper {
+	display: none;
+}
+
+.form-column{
+	width: 50%;
+	}
+	#external-authentication {
+		float: left;
+		text-align:center
+		}
+		#external-authentication div.form-item{
+			margin:1em 0
+		}
+	#internal-authentication {
+		float: right
+	}
+	.form-column input.form-text {
+		width: 80%;
+	}

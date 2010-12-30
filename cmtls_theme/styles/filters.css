@@ -1,0 +1,59 @@
+#filters {
+	background: #f2f2f2;
+	padding: 10px;
+	margin-bottom: 20px;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
+	border: 1px solid #ccc;
+	margin-top: 40px;
+}
+
+.timeline-slider {
+	font-size: 10px;
+}
+
+fieldset {
+	border: 0;
+	margin: 10px 20px;
+	height: 100px;
+}	
+
+label {
+	font-weight: normal;
+	float: left;
+	margin-right: .5em;
+	font-size: 1.1em;
+}
+
+select {
+	margin-right: 1em;
+	float: left;
+}
+
+.ui-slider {
+	clear: both;
+	top: 30px;
+}
+
+#filters label,
+#filters select {
+}
+
+a.filter-button {
+	float: left;
+	background: #ccc url(../img/alert-overlay.png) repeat-x;
+	padding: 8px 14px 9px;
+	color: #fff;
+	text-decoration: none;
+	font-weight: bold;
+	line-height: 1;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	text-shadow: 0 -1px 1px #999;
+	width: auto;
+	border: 0;
+	cursor: pointer;
+	display: inline-block;
+}

@@ -1,0 +1,851 @@
+<?php
+
+include_once('cmtls_gallery.features.inc');
+
+/**
+ * Implementation of hook_cmtls_app()
+ *
+ * @return unknown
+ */
+function cmtls_gallery_cmtls_app()
+{
+	return array(
+		'cmtls_gallery' => array(
+			'title' => t('Gallery'),
+			'callback' => 'views_embed_view',
+			'callback arguments' => array(
+				'cmtls_gallery',
+				'default',
+				arg(2),
+			),
+		),
+	);
+}
+
+/**
+ * Implementation of hook_cmtls_context()
+ * @return Array
+ */
+function cmtls_gallery_cmtls_context(){
+	return array(
+		'cmtls_album' => array(
+			'cmtls_album_edit' => array(
+				'title' => t('Edit album'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update','node'),
+			),
+			'cmtls_album_delete' => array(
+				'title' => t('Delete album'),
+				'access callback' => 'node_access',
+				'access arguments' => array('delete','node'),
+			),
+		),
+		'cmtls_album_object'=>array(
+			'cmtls_album_object_edit' => array(
+				'title' => t('Edit file'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update','node')
+			),
+			'cmtls_album_object_delete' => array(
+				'title' => t('Delete file'),
+				'access callback' => 'node_access',
+				'access arguments' => array('delete','node')
+			),
+		),
+		'script' => drupal_get_path('module','cmtls_gallery').'/js/context_actions.js',
+	);
+}
+
+/**
+ * Implementation of hook_init()
+ */
+function cmtls_gallery_init()
+{
+	drupal_add_js(array('cmtls' => array('currentAlbum' => _cmtls_node_json_prepare(_cmtls_album_get_current()))), 'setting');
+}
+
+/**
+ * Implementation of hook_file_download()
+ * @param String $filepath
+ * @return mixed
+ */
+function cmtls_gallery_file_download($filepath){
+	/*
+	 * TODO: Access check based on group permissions
+	 */
+
+	$filepath = file_create_path($filepath);
+	$result = db_query("SELECT f.* FROM {files} f WHERE filepath = '%s'", $filepath);
+	if($file = db_fetch_object($result)){
+		return array(
+			'Content-Type: '.$file->filemime,
+			'Content-Length: '.$file->filesize,
+			'Content-Disposition:attachment;filename='.$file->filename,
+		);
+	}else{
+		return -1;
+	}
+}
+
+/**
+ * Implementation of hook_menu()
+ * 
+ * @return Array of menu items
+ */
+function cmtls_gallery_menu(){
+	$items = array();
+
+	// Images
+	$items['cmtls/%node/%node/album/%node/add'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_album_object'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_album_object')),
+		'type'=>MENU_CALLBACK
+	);
+	
+	$items['cmtls/%node/%node/album/%node/%node'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(5),
+		'page callback'=>'cmtls_gallery_object_page',
+		'page arguments'=>array(1,2,4,5),
+		'access arguments'=>array('access content'),
+		'type'=>MENU_CALLBACK
+	);
+	
+	$items['cmtls/%node/%node/album/%node/%node/edit'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(5),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_album_object', 5),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 5),
+		'type'=>MENU_CALLBACK
+	);
+	
+	$items['cmtls/%node/%node/album/%node/%node/delete'] = array(
+		'title' => 'Delete image',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 5),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 5),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/album/%node/%node/download'] = array(
+		'title' => 'Download image',
+		'page callback' => 'cmtls_gallery_object_download_page',
+		'page arguments' => array(1,2,4,5),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 5),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+
+	// Albums
+	$items['cmtls/%node/%node/album/add'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_album'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_album')),
+		'type'=>MENU_CALLBACK
+	);
+	
+	$items['cmtls/%node/%node/album/%node'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback'=>'cmtls_gallery_album_page',
+		'page arguments'=>array(1,2,4),
+		'access arguments'=>array('access content'),
+		'type'=>MENU_CALLBACK
+	);
+
+	$items['cmtls/%node/%node/album/%node/edit'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_album', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type'=>MENU_CALLBACK
+	);
+	
+	$items['cmtls/%node/%node/album/%node/delete'] = array(
+		'title' => 'Delete album',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 4),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+/**
+ * Album page callback
+ * @param object $group
+ * @param object $app
+ * @param object $album
+ * @return unknown
+ */
+function cmtls_gallery_album_page($group,$app,$album){
+	// Send the Modal Frame javascript for parent windows to the page.
+	modalframe_parent_js();
+
+	return views_embed_view('cmtls_album','default',$album->nid);
+}
+
+/**
+ * Gallery object page callback
+ * @param object $group
+ * @param object $app
+ * @param object $album
+ * @param object $album_object
+ * @return unknown
+ */
+function cmtls_gallery_object_page($group,$app,$album,$album_object){
+	// Send the Modal Frame javascript for parent windows to the page.
+	modalframe_parent_js();
+
+	return views_embed_view('cmtls_image','default',$album_object->nid);
+}
+
+/**
+ * Gallery object download page callback
+ * @param object $group
+ * @param object $app
+ * @param object $album
+ * @param object $album_object
+ */
+function cmtls_gallery_object_download_page($group,$app,$album,$album_object){
+	foreach($album_object->files as $file){
+		file_download($file->filepath);
+		break;
+	}
+}
+
+/**
+ * Implementation of hook_theme()
+ * Adds the agllery view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_gallery_theme($existing)
+{
+	return array(
+		// Gallery view
+		'views_view__cmtls_gallery__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-gallery--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		'views_view_unformatted__cmtls_gallery__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-gallery--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		'views_view_fields__cmtls_gallery__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-gallery--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		// Album view
+		'views_view__cmtls_album__default'=>array(
+			'arguments'=>array('view'=>NULL,'options' => NULL),
+			'template'=>'views-view--cmtls-album--default',
+			'original hook'=>'views_view',
+			'path'=>drupal_get_path('module','cmtls_gallery').'/theme'
+		),
+		'views_view_unformatted__cmtls_album__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-album--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		'views_view_fields__cmtls_album__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-album--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		// Album dashboard view
+		'views_view__cmtls_album__block_1'=>array(
+			'arguments'=>array('view'=>NULL,'options' => NULL),
+			'template'=>'views-view--cmtls-album--block-1',
+			'original hook'=>'views_view',
+			'path'=>drupal_get_path('module','cmtls_gallery').'/theme'
+		),
+		'views_view_unformatted__cmtls_album__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-album--block-1',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		'views_view_fields__cmtls_album__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-album--block-1',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		// Image view
+		'views_view__cmtls_image__default'=>array(
+			'arguments'=>array('view'=>NULL,'options' => NULL),
+			'template'=>'views-view--cmtls-image--default',
+			'original hook'=>'views_view',
+			'path'=>drupal_get_path('module','cmtls_gallery').'/theme'
+		),
+		'views_view_unformatted__cmtls_image__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-image--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+		'views_view_fields__cmtls_image__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-image--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_gallery').'/theme',
+		),
+	);
+}
+
+/**
+ * Gallery view's fields preprocessor
+ * @param object $vars
+ */
+function cmtls_gallery_preprocess_views_view_fields__cmtls_gallery__default(&$vars){
+	$query = db_query("SELECT count(`nid`) FROM {nodehierarchy} WHERE `parent` = %d",$vars['fields']['nid']->raw);
+
+	if($query){
+		$result = db_result($query);
+		$vars['album_object_count'] = $result;
+	}else{
+		$vars['album_object_count'] = false;
+	}
+
+	$cover_image_node = node_load($vars['fields']['field_cmtls_cover_image_value']->raw);
+
+	$cover_image = NULL;
+	if(!empty($cover_image_node)){
+		foreach($cover_image_node->files as $file){
+			$cover_image = $file;
+			break;
+		}
+	}
+
+	$vars['fields']['field_cmtls_album_cover_image'] = $cover_image;
+}
+
+/**
+ * Album view's preprocessor
+ * @param object $vars
+ */
+function cmtls_gallery_preprocess_views_view__cmtls_album__default(&$vars)
+{
+	$vars = cmtls_gallery_folder_preprocess_vars($vars);
+}
+
+/**
+ * Album view's preprocessor
+ * @param object $vars
+ */
+function cmtls_gallery_preprocess_views_view__cmtls_album__block_1(&$vars)
+{
+	$vars = cmtls_gallery_folder_preprocess_vars($vars);
+}
+
+function cmtls_gallery_folder_preprocess_vars($vars)
+{
+	$album = $vars['cmtls']['current_album'] = _cmtls_album_get_current();
+
+	$vars['title'] = $album->title;
+
+	// Fetch album objects count
+	$children_count = array();
+
+	$children_query = db_query("SELECT f.filename FROM files f JOIN upload u ON f.fid = u.fid INNER JOIN nodehierarchy n ON n.nid = u.nid WHERE n.parent = %d",$album->nid);
+
+	module_load_include('inc','cmtls_gallery','cmtls_gallery.file_types');
+	$file_types = cmtls_gallery_get_file_type_map();
+
+	while($row = db_fetch_object($children_query)){
+		// Figure out file's extension
+		$extension = explode('.', strtolower($row->filename));
+		$extension = !empty($extension) ? array_pop($extension) : '';
+
+		// Determine type of file based on extension
+		// Note that module differentiates only photos, videos, audio files and other files
+		$type = (isset($file_types[$extension]) and !in_array($file_types[$extension]['type'], array('archive','document'))) ? $file_types[$extension]['type'] : 'other';
+		$children_count[$type] = isset($children_count[$type]) ? $children_count[$type]+1 : 1;
+	}
+	
+	$vars['children_count'] = (object)$children_count;
+
+	return $vars;
+}
+
+function cmtls_gallery_folder_preprocess_fields_vars($vars)
+{
+	module_load_include('inc','cmtls_gallery','cmtls_gallery.file_types');
+	$file_types = cmtls_gallery_get_file_type_map();
+
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group->nid);
+	$current_album = _cmtls_album_get_current();
+	$vars['cmtls']['current_album'] = $current_album;
+
+	$node = node_load($vars['fields']['nid']->raw);
+
+	$album_object = new StdClass();
+	$file = new StdClass();
+
+	if(!empty($node)){
+		// Get first file attached to node
+		foreach($node->files as $file_object){
+			$file = $file_object;
+			break;
+		}
+	}
+
+	// Figure out the object type we're about to render
+	$file_extension = explode('.',$file->filename);
+	$file_extension = !empty($file_extension) ? strtolower(array_pop($file_extension)) : '';
+	$object_type = isset($file_types[$file_extension]) ? $file_types[$file_extension]['type'] : '';
+
+	// Render element according to type of object
+	switch($object_type){
+		case 'image':
+			$title = $vars['fields']['title']->raw;
+			$description = $vars['fields']['field_cmtls_description']->raw ? $vars['fields']['field_cmtls_description']->raw : $vars['fields']['title']->raw;
+			$url = imagecache_create_url('full',$file->filename);
+
+			$icon = theme('imagecache','thumbnail',$file->filename,$title,$description);
+
+			$album_object->icon = l($icon,$url,array('html'=>true,'attributes'=>array('rel'=>'lightbox['.$current_album->nid.']','title'=> $description)));
+			$album_object->caption = l($title,$url,array('attributes'=>array('rel'=>'lightbox['.$current_album->nid.']','title'=>$description)));
+			break;
+		case 'video':
+		case 'audio':
+		default:
+			$icon_name = (isset($file_types[$file_extension]) and isset($file_types[$file_extension]['icon'])) ? $file_types[$file_extension]['icon'] : strtolower($file_extension).'.png';
+
+			// Try to get icon for the file
+			if(file_exists(dirname(__FILE__).'/icons/'.$icon_name)){
+				$icon = url(drupal_get_path('module','cmtls_gallery').'/icons/'.$icon_name);
+			}else{
+				// Try to get generic icon for file type
+				if(file_exists(dirname(__FILE__).'/icons/'.$file_types[$file_extension]['type'].'.png')){
+					$icon = url(drupal_get_path('module','cmtls_gallery').'/icons/'.$file_types[$file_extension]['type'].'.png');
+				// Use default icon for file
+				}else{
+					$icon = url(drupal_get_path('module','cmtls_gallery').'/icons/default.png');
+				}
+			}
+
+			$description = '';
+			$title = $vars['fields']['title']->raw;
+			$url = url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/album/'.$current_album->nid.'/'.$node->nid.'/download',array('absolute'=>TRUE));
+			
+			$album_object->icon = l('<img src="'.$icon.'" class="file-icon" alt="'.t('Icon for @file',array('@file'=>$title)).'" />',$url,array('html'=>TRUE,'attributes'=>array('title'=>t('Click to download !file',array('!file'=>$title)))));
+			$album_object->caption = l($title,$url,array('attributes'=>array('title'=>t('Click to download @file',array('@file'=>$title)))));
+	}
+	
+	$vars['album_object'] = $album_object;
+	
+	return $vars;
+}
+
+/**
+ * Album view's fields preprocessor
+ * @param object $vars 
+ */
+function cmtls_gallery_preprocess_views_view_fields__cmtls_album__default(&$vars)
+{
+	$vars = cmtls_gallery_folder_preprocess_fields_vars($vars);
+}
+
+/**
+ * Album view's fields preprocessor
+ * @param object $vars 
+ */
+function cmtls_gallery_preprocess_views_view_fields__cmtls_album__block_1(&$vars)
+{
+	$vars = cmtls_gallery_folder_preprocess_fields_vars($vars);
+}
+
+/**
+ * Implementation of hook_nodeapi()
+ * @param object $node
+ * @param object $op
+ */
+function cmtls_gallery_nodeapi(&$node,$op){
+	// When we're creating a new album object node
+	if($node->type=='cmtls_album_object' and $op=='insert'){
+		// Check whether cover image for that album already exists
+		$query = db_query("SELECT `field_cmtls_cover_image_value` AS fid FROM {content_type_cmtls_album} WHERE `nid` = %d",$node->parent);
+		$cover_image = db_fetch_object($query);
+
+		// If it doesn't
+		if(!$cover_image or $cover_image->fid==NULL){
+			// Check the type of file attached to the current album object node
+			module_load_include('inc','cmtls_gallery','cmtls_gallery.file_types');
+			$file_types = cmtls_gallery_get_file_type_map();
+
+			$file = new stdClass();
+
+			foreach($node->files as $file_object){
+				$file = $file_object;
+				break;
+			}
+
+			// Figure out the type of file attached to album object node
+			$file_extension = explode('.',$file->filename);
+			$file_extension = !empty($file_extension) ? strtolower(array_pop($file_extension)) : '';
+			$object_type = isset($file_types[$file_extension]) ? $file_types[$file_extension]['type'] : '';
+
+			// If that file is an image, make it default album cover image
+			if($object_type=='image'){
+				// Update cover image value
+				$album = node_load($node->parent);
+				$album->field_cmtls_cover_image[0]['value'] = $node->nid;
+				node_save($album);
+				
+				// Set cover image flag to the album object
+				$node->field_cmtls_image_cover[0]['value'] = 1;
+			}
+		}
+	}elseif($node->type=='cmtls_album_object' and $op=='update' and $node->field_cmtls_image_cover[0]['value']==1){
+		// Update cover image value
+		$album = node_load($node->parent);
+		$album->field_cmtls_cover_image[0]['value'] = $node->nid;
+		node_save($album);
+
+		// We can have only one cover image on an album, to avoid confusion, unset cover image flag on every other node in current album
+		$album_objects = array();
+		$album_objects_query = db_query("SELECT nid FROM {nodehierarchy} WHERE parent = %d",$node->parent);
+
+		while($nid = db_result($album_objects_query)){
+			if($nid==$node->nid){ continue; }
+			$album_objects[] = $nid;
+		}
+
+		if(!empty($album_objects)){
+			foreach($album_objects as $nid){
+				$album_object = node_load($nid, NULL, TRUE);
+				$album_object->field_cmtls_image_cover[0]['value'] = NULL;
+				node_save($album_object);
+			}
+		}
+	}
+}
+
+
+/*
+ * TODO: Reduce code repetition 
+ */
+
+/**
+ * Implementation of hook_form_FORM_ID_alter
+ * Prepares album node form for cleanup
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_gallery_form_cmtls_album_node_form_alter(&$form,&$form_state){
+	if(!_cmtls_is()){ return; }
+
+	$form['name'] = $form['author']['name'];
+	$form['name']['#type'] = 'value';
+	$form['date'] = $form['author']['date'];
+	$form['date']['#type'] = 'value';
+	//$form['body'] = $form['body_field']['body'];
+	
+	$form['revision_information'] = NULL;
+	$form['author'] = NULL;
+	//$form['body_field'] = NULL;
+	$form['options'] = NULL;
+	$form['buttons']['preview'] = NULL;
+	$form['buttons']['delete'] = NULL;
+	$form['#after_build'][] = '_cmtls_gallery_album_form_after_build';
+	$form['#submit'][] = '_cmtls_gallery_forms_submit';
+}
+
+/**
+ * Implementation of hook_form_FORM_ID_alter
+ * Prepares image node form for cleanup
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_gallery_form_cmtls_album_object_node_form_alter(&$form,&$form_state){
+	if(!_cmtls_is()){ return; }
+
+	$form['name'] = $form['author']['name'];
+	$form['name']['#type'] = 'value';
+	$form['date'] = $form['author']['date'];
+	$form['date']['#type'] = 'value';
+	//$form['body'] = $form['body_field']['body'];
+	
+	$form['revision_information'] = NULL;
+	$form['author'] = NULL;
+	$form['body_field'] = NULL;
+	$form['options'] = NULL;
+
+	$form['buttons']['submit']['#submit'] = array('cmtls_gallery_album_object_form_submit');
+	$form['buttons']['preview'] = NULL;
+	$form['buttons']['delete'] = NULL;
+
+	$form['#after_build'][] = '_cmtls_gallery_album_object_form_after_build';
+	$form['#submit'] = array('cmtls_gallery_album_object_submit');
+	
+	$form['field_cmtls_address'] = NULL; // Remove when map completed
+
+	// This part is important!
+	$form['#multistep'] = TRUE;
+	$form['#redirect'] = FALSE;
+}
+
+/**
+ * Helper for common form body setup tasks
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function _cmtls_gallery_album_form_after_build($form, &$form_state){
+	//printr($form['field_cmtls_album_cover_image']);
+	$node = $form['#node'];
+
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	cmtls_group_set_og_form_values($form, $form_state);
+	
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+	
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
+	
+	$form['hierarchy'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['og_nodeapi'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+	$form['sections'] = NULL;
+
+	$form['attachments'] = NULL;
+	$form['field_cmtls_cover_image']['#type'] = 'value';
+
+	$form['field_cmtls_address'] = NULL; // Remove when map completed
+
+	return $form;
+}
+
+/**
+ * Helper for common form body setup tasks
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function _cmtls_gallery_album_object_form_after_build($form, &$form_state){
+	$node = $form['#node'];
+	$current_album = _cmtls_album_get_current();
+
+	cmtls_group_set_og_form_values($form, $form_state);
+	
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+	
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_album->nid;
+	
+	$form['hierarchy'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['attachments'] = NULL;
+	$form['og_nodeapi'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+	$form['sections'] = NULL;
+
+	// New node case
+	if(empty($node->nid)){
+		$form['field_cmtls_image_cover'] = NULL;
+		$form['title'] = NULL;
+		$form['field_cmtls_description'] = NULL;
+	// Edit node case
+	}else{
+		if(!empty($node->files)){
+			// Get first file attached to node
+			foreach($node->files as $key=>$file_object){
+				$file = $file_object;
+				break;
+			}
+
+			module_load_include('inc','cmtls_gallery','cmtls_gallery.file_types');
+			$file_types = cmtls_gallery_get_file_type_map();
+			$file_extension = explode('.',$file->filename);
+			$file_extension = !empty($file_extension) ? strtolower(array_pop($file_extension)) : '';
+
+			$file_is_image = (!empty($file_extension) and isset($file_types[$file_extension]) and $file_types[$file_extension]['type']=='image') ? TRUE : FALSE;
+
+			if($file_is_image){
+				// Show thumbnail for the image
+				$form['thumb']['#prefix'] = '<div class="thumb">';
+				$form['thumb']['#value'] = theme('imagecache','thumbnail',$file->filename);
+				$form['thumb']['#suffix'] = '</div>';
+			}else{
+				// Hide the 'Use as cover image' for the node
+				$form['field_cmtls_image_cover']['#type'] = 'value';
+			}
+		}
+
+		$form['field_cmtls_upload'] = NULL;
+		$form['upload'] = NULL;
+		
+		$form['buttons']['submit']['#value'] = t('Save');
+	}
+
+	return $form;
+}
+
+function cmtls_gallery_album_object_form_submit(&$form,&$form_state){
+	$node = $form['#node'];
+
+	// New node case
+	if(!isset($node->nid) or empty($node->nid)){
+		$files = cmtls_upload_get_uploaded_files();
+
+		foreach($files as $file){
+			$tmp_form = $form;
+			$state = $form_state;
+			$values = $state['values'];
+	
+			$values['title'] = $file->filename;
+
+			$state['values'] = $values;
+			
+			$node = node_form_submit_build_node($tmp_form,$state);
+
+			// Attach file to node
+			$file->new = 1;
+			$node->files[$file->fid] = $file;
+	
+			node_save($node);
+
+			// Update file status to permanent
+			file_set_status($file,1);
+			// Remove file from cache table
+			db_query("DELETE FROM {cache_cmtls_upload} WHERE fid = %d",$file->fid);
+		}
+	// Edit node case
+	}else{
+		$node = node_form_submit_build_node($form,$form_state);
+		node_save($node);
+	}
+
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+/**
+ * Implementation of hook_form_FORM_ID_alter()
+ * @param object $form
+ * @param object $form_state
+ */
+function cmtls_gallery_form_node_delete_confirm_alter(&$form,&$form_state){
+	$node = $form['#parameters'][2];
+	
+	if($node->type=='cmtls_album'){
+		$form['#submit'][] = 'cmtls_gallery_node_delete_confirm_submit';
+	}
+}
+
+function cmtls_gallery_node_delete_confirm_submit(&$form,$form_state){
+	$group = _cmtls_group_get_current();
+	$app = _cmtls_app_get_current($group);
+
+	$path = url('cmtls/'.$group->nid.'/'.$app->nid, array('absolute'=>TRUE));
+
+	modalframe_close_dialog(array(
+		'redirect' => url($path),
+	));
+}
+
+/**
+ * Helper for common form submit tasks
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function _cmtls_gallery_forms_submit($form, &$form_state){
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+/**
+ * Helper for fetching current album node
+ * 
+ * @return object $node
+ */
+function _cmtls_album_get_current(){
+	$node = menu_get_object('node',4);
+
+	return $node->type=='cmtls_album' ? $node : false;
+}
+
+function cmtls_gallery_cmtls_dashboard_block_content($group, $app)
+{
+	$folders = array();
+	
+	// get all folders
+	$result = db_query('SELECT nodehierarchy.nid FROM {nodehierarchy} nodehierarchy WHERE nodehierarchy.parent = %d ORDER BY order_by', $app->nid);
+	while($row = db_fetch_array($result))
+	{
+		$folders[] = $row['nid'];
+	}
+	
+	$arguments = array(
+		'cmtls_album',
+		'block_1',
+	);
+	
+	$arguments = array_merge($arguments, $folders);
+	
+	return call_user_func_array('views_embed_view', $arguments);
+}
+
+/**
+ * Creates the path to album view
+ *
+ * @param unknown_type $album
+ * @param unknown_type $group
+ * @return unknown
+ */
+function cmtls_album_path($album, $group = NULL)
+{
+	if(!$group) $group = _cmtls_group_get_current();
+	
+	return 'cmtls/'.$group->nid.'/'.$album->parent.'/album/'.$album->nid;
+}

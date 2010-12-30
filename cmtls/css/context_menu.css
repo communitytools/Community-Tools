@@ -1,0 +1,59 @@
+img.context_anchor {
+	margin-bottom: -5px;
+	border: none;
+	padding: 2px;
+	cursor: pointer;
+	width: 18px;
+	height: 18px;
+}
+
+ul.context_plugin_dropdown {
+	display: none;
+	border: 2px solid #ccc;
+	background-color: #fff;
+	position: absolute;
+	z-index: 10000;
+	margin: 0;
+	list-style: none;
+	text-align: left;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+ul.context_plugin_dropdown li.scms_context_item {
+	margin: 0;
+	padding: 0;
+	background-color: #fff;
+	text-align: left;
+}
+
+ul.context_plugin_dropdown li.context_plugin_item a:link, ul.context_plugin_dropdown li.context_plugin_item a:visited, ul.context_plugin_dropdown li.context_plugin_item a:active {
+	color: #333333;
+	display: block;
+	margin: 0;
+	padding: 2px 10px 2px 22px;
+	background-color: #fff;
+	background-image: none;
+	font-size: 13px;
+	text-decoration: none;
+	font-weight: normal;
+	height: auto;
+	width: auto;
+	border: none;
+}
+
+ul.context_plugin_dropdown li.context_plugin_item a.cmtls_article_edit {
+	text-decoration: none;
+	background: url(../../../themes/cmtls_theme/images/edit.png) no-repeat 0 0;
+}
+
+	ul.context_plugin_dropdown li.context_plugin_item a.cmtls_article_edit:hover,
+	ul.context_plugin_dropdown li.context_plugin_item a.cmtls_event_edit:hover,
+	ul.context_plugin_dropdown li.context_plugin_item a.cmtls_forum_edit:hover,
+	ul.context_plugin_dropdown li.context_plugin_item a.cmtls_group_edit:hover {
+			background: #f2f2f2 url(../../../themes/cmtls_theme/images/edit.png) no-repeat 0 0;
+	}
+
+ul.context_plugin_dropdown li.context_plugin_item a:hover {
+	background: #f2f2f2;
+}

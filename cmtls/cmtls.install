@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * Implements hook_install()
+ * Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
+ * Adds the custom menu
+ * Adds wysiwyg settings
+ *
+ */
+function cmtls_install()
+{
+	// Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
+	db_query("UPDATE {system} SET weight = 11 WHERE type = 'module' AND name = '%s'", 'cmtls');
+	
+	// cmtls site menu
+	db_query("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('cmtls-site-menu', 'Community Tools: menu', 'Community Tools: menu')");
+	
+	// wysiwyg
+	$wysiwyg_settings = array(
+		1 => array(
+			'default' => '1',
+		    'user_choose' => '0',
+		    'show_toggle' => '0',
+		    'theme' => 'advanced',
+		    'language' => 'en',
+		    'buttons' => array(),
+		    'toolbar_loc' => 'top',
+		    'toolbar_align' => 'left',
+		    'path_loc' => 'bottom',
+		    'resizing' => '1',
+		    'verify_html' => '1',
+		    'preformatted' => '0',
+		    'convert_fonts_to_spans' => '1',
+		    'remove_linebreaks' => '1',
+		    'apply_source_formatting' => '0',
+		    'paste_auto_cleanup_on_paste' => '0',
+		    'block_formats' => 'p,address,pre,h2,h3,h4,h5,h6,div',
+		    'css_setting' => 'theme',
+		    'css_path' => '',
+		    'css_classes' => '',
+		),
+		2 => array(
+			'default' => '1',
+			'user_choose' => '0',
+			'show_toggle' => '0',
+			'theme' => 'advanced',
+			'language' => 'en',
+			'buttons' => array(
+				'default' => array(
+					'Bold' => '1',
+					'Italic' => '1',
+					'Strike' => '1',
+					'BulletedList' => '1',
+					'NumberedList' => '1',
+					'Outdent' => '1',
+					'Indent' => '1',
+					'Link' => '1',
+					'Source' => '1',
+					'PasteFromWord' => '1',
+					'ShowBlocks' => '1',
+					'RemoveFormat' => '1',
+					'Format' => '1',
+					'Table' => '1',
+				),
+				'drupal' => array(
+					'imgupload' => '1',
+				),
+			),
+			'toolbar_loc' => 'top',
+			'toolbar_align' => 'left',
+			'path_loc' => 'bottom',
+			'resizing' => '1',
+			'verify_html' => '1',
+			'preformatted' => '0',
+			'convert_fonts_to_spans' => '1',
+			'remove_linebreaks' => '1',
+			'apply_source_formatting' => '0',
+			'paste_auto_cleanup_on_paste' => '1',
+			'block_formats' => 'p,h2,h3,h4,h5,address,pre',
+			'css_setting' => 'theme',
+			'css_path' => '',
+			'css_classes' => '',
+		),
+	);
+	
+	db_query("INSERT INTO {wysiwyg} (format, editor, settings) VALUES ('1', 'ckeditor', '%s')", serialize($wysiwyg_settings[1]));
+	db_query("INSERT INTO {wysiwyg} (format, editor, settings) VALUES ('2', 'ckeditor', '%s')", serialize($wysiwyg_settings[2]));
+	
+	// wysiwyg image upload filter
+	db_query("INSERT INTO {filters} (format, module,delta, weight) VALUES (2, 'wysiwyg_imageupload', 0 , 10)");
+	
+	// sections
+	db_query("TRUNCATE {sections_data}");
+	db_query("INSERT INTO {sections_data} (sid, name, status, path, theme, visibility, weight) VALUES ('1', 'Administration theme', '1', 'admin\r\nadmin/*', 'garland', '1', '-10')");
+	db_query("INSERT INTO {sections_data} (sid, name, status, path, theme, visibility, weight) VALUES ('2', 'cmtls', '1', 'cmtls\r\ncmtls/*', 'cmtls_theme', '1', '0')");
+	
+}
+
+/**
+ * Removes the custom menu
+ * Removes WYSIWYG formats
+ * Removes section settings
+ *
+ * @todo remove custom menu items
+ */
+function cmtls_uninstall()
+{
+	// remove site menu
+	db_query("DELETE FROM {menu_custom} WHERE menu_name = 'cmtls-site-menu'");
+	
+	// wysiwyg
+	db_query("DELETE FROM {wysiwyg} WHERE format IN ('1', '2')");
+	
+	// sections
+	db_query("DELETE FROM {sections_data} WHERE sid IN ('1', '2')");
+}

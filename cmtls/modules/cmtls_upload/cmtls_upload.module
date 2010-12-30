@@ -1,0 +1,185 @@
+<?php
+
+include_once('cmtls_upload.features.inc');
+
+/**
+ * Implementation of hook_menu()
+ * @return Array $items
+ */
+function cmtls_upload_menu(){
+	$items = array();
+
+	$items['cmtls/upload/%node'] = array(
+		'title'=>'Community Tools Upload',
+		'page callback'=>'cmtls_upload_transfer',
+		'page arguments'=>array(2),
+		'file'=>'cmtls_upload.inc',
+		'access arguments' => array('access content'), // the real permission check is on cmtls_upload.inc
+		'type'=>MENU_CALLBACK
+	);
+	
+	return $items;
+}
+
+
+/**
+ * Implementation of hook_field_info()
+ * @return Array
+ */
+function cmtls_upload_field_info(){
+	return array(
+		'cmtls_upload'=>array(
+			'label'=>t('Community Tools Upload Widget'),
+			'description'=>t('Upload widget for Community Tools'),
+		),
+	);
+}
+
+/**
+ * Implementation of hook_field_settings()
+ * @return Array Unknown
+ */
+function cmtls_upload_field_settings($op,$field){
+	switch($op){
+		case 'form':
+			$form = filefield_field_settings('form',$field);
+			if(!_cmtls_is()){ return $form; }
+
+			$form['list_field']['#type'] = 'value';
+			$form['list_default']['#type'] = 'value';
+			$form['description_field']['#type'] = 'value';
+
+			return $form;
+			break;
+		case 'save':
+			return array('required','file_extensions','file_path','max_filesize_per_file');
+	}
+}
+
+/**
+ * Implementation of hook_field()
+ */
+function cmtls_upload_field($op,&$node,&$field,&$items,$teaser,$page){
+
+}
+
+/*
+ */
+
+/**
+ * Implementation of hook_content_is_empty()
+ */
+function cmtls_upload_content_is_empty($item,$field){
+	
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function cmtls_upload_theme(){
+	return array(
+		'cmtls_upload_settings' => array(
+			'path'=>drupal_get_path('module','cmtls_upload').'/theme',
+			'template'=>'cmtls-upload-settings',
+			'arguments'=>array('modulepath'=>NULL,'uploadpath'=>NULL,'uploaddirectory','maxfilesize'=>NULL,'fileextensions'=>NULL,'sessionid'=>NULL,'uploadlimit'=>NULL,'nodetype'=>NULL,'fieldname'=>NULL,'field_required'=>NULL),      
+		),
+	);
+}
+
+/**
+ * Implementation of hook_widget_info()
+ */
+function cmtls_upload_widget_info(){
+	return array(
+		'cmtls_upload'=>array(
+			'label'=>t('Community Tools: Upload'),
+			'field types'=>array('cmtls_upload'),
+			'multiple values'=>CONTENT_HANDLE_CORE,
+			
+		),
+	);
+}
+
+
+function cmtls_upload_widget_settings($op,$widget){
+	switch($op){
+		case 'form':
+			$form = filefield_widget_settings('form',$widget);
+			return $form;
+			break;
+		case 'save':
+			return array('required','file_extensions','file_path','max_filesize_per_file');
+	}
+}
+
+function cmtls_upload_widget(&$form,$form_state,$field,$items,$delta=0){
+	$widget = filefield_widget($form,$form_state,$field,$items,$delta);
+	
+	if(!_cmtls_is()){ return $widget; }
+
+	$widget['#type'] = 'file';
+
+	$form['upload'] = array(
+		'#prefix'=>'<div id="upload-wrapper">',
+		'#suffix'=>'</div>',
+		'progressbar'=>array(
+			'#prefix'=>'<div id="progressbar-wrapper" class="upload-progressbar-wrapper">',
+			'#value'=>'<div id="progressbar" class="upload-progressbar"></div>',
+			'#suffix'=>'</div>',
+		),
+		'status container'=>array(
+			'#prefix'=>'<div id="upload-status-message" class="upload-status-message">',
+			'#value'=>t('Click button on the left to start adding files to upload queue'),
+			'#suffix'=>'</div>',
+		),
+		'notifications container'=>array(
+			'#value'=>'<div id="upload-notification-messages" class="upload-notification-messages"></div>',
+		),
+	);
+
+	$form['buttons']['submit']['#value'] = t('Upload');
+
+	drupal_add_js(drupal_get_path('module','cmtls_upload').'/js/swfupload/swfupload.js');
+	drupal_add_js(drupal_get_path('module','cmtls_upload').'/js/swfupload/swfupload.queue.js');
+	drupal_add_js(drupal_get_path('module','cmtls_upload').'/js/cmtls_upload.js');
+
+	$parent = arg(4)!=NULL ? '/'.arg(4) : '';
+
+	drupal_add_js(
+		theme(
+			'cmtls_upload_settings',
+			url(drupal_get_path('module','cmtls_upload')),
+			url('cmtls/upload'.$parent),						// TODO: Something less dirty here
+			$field['widget']['file_path'],
+			round(parse_size($field['widget']['max_filesize_per_file'])/1024),
+			!empty($file['widget']['file_extensions']) ? "*.".str_replace(" ","; *.",$field['widget']['file_extensions']) : '*.*',
+			!empty($user->sid) ? $user->sid : session_id(),
+			100,
+			$field['type_name'],
+			$field['field_name'],
+			$field['required']
+		),
+	'inline');
+
+	return $widget;
+}
+
+/**
+ * Fetches list of uploaded files from upload cache
+ * 
+ * @return Array $files
+ */
+function cmtls_upload_get_uploaded_files(){
+	$sid = session_id();
+	$session = db_fetch_object(db_query("SELECT * FROM {sessions} WHERE sid = '%s' AND hostname = '%s' LIMIT 1",$sid,ip_address()));
+	$parent = arg(4); // TODO: Need to do something with that
+
+	$files_query = db_query("SELECT f.* FROM {cache_cmtls_upload} c JOIN {files} f ON c.fid = f.fid WHERE c.uid = %d AND c.sid = '%s' AND c.parent = %d",$session->uid,$session->sid,$parent);
+
+	$files = array();
+	while($file = db_fetch_object($files_query)){
+		$files[] = $file;
+	}
+	
+	return $files;
+}

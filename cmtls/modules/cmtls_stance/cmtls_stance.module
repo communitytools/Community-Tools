@@ -1,0 +1,280 @@
+<?php
+
+/**
+ * Implements hook_init()
+ */
+function cmtls_stance_init() {
+	drupal_add_js(drupal_get_path('module', 'cmtls_stance') . '/js/app.js');
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the event view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_stance_theme($existing) {
+	return array(
+		// stance
+		'cmtls_stance' => array (
+			'arguments' => array('node' => NULL, 'form' => NULL),
+			'template' => 'cmtls-stance',
+			'path' => drupal_get_path('module', 'cmtls_stance') . '/theme',
+		),
+	);
+}
+
+/**
+ * Implents hook_nodeapi()
+ * 
+ *
+ * @param node $node
+ * @param string $op
+ * @param unknown_type $a3
+ * @param unknown_type $a4
+ * @return array
+ */
+function cmtls_stance_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+	global $user;
+	
+	static $stance_types;
+
+	if ($op == 'load' || $op == 'save') {
+
+		if (!is_array($stance_types)) {
+			$stance_types = module_invoke_all('cmtls_stance_info');
+
+			foreach ($stance_types as $key => $value) {
+				if (!is_array($stance_types[$key]['stance choices'])) {
+					$stance_types[$key]['stance choices'] = array();
+				}
+
+				if (!is_numeric($stance_types[$key]['default stance choice'])) {
+					$stance_types[$key]['default stance choice'] = 0;
+				}
+
+				if (!is_array($stance_types[$key]['visible stance choices'])) {
+					$stance_types[$key]['visible stance choices'] = array();
+				}
+
+				if (!$stance_types[$key]['stance form title']) {
+					$stance_types[$key]['stance form title'] = t('Answer');
+				}
+			}
+		}
+
+		// Check if node of this type should have a stance choice
+		if (is_array($stance_types[$node->type])) {
+			$sql = "SELECT cmtls_member_stance.uid,
+					cmtls_member_stance.parent,
+					cmtls_member_stance.stance,
+					(SELECT value FROM {profile_values} AS profile_values WHERE profile_values.fid = 2 AND profile_values.uid = cmtls_member_stance.uid) AS name,
+					(SELECT name FROM {users} AS users WHERE users.uid = cmtls_member_stance.uid) AS username
+				FROM {cmtls_member_stance} AS cmtls_member_stance
+				LEFT JOIN {users} AS users ON cmtls_member_stance.uid=users.uid
+				WHERE cmtls_member_stance.parent=%d
+				ORDER BY cmtls_member_stance.stance ASC";
+			$result = db_query($sql, $node->nid);
+
+			$stances = new StdClass();
+	
+			$stances->info = $stance_types[$node->type];
+
+			$stances->user_stance = $stances->info['default stance choice'];
+			$stances->all = array();
+			$stances->sorted = array();
+			$stances->sorted_count = array();
+
+			foreach ($stances->info['stance choices'] as $key => $value) {
+				$stances->sorted[$key] = array();
+				$stances->sorted_count[$key] = array();
+			}
+
+			while ($stance = db_fetch_object($result)) {
+				if (!$stance->name) {
+					$stance->name = $stance->username;
+				}
+
+				$main_group = _cmtls_group_get_main();
+				$stance->name = l($stance->name, 'cmtls/' . $main_group->nid . '/member/' . $stance->uid);
+				$stance->user_url = url('cmtls/' . $main_group->nid . '/member/' . $stance->uid, array('absolute' => TRUE));
+
+				$stances->sorted[$stance->stance][] = $stance;
+				$stances->all[] = $stance;
+
+				if ($user->uid == $stance->uid) {
+					$stances->user_stance = $stance->stance;
+				}
+			}
+
+			foreach ($stances->sorted as $key => $value) {
+				$stances->sorted_count[$key] = count($stances->sorted[$key]);
+			}
+
+			return array('stances' => $stances);
+		}
+	}
+}
+
+/**
+ * Implents hook_forms()
+ * Used to call the stance forms
+ *
+ * @param int $form_id
+ * @param node $node
+ * @return array
+ */
+function cmtls_stance_forms($form_id, $node) {
+	$forms = array();
+
+	if (strpos($form_id, 'cmtls_stance_answer_form_') === 0) {
+		$forms[$form_id] = array(
+			'callback' => 'cmtls_stance_answer_form',
+		);
+	}
+
+	return $forms;
+}
+
+/**
+ * Generates a form where user can pick his stance on node
+ *
+ * @param array $form_state
+ * @param node $node
+ * @return array
+ */
+function cmtls_stance_answer_form(&$form_state, $node) {
+	global $user;
+
+	$options = array();
+
+	if (is_array($node->stances->info['stance choices'])) {
+		foreach ($node->stances->info['stance choices'] as $key => $value) {
+			$options[$key] = $value;
+		}
+	}
+
+	/*array(
+		CMTLS_MEMBER_STANCE_APPROVE => t('Yes'),
+		CMTLS_MEMBER_STANCE_MAYBE => t('Maybe'),
+		CMTLS_MEMBER_STANCE_DISAPPROVE => t('No'),
+		CMTLS_MEMBER_STANCE_UNANSWERED => t('Unanswered')
+	)*/
+
+	$form['answer'] = array(
+		'#type' => 'radios',
+		'#title' => $node->stances->info['stance form title'],
+		'#default_value' => $node->stances->user_stance,
+		'#options' => $options,
+		'#required' => true,
+	);
+
+	$form['nid'] = array(
+		'#type' => 'hidden',
+		'#value' => $node->nid,
+		'#required' => true,
+	);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save'),
+	);
+
+	$form['#submit'] = array(
+		'cmtls_stance_answer_form_submit',
+	);
+
+	if ($_POST['ajax'] == 1) {
+		$form['#submit'][] = 'cmtls_stance_answer_ajax_response';
+	}
+	
+	return $form;
+}
+
+/**
+ * Generates and prints a json response containing the stance theme of the node
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_stance_answer_ajax_response($form, &$form_state) {
+	if (user_access('access cmtls stance')) {
+		print drupal_json(array('content' => theme('cmtls_stance', node_load($form_state['values']['nid']), NULL)));
+	}
+
+	exit;
+}
+
+/**
+ * Inserts or updates the stance submitted
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_stance_answer_form_submit($form, &$form_state) {
+	global $user;
+
+	if (user_access('access cmtls stance')) {
+		db_query("INSERT INTO {cmtls_member_stance}
+				(stance, parent, uid)
+				VALUES (%d, %d, %d)
+				ON DUPLICATE KEY UPDATE stance=%d",
+			$form_state['values']['answer'],
+			$form_state['values']['nid'],
+			$user->uid,
+			$form_state['values']['answer']
+		);
+	}
+	
+	node_load($form_state['values']['nid'], NULL, TRUE);
+}
+
+/**
+ * Implents hook_preprocess()
+ * Generates the stance theme and adds to fields view
+ * 
+ * @param object $vars
+ * @param string $hook
+ */
+function cmtls_stance_preprocess(&$vars, $hook)
+{
+	if ($hook != 'cmtls_stance' && $vars['view'] && $vars['view']->name != 'cmtls_stance' && $vars['fields'] && $vars['fields']['nid'] && $vars['fields']['nid']->raw && strpos($hook, 'views_view_') === 0)
+	{
+		$node = node_load($vars['fields']['nid']->raw);
+
+		$vars['stance'] = theme(
+			'cmtls_stance',
+			$node,
+			(user_access('access cmtls stance') ? drupal_get_form('cmtls_stance_answer_form_' . $node->nid, $node) : NULL)
+		);
+	}
+}
+
+/**
+ * Defines hook_cmtls_stance_info()
+ * Use this hook to add stance functionality to nodes
+ * 
+ * @return array
+ */
+function hook_cmtls_stance_info()
+{
+	return array(
+		'example_node_type' => array(
+			'stance choices' => array(
+				1 => t('Yes'),
+				2 => t('Maybe'),
+				3 => t('No'),
+				0 => t('Unanswered'),
+			),
+			'default stance choice' => 0,
+			'visible stance choices' => array(1, 2, 3),
+			'stance form title' => t('Answer'),
+		),
+	);
+}
+
+function cmtls_stance_perm()
+{
+	return array('access cmtls stance');
+}

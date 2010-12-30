@@ -1,0 +1,213 @@
+/* -------------------------------------------------------------- 
+	TYPOGRAPHY
+-------------------------------------------------------------- */   
+
+body,
+input,
+textarea,
+select,
+button {
+    color: #333;    
+    font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;	
+    line-height: 1.35em;
+}
+
+/* Headings
+-------------------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 { 
+	font-weight: normal;
+	clear: both;
+}
+
+h1,
+.cke_show_borders h1 {
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 1.20;
+    margin-bottom: 8px;
+}
+
+h2,
+.cke_show_borders h2 {
+    font-weight: normal;
+    font-size: 19px;
+    margin-bottom: 5px;    
+}
+
+h3,
+.cke_show_borders h3 {
+    font-weight: bolder;
+    font-size: 17px;
+    margin-bottom: 5px;    
+}
+
+h4,
+.cke_show_borders h4 {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 5px;    
+}
+
+h5,
+.cke_show_borders h5 {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 5px;    
+}
+
+pre,
+cke_show_borders pre {
+    font-family: "Courier New", Monaco, monospace;
+    font-size: 14px;
+    line-height: 0.65;
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;      /* Internet Explorer 5.5+ */
+}
+
+/* Text elements
+-------------------------------------------------------------- */
+a {
+	color: #2786C2;
+	text-decoration: none;
+	padding-bottom: 1px;
+}
+
+	a:hover {
+		color: #154F73;
+	}
+
+/*	
+a.green {
+	color: #009900;
+	text-decoration: none;
+}
+
+	a.green:hover {
+		border-bottom: 1px solid #009900;
+	}
+
+a.red {
+	color: #FF0000;
+	text-decoration: none;
+	border-bottom: 1px solid #FCC2C2;
+}
+
+	a.red:hover {
+		border-bottom: 1px solid #FF0000;
+	}
+*/
+
+p {
+    margin-bottom: 18px;
+}
+
+ul {
+	margin: 0 0 18px 2.5em;
+}
+
+ol {
+	margin: 0 0 18px 2.5em;
+}
+
+ul {
+	list-style: disc;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+ol ol {
+	list-style: upper-alpha;
+}
+
+ol ol ol {
+	list-style: lower-roman;
+}
+
+ol ol ol ol {
+	list-style: lower-alpha;
+}
+
+ul ul, ol ol, ul ol, ol ul {
+	margin-bottom: 0;
+}
+
+dl	{
+    margin: 0 1.5em;
+}
+
+dt {
+    font-weight: bold;
+}
+
+dd {
+	margin-bottom: 18px;
+}
+
+strong {
+	font-weight: bold;
+}
+
+cite, em, i {
+	font-style: italic;
+}
+
+blockquote {
+	margin: 0 3em;
+}
+
+blockquote em, blockquote i, blockquote cite {
+	font-style: normal;
+}
+
+code {
+	font: 11px Monaco, monospace;
+}
+
+abbr, acronym {
+  border-bottom: 1px dotted #333;
+  cursor: help;
+}
+
+ins {
+	text-decoration: none;
+}
+
+sup,
+sub {
+	height: 0;
+	line-height: 1;
+	vertical-align: baseline;
+	position: relative;
+	
+}
+
+sup {
+	bottom: 1ex;
+}
+
+sub {
+	top: .5ex;
+}
+
+.big-arrow {
+	color: #333;
+	font-size: 25px;
+	line-height: 1;
+	font-weight: bold;
+	margin: 0 3px;
+	
+	opacity: 0.5;
+	-moz-opacity: 0.5;
+	filter:alpha(opacity=50);
+}

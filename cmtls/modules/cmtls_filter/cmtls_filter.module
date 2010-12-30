@@ -1,0 +1,453 @@
+<?php
+
+/**
+ * Implements hook_init()
+ */
+function cmtls_filter_init()
+{
+	drupal_add_js(drupal_get_path('module', 'cmtls_filter') . '/js/app.js');
+}
+
+/**
+ * Implements hook_theme()
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_filter_theme($existing)
+{
+	return array(
+		// filter
+		'cmtls_filter' => array (
+			'arguments' => array('form' => NULL, 'node' => NULL),
+			'template' => 'cmtls-filter',
+			'path' => drupal_get_path('module', 'cmtls_filter') . '/theme',
+		),
+		// customizing the filter form
+		'cmtls_filter_answer_form' => array(
+			'arguments' => array('form' => NULL), 
+		),
+	);
+}
+
+/**
+ * Implents hook_nodeapi()
+ *
+ * @param node $node
+ * @param string $op
+ * @param unknown_type $a3
+ * @param unknown_type $a4
+ * @return array
+ */
+function cmtls_filter_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
+{
+	global $user;
+	
+	static $filter_types;
+
+	if ($op == 'load')
+	{
+		if (!is_array($filter_types))
+		{
+			$filter_types = module_invoke_all('cmtls_filter_info');
+		}
+
+		if (is_array($filter_types[$node->field_cmtls_app_type[0]['value']]))
+		{
+			$filters = new StdClass();
+			$filters->info = $filter_types[$node->field_cmtls_app_type[0]['value']];
+		}
+
+		return array('filters' => $filters);
+	}
+}
+
+/**
+ * 
+ *
+ * @param array $form_state
+ * @param node $node
+ * @return array
+ */
+function cmtls_filter_answer_form(&$form_state, $node)
+{
+	global $user;
+
+	/* these mess up the title bar in modalframe
+	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.core.css');
+	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.theme.css');
+	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.datepicker.css');
+	*/
+
+	/*date_popup_load();*/
+
+	$from_date = strtotime($node->filters->info['default values']['date from']);
+	$from_to = strtotime($node->filters->info['default values']['date to']);
+
+	// If user has chosen a predefined option, set the values of $_GET array
+	// Those values are also used by cmtls_filter_views_query_alter below
+	if (is_numeric($_GET['predefined_choice']))
+	{
+		$_GET['date_from'] = strtotime($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date from']);
+		$_GET['date_to'] = strtotime($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date to']);
+		$_GET['sort'] = $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['sort'];
+		$_GET['search'] = $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['search'];
+	}
+
+	if ($node->filters->info['filter fields']['date from'])
+	{
+		$form['date_from'] = array(
+			'#type' => 'date_popup',
+			'#default_value' => date('Y-m-d', $from_date),
+			'#size' => 8,
+			'#maxlength' => 20,
+			'#attributes' => array('class' => 'filter-input'),
+		);
+
+		if (is_numeric($_GET['date_from']))
+		{
+			$form['date_from']['#value'] = date('Y-m-d', $_GET['date_from']);
+		}
+	}
+
+	if ($node->filters->info['filter fields']['date to'])
+    {
+		$form['date_to'] = array(
+			'#type' => 'date_popup',
+			'#default_value' => date('Y-m-d', $from_to),
+			'#size' => 8,
+			'#maxlength' => 20,
+			'#attributes' => array('class' => 'filter-input'),
+		);
+
+		if (is_numeric($_GET['date_to']))
+		{
+			$form['date_to']['#value'] = date('Y-m-d', $_GET['date_to']);
+		}
+	}
+
+	$options = array();
+	foreach ($node->filters->info['sort options'] as $key=>$value)
+	{
+		$options[$key] = $value['title'];
+	}
+
+	if ($node->filters->info['filter fields']['sort'])
+	{
+		$form['sort'] = array(
+			'#type' => 'select',
+			'#options' => $options,
+			'#default_value' => $node->filters->info['default values']['sort'],
+		);
+
+		if (is_numeric($_GET['sort']))
+		{
+			$form['sort']['#value'] = $_GET['sort'];
+		}
+	}
+
+	// used to clear "Keyword" text when field is clicked/focused
+	drupal_add_js('edit_search_focused = false;', 'inline');
+
+	if ($node->filters->info['filter fields']['search'])
+	{
+		$form['search'] = array(
+			'#type' => 'textfield',
+			'#default_value' => t('Keyword'),
+			'#size' => 8,
+			'#maxlength' => 128,
+			'#attributes' => array('class' => 'filter-input'),
+		);
+
+		if ($_GET['search'])
+		{
+			$form['search']['#value'] = $_GET['search'];
+			
+			// There's no need no clear the text, since it's user submitted or predefined
+			drupal_add_js('edit_search_focused = true;', 'inline');
+		}
+	}
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Search'),
+	);
+
+	$form['#submit'] = array(
+		'cmtls_filter_answer_form_submit',
+	);
+
+	return $form;
+}
+
+function theme_cmtls_filter_answer_form($form)
+{
+	$node = node_load($form['nid']['#value']);
+
+	$output = '';
+	$output .= '<table class="filter-fields">';
+
+	if (isset($form['date_from']) || isset($form['date_to']) || isset($form['search']))
+	{
+		$output .= '<tr>';
+
+		if (isset($form['date_from']) || isset($form['date_to']))
+		{
+			$form['date_from']['date']['#description'] = NULL;
+			$form['date_to']['date']['#description'] = NULL;
+			$form['date_from']['time'] = NULL;
+			$form['date_to']['time'] = NULL;
+			$output .= '<th>';
+			$output .= '<label for="from-date">' . t('Created between') . ':</label>';
+			$output .= '</th>';
+			$output .= '<td>';
+			//$output .= '<input name="" id="from-date" size="8" value="" class="filter-input" type="text"> - <input name="" id="to-date" size="8" value="" class="filter-input" type="text">';
+			$output .= drupal_render($form['date_from']);
+			$output .= ' - ';
+			$output .= drupal_render($form['date_to']);
+			$output .= '</td>';
+		}
+
+		if (isset($form['search']))
+		{
+			$output .= '<th>';
+			$output .= '<label for="search">' . t('Keyword or phrase') . ':</label>';
+			$output .= '</th>';
+			$output .= '<td>';
+			//$output .= '<input name="" id="search" size="8" value="" class="filter-input" type="text">';
+			$output .= drupal_render($form['search']);
+			$output .= '</td>';
+		}
+
+		$output .= '</tr>';
+	}
+
+	$output .= '<tr>';
+
+	if (isset($form['sort']))
+	{
+		$output .= '<th>';
+		$output .= '<label for="sort">' . t('Sort by') . ':</label>';
+		$output .= '</th>';
+		$output .= '<td>';
+		$output .= drupal_render($form['sort']);
+		$output .= '</td>';
+		$output .= '<td>';
+		//$output .= '<input name="" value="' . t('Search') . '" class="form-submit" type="submit">';
+		$output .= drupal_render($form['submit']);
+		$output .= '</td>';
+	}
+
+	$output .= '<td>';
+	$output .= '</td>';
+	$output .= '</tr>';
+	$output .= '</table>';
+	$output .= drupal_render($form);
+
+	return $output;
+}
+
+/**
+ * 
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_filter_answer_form_submit($form, &$form_state)
+{
+	$date_from = strtotime($form['#post']['date_from']['date']);
+	$date_to = strtotime($form['#post']['date_to']['date']);
+
+	$parameters = '?action=search&date_from=' . $date_from . '&date_to=' . $date_to . '&search=' . $form['#post']['search'] . '&sort=' . $form['#post']['sort'];
+
+	$form_state['redirect'] = url($_GET['q'], array('absolute' => TRUE)) . $parameters;
+}
+
+/**
+ * Implents hook_preprocess()
+ * 
+ * @param object $vars
+ * @param string $hook
+ */
+function cmtls_filter_preprocess(&$vars, $hook)
+{
+	if ($hook != 'cmtls_filter' && $vars['view']->name != 'cmtls_filter')
+	{
+		$node = node_load($vars['app_id']);
+
+		if (isset($node->filters->info))
+		{
+			$vars['filter'] = theme(
+				'cmtls_filter',
+				drupal_get_form('cmtls_filter_answer_form', $node),
+				$node
+			);
+		}
+	}
+}
+
+function cmtls_filter_views_query_alter(&$view, &$query)
+{
+	$node = node_load($view->args[0]);
+
+	if (isset($node->filters->info))
+	{
+		if (is_numeric($_GET['tag']) && $node->filters->info['filter fields']['tag'])
+		{
+			$join = new views_join();
+
+			$def = array(
+				'table' => 'term_node',
+				'left_field' => 'nid',
+				'field' => 'nid',
+				'left_table' => 'node',
+			);
+
+			$join->definition = $def;
+			$join->construct();
+			$join->adjusted = TRUE;
+
+			$query->table_queue['term_node'] = array(
+				'table' => 'term_node',
+				'num' => 1,
+				'alias' => 'term_node',
+				'join' => $join,
+				'relationship' => 'node',
+			);
+
+			$query->where[0]['clauses'][] = '{term_node}.tid = %d';
+			$query->where[0]['args'][] = $_GET['tag'];
+		}
+
+		if ($_GET['action'] == 'search' && $_GET['date_from'] && $node->filters->info['filter fields']['date from'])
+		{
+			$query->where[0]['clauses'][] = '{node}.created >= %d';
+			$query->where[0]['args'][] = $_GET['date_from'];
+		}
+
+		if ($_GET['action'] == 'search' && $_GET['date_to'] && $node->filters->info['filter fields']['date to'])
+		{
+			$query->where[0]['clauses'][] = '{node}.created <= %d';
+			$query->where[0]['args'][] = $_GET['date_to'];
+		}
+
+		if ($_GET['action'] == 'search' && $_GET['search'] && $node->filters->info['filter fields']['search'])
+		{
+			$search_clause_position = count($query->where[0]['clauses']);
+			$query->where[0]['clauses'][] = '({node}.title LIKE \'%s\' OR node_revisions.body LIKE \'%s\')';
+			$query->where[0]['args'][] = '%' . $_GET['search'] . '%';
+			$query->where[0]['args'][] = '%' . $_GET['search'] . '%';
+
+			// Search from taxonomy terms
+			if ($node->filters->info['filter fields']['tag'])
+			{
+				// Find id's of terms that match the criteria
+				$sql = "SELECT tid
+					FROM {term_data} AS term_data
+					WHERE name LIKE '%s'";
+				$result = db_query($sql, '%' . $_GET['search'] . '%');
+
+				$terms = array();
+				while ($term = db_fetch_object($result))
+				{
+					$terms[] = $term->tid;
+				}
+
+				if (count($terms) > 0)
+				{
+					$join = new views_join();
+
+					$def = array(
+						'table' => 'term_node',
+						'left_field' => 'nid',
+						'field' => 'nid',
+						'left_table' => 'node',
+					);
+
+					$join->definition = $def;
+					$join->construct();
+					$join->adjusted = TRUE;
+
+					$query->table_queue['term_node'] = array(
+						'table' => 'term_node',
+						'num' => 1,
+						'alias' => 'term_node',
+						'join' => $join,
+						'relationship' => 'node',
+					);
+
+					$query->where[0]['clauses'][$search_clause_position] = "(" . $query->where[0]['clauses'][$search_clause_position] . " OR ({term_node}.tid IN (%s)))";
+					$query->where[0]['args'][] = implode(',', $terms);
+				}
+			}
+		}
+
+		if ($_GET['action'] == 'search' && is_numeric($_GET['sort']) && $node->filters->info['filter fields']['sort'])
+		{
+			$query->orderby = array($node->filters->info['sort options'][$_GET['sort']]['field'] . ' ' . $node->filters->info['sort options'][$_GET['sort']]['direction']);
+		}
+	}
+}
+
+/**
+ * Defines hook_cmtls_filter_info()
+ * 
+ * @return array
+ */
+function hook_cmtls_filter_info()
+{
+	return array(
+		'example_node_type' => array(
+			'filter predefined options' => array(
+				array(
+					'title' => t('Title 1'),
+					'default values' => array(
+						'sort' => 0,
+						'date from' => '-7 days',
+						'date to' => 'now',
+						'search' => '',
+					),
+					'where' => array(
+						'clauses' => array(),
+						'args' => array(),
+					), // where
+				),
+
+				array(
+					'title' => t('Title 2'),
+					'default values' => array(
+						'sort' => 0,
+						'date from' => '-7 days',
+						'date to' => 'now',
+						'search' => '',
+					),
+					'where' => array(
+						'clauses' => array(),
+						'args' => array(),
+					), // where
+				),
+			), // filter predefined options
+
+			'filter fields' => array(
+				'tag' => FALSE,
+				'search' => FALSE,
+				'date from' => FALSE,
+				'date to' => FALSE,
+				'sort' => FALSE,
+			), // filter fields
+
+			'taxonomy dictionary id' => NULL,
+
+			'sort options' => array(
+				array(
+					'field' => 'field_name',
+					'direction' => 'DESC',
+					'title' => 'Field Description',
+				),
+			),
+
+			'default sort' => 0,
+
+		), // node type
+	);
+}

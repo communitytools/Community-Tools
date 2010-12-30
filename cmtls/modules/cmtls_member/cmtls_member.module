@@ -1,0 +1,614 @@
+<?php
+
+include_once('cmtls_member.features.inc');
+
+/**
+ * Implements hook_init()
+ * 
+ * Adds context menu styles and scripts
+ *
+ */
+function cmtls_member_init()
+{
+}
+
+function cmtls_member_cmtls_app()
+{
+	return array(
+		'cmtls_member' => array(
+			'title' => t('Members'),
+			'callback' => 'views_embed_view',
+			'callback arguments' => array(
+				'cmtls_members',
+				'default',
+				arg(1),
+			),
+		),
+	);
+}
+
+/**
+ * Implements hook_menu()
+ * Member menu items
+ *
+ * @return array
+ */
+function cmtls_member_menu()
+{
+	$items = array();
+	
+	$items['cmtls/%node/member/%'] = array(
+		'title' => 'Member',
+		'page callback' => 'cmtls_member_page',
+		'page arguments' => array(1, 3),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 1),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/members'] = array(
+		'title' => 'Member',
+		'page callback' => 'cmtls_members_page',
+		'page arguments' => array(1),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 1),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/member/%user/edit'] = array(
+		'title' => 'Edit',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('user_profile_form', 3, 'account'),
+		'access callback' => 'user_edit_access',
+		'access arguments' => array(3),
+		'type' => MENU_CALLBACK,
+		'file' => 'user.pages.inc',
+		'file path' => drupal_get_path('module', 'user'),
+	);
+	
+	$items['cmtls/%node/member/%user/delete'] = array(
+		'title' => 'Delete',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('user_confirm_delete', 3),
+		'access callback' => 'cmtls_member_own_delete_permission',
+		'access arguments' => array(3),
+		'type' => MENU_CALLBACK,
+		'file' => 'user.pages.inc',
+		'file path' => drupal_get_path('module', 'user'),
+	);
+	
+	$items['cmtls/login/redirect'] = array(
+		'title' => 'redirect',
+		'page callback' => 'cmtls_member_login_redirect',
+	    'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/member/%user/create_admin'] = array(
+		'title' => 'Create group administrator',
+		'type' => MENU_CALLBACK,
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('og_create_admin_confirm', 1, 3),
+		'access callback' => 'og_is_group_admin',
+		'access arguments' => array(1),
+		'file path' => drupal_get_path('module', 'og'),
+		'file' => 'og.pages.inc',
+	);
+	
+	$items['cmtls/%node/member/%user/remove_admin'] = array(
+		'title' => 'Create group administrator',
+		'type' => MENU_CALLBACK,
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('og_remove_admin_confirm', 1, 3),
+		'access callback' => 'og_is_group_admin',
+		'access arguments' => array(1),
+		'file path' => drupal_get_path('module', 'og'),
+		'file' => 'og.pages.inc',
+	);
+	
+	return $items;
+}
+
+
+/**
+ * Implementation of hook_user()
+ */
+function cmtls_member_user($op, &$edit, &$account, $category = NULL){
+	switch($op){
+		case 'insert':
+			$group = _cmtls_group_get_main();
+
+			og_save_subscription($group->nid, $account->uid, array('is_active' => 1));
+
+			break;
+		case 'login':
+			$main_group = _cmtls_group_get_main();
+
+			modalframe_close_dialog(array(
+				'redirect' => base_path().'cmtls/'.$main_group->nid.'/member/'.$account->uid,
+			));
+
+			break;
+	}
+}
+
+/**
+ * Member profile page
+ *
+ * @param node $group Group context
+ * @param integer $uid user ID
+ * @return unknown
+ */
+function cmtls_member_page($group, $uid)
+{
+	global $user;
+	
+	// Send the Modal Frame javascript for parent windows to the page.
+	modalframe_parent_js();
+	
+	return views_embed_view('cmtls_member', 'default', $group->nid, $uid);
+}
+
+/**
+ * Member profile page
+ *
+ * @param node $group Group context
+ * @param integer $uid user ID
+ * @return unknown
+ */
+function cmtls_members_page($group)
+{
+	global $user;
+	
+	// Send the Modal Frame javascript for parent windows to the page.
+	modalframe_parent_js();
+	
+	return views_embed_view('cmtls_members', 'default', $group->nid);
+}
+
+/**
+ * User profile form alter
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @param unknown_type $form_id
+ */
+function cmtls_member_form_alter(&$form, &$form_state, $form_id)
+{
+	if(!_cmtls_is()){ return; }
+
+	switch($form_id){
+
+		/*
+		 * User profile form
+		 */
+		case 'user_profile_form':
+			// Send the Modal Frame javascript for child windows to the page.
+			modalframe_child_js();
+	
+			$weight = 1;
+			foreach($form['account'] as $key => $field)
+			{
+				if(strpos($key, '#') !== 0)
+				{
+					$field['#weight'] = $weight;
+					$weight++;
+					$form[$key] = $field;
+				}
+			}
+			
+			foreach($form['picture'] as $key => $field)
+			{
+				if(strpos($key, '#') !== 0)
+				{
+					$field['#weight'] = $weight;
+					$weight++;
+					$form[$key] = $field;
+				}
+			}
+			
+			foreach($form['Community Tools: Member'] as $key => $field)
+			{
+				if(strpos($key, '#') !== 0)
+				{
+					$field['#weight'] = $weight;
+					$weight++;
+					$form[$key] = $field;
+				}
+			}
+	
+			// Lift the name element
+			$form['profile_cmtls_member_name']['#weight'] = 0;
+			// Sink the locale selection element
+			$form['locale']['#weight'] = 25;
+	
+			$form['Community Tools: Member'] = NULL;
+			$form['picture'] = NULL;
+			$form['account'] = NULL;
+			$form['theme_select'] = NULL;
+			$form['locale'] = NULL;
+	
+			$form['#submit'][] = 'cmtls_member_form_submit';
+			
+			if($form['actions']['cancel'])
+			{
+				$form['actions']['cancel'] = array(
+					'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+				);
+			}
+	
+			break;
+
+		/*
+		 * User deletion confirmation dialog
+		 */
+		case 'user_confirm_delete':
+			// Send the Modal Frame javascript for child windows to the page.
+			modalframe_child_js();
+			
+			$form['#submit'][] = 'cmtls_member_delete_submit';
+			$form['actions']['cancel'] = array(
+				'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+			);
+	
+			break;
+
+		/*
+		 * Group admin creation confirmation dialog
+		 */
+		case 'og_create_admin_confirm':
+			// Send the Modal Frame javascript for child windows to the page.
+			modalframe_child_js();
+			
+			$form['#submit'][] = 'cmtls_member_create_admin_submit';
+			
+			if($form['actions']['cancel'])
+			{
+				$form['actions']['cancel'] = array(
+					'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+				);
+			}
+	
+			break;
+
+		/*
+		 * Group admin removal confirmation dialog
+		 */
+		case 'og_remove_admin_confirm':
+			// Send the Modal Frame javascript for child windows to the page.
+			modalframe_child_js();
+			
+			$form['#submit'][] = 'cmtls_member_remove_admin_submit';
+			
+			if($form['actions']['cancel'])
+			{
+				$form['actions']['cancel'] = array(
+					'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+				);
+			}
+	
+			break;
+	}
+}
+
+// Is this needed anymore?
+function user_login_save_previous_login($form, &$form_state)
+{
+	$account = user_load(array('name' => $form_state['values']['name'], 'pass' => trim($form_state['values']['pass']), 'status' => 1));
+	
+	if($account->uid)
+	{
+		db_query("UPDATE {users} SET previous_login = %d WHERE uid = %d", $account->login, $account->uid);
+	}
+}
+
+
+function cmtls_member_form_submit($form, &$form_state)
+{
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+function cmtls_member_create_admin_submit($form, &$form_state)
+{
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+function cmtls_member_remove_admin_submit($form, &$form_state)
+{
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+function cmtls_member_delete_submit($form, &$form_state)
+{
+	global $user;
+	
+	$main_group = _cmtls_group_get_main();
+	
+	modalframe_close_dialog(array(
+		'redirect' => base_path().'cmtls/'.$main_group->nid,
+	));
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the member view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_member_theme($existing)
+{
+	return array(
+		// members view
+		'views_view__cmtls_members__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-members--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_member').'/theme',
+		),
+		'views_view_unformatted__cmtls_members__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-members--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_member').'/theme',
+		),
+		'views_view_fields__cmtls_members__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-members--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_member').'/theme',
+		),
+		// member profile view
+		'views_view__cmtls_member__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-member--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_member').'/theme',
+		),
+		'views_view_unformatted__cmtls_member__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-member--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_member').'/theme',
+		),
+		'views_view_fields__cmtls_member__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-member--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_member').'/theme',
+		),
+	);
+}
+
+function _cmtls_member_name($fields, $link_to_member = FALSE, $shorten = FALSE)
+{
+	//printr($fields);
+	
+	if(!$fields['value']->raw)
+	{
+		$name = $fields['name']->raw;
+	}
+	else 
+	{
+		$name = $fields['value']->raw;
+		
+		if($shorten)
+		{
+			$name = explode(' ', $name);
+			if(sizeof($name) > 1)
+			{
+				$last_fragment = array_pop($name);
+				$name = implode(' ', $name).' '.$last_fragment[0].'.';
+			}
+			else 
+			{
+				$name = $fields['value']->raw;
+			}
+			
+		}
+	}
+	
+	if($link_to_member && $fields['uid']->raw)
+	{
+		$current_group = _cmtls_group_get_current();
+		$name = l($name, 'cmtls/'.$current_group->nid.'/member/'.$fields['uid']->raw);
+	}
+	
+	return $name;
+}
+
+function _cmtls_member_name_by_uid($uid) {
+	$user = user_load($uid);
+	profile_load_profile($user);
+
+	$name = $user->name;
+
+	/*$name = db_result(db_query("SELECT value FROM {profile_values} WHERE uid = %d LIMIT 1", $uid));
+
+	if (!$name) {
+		$name = db_result(db_query("SELECT name FROM {users} WHERE uid = %d", $uid));
+	}*/
+
+	$current_group = _cmtls_group_get_current();
+	$name = l($name, 'cmtls/' . $current_group->nid . '/member/' . $uid);
+
+	return $name;
+}
+
+function _cmtls_member_avatar($uid = NULL, $width = 100, $link_to_member = FALSE)
+{
+	if(!$uid)
+	{
+		global $user;
+		$account = $user;
+	}
+	
+	if(is_numeric($uid))
+	{
+		$account = user_load($uid);
+	}
+	else 
+	{
+		$account = $uid;
+	}
+
+	if($account->euid && $account->use_fb_avatar && $account->fb_avatar)
+	{
+		$output = '<img class="avatar" src="'.imagecache_create_url('avatar_small',$account->fb_avatar).'" width="'.$width.'" height="'.$width.'" alt="">';
+	}
+	else 
+	{
+		$output = '<img class="avatar" src="'.($account->picture ? file_create_url($account->picture) : _cmtls_get_default_avatar_url()).'" width="'.$width.'" height="'.$width.'" alt="">';
+	}
+	
+	if ($link_to_member) {
+		$current_group = _cmtls_group_get_current();
+		$output = '<a class="avatar" href="'.base_path().'cmtls/'.$current_group->nid.'/member/'.$account->uid.'">'.$output.'</a>';
+	}
+	return $output;	
+}
+
+function _cmtls_member_avatar_url($fields)
+{
+	return $fields['picture']->raw ? file_create_url($fields['picture']->raw) : _cmtls_get_default_avatar_url();
+}
+
+/**
+ * Helper function to get the default avatar
+ *
+ * @return string the URL to the default avatar
+ */
+function _cmtls_get_default_avatar_url()
+{
+	$path = drupal_get_path('theme', 'cmtls_theme').'/images/default-avatar.jpg';
+	
+	$url = base_path().$path;
+	
+	return $url;
+}
+
+/**
+ * Implements hook_preprocess()
+ * Adds current groups current app node to template variables
+ *
+ * @param unknown_type $vars
+ * @param unknown_type $hook
+ */
+function cmtls_member_preprocess(&$vars, $hook)
+{
+	if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
+
+	global $user;
+	
+	profile_load_profile($user);
+	
+	$vars['user'] = $user;
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function cmtls_member_token_values($type, $object = NULL, $options = array())
+{
+	$values = array();
+	switch ($type)
+	{
+		case 'user':
+			
+			$account = $object;
+			profile_load_profile($account);
+			
+			$values['cmtls-member-avatar-url'] = _cmtls_member_avatar($account, 16);
+			$values['cmtls-member-name'] = _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid)));
+			$values['cmtls-member-name-link'] = _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid)), TRUE);
+			$values['cmtls-member-name-short'] = _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid)), FALSE, TRUE);
+			$values['cmtls-member-name-short-link'] = _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid)), TRUE, TRUE);
+			$values['cmtls-member-skype'] = $account->profile_cmtls_member_skype;
+			$values['cmtls-member-phone'] = $account->profile_cmtls_member_phone;
+			$values['cmtls-member-address'] = $account->profile_cmtls_member_address;
+			$values['cmtls-member-url'] = $account->profile_cmtls_member_url;
+			$values['cmtls-member-description'] = $account->profile_cmtls_member_description;
+		
+		break;
+	}
+	return $values;
+}
+
+/**
+ * Implementation of hook_token_list().
+ */
+function cmtls_member_token_list($type = 'all')
+{
+	$tokens = array();
+	
+	if ($type == 'user' || $type == 'all')
+	{
+		$tokens['user']['cmtls-member-avatar-url'] = 'cmtls picture';
+		$tokens['user']['cmtls-member-name'] = 'cmtls full name';
+		$tokens['user']['cmtls-member-name-link'] = 'cmtls full name';
+		$tokens['user']['cmtls-member-name-short'] = 'cmtls short name';
+		$tokens['user']['cmtls-member-name-short-link'] = 'cmtls short name';
+		$tokens['user']['cmtls-member-skype'] = 'cmtls Skype';
+		$tokens['user']['cmtls-member-phone'] = 'cmtls phone';
+		$tokens['user']['cmtls-member-address'] = 'cmtls address';
+		$tokens['user']['cmtls-member-url'] = 'cmtls homepage';
+		$tokens['user']['cmtls-member-description'] = 'cmtls description';
+	}
+		
+	return $tokens;
+}
+
+function cmtls_member_login_redirect()
+{
+	global $user;
+	
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+	
+	$main_group = _cmtls_group_get_main();
+	
+	modalframe_close_dialog(array(
+		'redirect' => base_path().'cmtls/'.$main_group->nid.'/member/'.$user->uid,
+	));
+	
+	return '';
+}
+
+/**
+ * Enter description here...
+ *
+ * @param unknown_type $account
+ * @return unknown
+ */
+function cmtls_member_own_delete_permission($account)
+{
+	global $user;
+	
+	if($user->uid && $account->uid && ($user->uid == $account->uid || $user->uid == 1))
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+/*
+function cmtls_member_cmtls_dashboard_widgets($group, $app)
+{
+	return array(
+		'cmtls_member_latest_widget' => array(
+			'title' => 'Viimased liitujad',
+			'content' => 'muhhahahahahasds',
+		),
+	);
+}
+*/

@@ -1,0 +1,888 @@
+<?php
+
+include_once('cmtls.features.inc');
+
+function printr($var)
+{
+	echo '<pre>';
+	print_r($var);
+	echo '</pre>';
+}
+
+/**
+ * Implements hook_init()
+ * 
+ * Adds context menu styles and scripts
+ *
+ */
+function cmtls_init()
+{
+	// context menu
+	drupal_add_css(drupal_get_path('module', 'cmtls').'/css/context_menu.css');
+	drupal_add_js(drupal_get_path('module', 'cmtls') .'/js/jquery.contextMenu.js');
+	drupal_add_js(drupal_get_path('module', 'cmtls') .'/js/app.js');
+	drupal_add_css(drupal_get_path('module', 'cmtls').'/css/cmtls.css');
+	
+	// Send the Modal Frame javascript for parent windows to the page.
+	modalframe_parent_js();
+	
+	drupal_set_html_head('<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js"></script>');
+}
+
+/**
+ * Implents hook_nodeapi()
+ * Adds context menu edit actions (by invoking hook_cmtls_context) and adds cmtls_context_button attribute to nodes
+ *
+ * @param node $node
+ * @param string $op
+ * @param unknown_type $a3
+ * @param unknown_type $a4
+ * @return array
+ */
+function cmtls_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
+{
+	global $user;
+	
+	static $binds;
+
+	// some of the cck fields "forget" their value after saving
+	if($op == 'insert' && $user->uid && strpos($node->type, 'cmtls_') === 0)
+	{
+		db_query("DELETE FROM {cache_content} WHERE cid LIKE '%content:%d%'", $node->nid);	
+	}
+
+	// Generate icons for uploaded files
+	if ($op == 'load' && strpos($node->type, 'cmtls_') === 0)
+	{
+		module_load_include('inc', 'cmtls_gallery', 'cmtls_gallery.file_types');
+		$file_types = cmtls_gallery_get_file_type_map();
+
+		if (is_array($node->field_cmtls_files)) {
+			foreach ($node->field_cmtls_files as $key => &$file) {
+				if (is_array($file)) {
+					// Figure out the object type we're about to render
+					$file_extension = explode('.', $file['filename']);
+					$file_extension = !empty($file_extension) ? strtolower(array_pop($file_extension)) : '';
+					$object_type = isset($file_types[$file_extension]) ? $file_types[$file_extension]['type'] : '';
+
+					// Render element according to type of object
+					switch ($object_type) {
+						case 'image':
+							$file['imagecache_icon'] = theme('imagecache', 'small', $file['filepath'], $file['data']['description'], $file['data']['description']);
+							break;
+						case 'video':
+						case 'audio':
+						default:
+							$icon_name = (isset($file_types[$file_extension]) and isset($file_types[$file_extension]['icon'])) ? $file_types[$file_extension]['icon'] : strtolower($file_extension) . '.png';
+							// Try to get icon for the file
+							if (file_exists(drupal_get_path('module', 'cmtls_gallery') . '/icons/' . $icon_name)) {
+								$icon = url(drupal_get_path('module', 'cmtls_gallery') . '/icons/' . $icon_name);
+							}
+							else {
+								// Try to get generic icon for file type
+								if (file_exists(drupal_get_path('module', 'cmtls_gallery') . '/icons/' . $file_types[$file_extension]['type'] . '.png')) {
+									$icon = url(drupal_get_path('module', 'cmtls_gallery') . '/icons/' . $file_types[$file_extension]['type'] . '.png');
+								// Use default icon for file
+								}
+								else {
+									$icon = url(drupal_get_path('module', 'cmtls_gallery') . '/icons/default.png');
+								}
+							}
+							$file['imagecache_icon'] = '<img src="' . $icon . '" alt="' . $file['data']['description'] . '" />';
+					}
+					$file['imagecache_object_type'] = $object_type;
+				}
+			}
+		}
+	}
+
+	if($op == 'load' && $user->uid && strpos($node->type, 'cmtls_') === 0)
+	{
+		$context = module_invoke_all('cmtls_context');
+		
+		if(is_array($context['script']))
+		{
+			foreach($context['script'] as $script)
+			{
+				drupal_add_js($script);
+			}
+			
+		}
+		else 
+		{
+			drupal_add_js($context['script']);
+		}
+		
+		unset($context['script']);
+		
+		$context_actions = array();
+		$add_json = array();
+		
+		foreach ($context as $node_type => &$actions) if($node_type == $node->type)
+		{
+			foreach($actions as $name => $action)
+			{
+				if(isset($action['access callback']))
+				{
+					if(isset($action['access arguments']))
+					{
+						// replace 'node' in argument list with $node
+						foreach($action['access arguments'] as &$arg)
+						{
+							switch ($arg)
+							{
+								case 'node':
+									$arg = $node;
+									$add_json['node'] = 1;
+								break;
+							
+								/*
+								case 'user':
+									$arg = $user;
+									$add_json['user'] = 1;
+								break;
+								*/
+							
+								default: break;
+							}
+						}
+						
+						if(call_user_func_array($action['access callback'], $action['access arguments']))
+						{
+							$context_actions[$name] = $action;
+						}
+					}
+					elseif($actions['access callback']()) 
+					{
+						$context_actions[$name] = $action;
+					}
+				}
+				else 
+				{
+					$context_actions[$name] = $action;
+				}
+				
+				// add the bind
+				if(!isset($binds[$name]))
+				{
+					$bind = "$.fn.contextMenu.addAction({name: '".$name."', title: '".$action['title']."', bind: ".$name."});";
+					
+					drupal_add_js($bind, 'inline');
+					
+					$binds[$name] = 1;
+				}
+			}
+		}
+		
+		$anchor = '';
+		
+		if(sizeof($context_actions))
+		{
+			$buttons = implode(',', array_keys($context_actions));
+			$anchor_src = base_path().'sites/all/themes/cmtls_theme/images/edit.png';
+			
+			$anchor = '<img src="'.$anchor_src.'" class="context_anchor" width="24" height="24" buttons="'.$buttons.'"';
+			
+			if(isset($add_json['node']))
+			{
+				$node_json = _cmtls_node_json($node);
+				$anchor .= " object='".$node_json."'";
+			}
+			
+			$anchor .= '>';
+			
+		}
+		
+	    //printr($context_actions); // exit;
+		return array('cmtls_context_button' => $anchor);
+	}
+
+}
+
+
+/**
+ * Helper function to filter node attributes
+ *
+ * @return array
+ */
+function _cmtls_node_attributes()
+{
+	return array(
+		'nid',
+		'uid',
+		'name',
+		'type',
+		'language',
+		'status',
+		'created',
+	);
+}
+
+function _cmtls_node_json_prepare($node)
+{
+	$node_json = array();
+	
+	foreach(_cmtls_node_attributes() as $attr)
+	{
+		$node_json[$attr] = $node->$attr;
+	}
+	
+	return (object)$node_json;
+}
+
+/**
+ * Helper function to encode a node to json
+ *
+ * @param node $node
+ * @return string
+ */
+function _cmtls_node_json($node)
+{
+	return json_encode(_cmtls_node_json_prepare($node));
+}
+
+
+/**
+ * Implements hook_form_alter
+ * prepare app node form for cleanup
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_form_alter(&$form, &$form_state, $form_id)
+{
+	if($form_id == 'node_delete_confirm' && _cmtls_is())
+	//if($form_id == 'node_delete_confirm')
+	{
+		// Send the Modal Frame javascript for child windows to the page.
+		modalframe_child_js();
+		
+		if($form['actions']['cancel'])
+		{
+			$form['actions']['cancel'] = array(
+				'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+			);
+		}
+		
+		$form['#submit'][] = 'cmtls_delete_confirm_submit';
+		
+		$form['#node'] = node_load($form['nid']['#value']);
+		
+	    $form_state['redirect']  = NULL;
+	}
+	
+	if($form_id == 'page_node_form' && $_GET['preselect_menu'] == 'cmtls-site-menu')
+	{
+		$form['menu']['parent']['#default_value'] = 'cmtls-site-menu:0';
+		$form['menu']['link_title']['#required'] = 1;
+	}
+	
+	//printr($form); exit;
+}
+
+function cmtls_delete_confirm_submit($form, &$form_state)
+{
+	$node = $form['#node'];
+	
+	if($node->type == 'cmtls_group')
+	{
+		//$main_group = _cmtls_group_get_main();
+		//$redirect = base_path().'cmtls/'.$main_group->nid;
+		
+		$redirect = base_path().'cmtls/list';
+	}
+	elseif ($node->type == 'cmtls_app')
+	{
+		$current_group = _cmtls_group_get_current();
+		$redirect = base_path().'cmtls/'.$current_group->nid;
+	}
+	else 
+	{
+		$current_group = _cmtls_group_get_current();
+		$current_app = _cmtls_app_get_current($current_group);
+		$redirect = base_path().'cmtls/'.$current_group->nid.'/'.$current_app->nid;
+	}
+	
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'redirect' => $redirect,
+	));
+}
+
+/**
+ * Common install procedures
+ *
+ * @param string $module_name 
+ */
+function cmtls_module_install($module_name)
+{
+	// Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
+	db_query("UPDATE {system} SET weight = 11 WHERE name = '%s'", $module_name);
+}
+
+/**
+ * The context edit menu for nodes hook example
+ *
+ * @return array
+ */
+function hook_cmtls_context()
+{
+	return array(
+		'example_node_type' => array(
+			'example_action_function' => array(
+				'title' => 'Example action',
+				'access callback' => 'example_access',
+				'access arguments' => array(),
+			),
+			'example_action_function2' => array(
+				'title' => 'Example action 2',
+			),
+		),
+		'script' => 'js/example_actions.js',
+	);
+}
+
+/**
+ * Helper function to determine if this is the CT subsite
+ *
+ * @return boolean
+ */
+function _cmtls_is()
+{
+	if(arg(0) == 'cmtls')
+	{
+		return TRUE;
+	}
+	else 
+	{
+		return FALSE;
+	}
+}
+
+/**
+ * returns the node::cmtls_context_button attribute containing the edit button HTML
+ *
+ * @param integer $nid the node ID
+ * @return string
+ */
+function _cmtls_edit_button($nid)
+{
+	$node = node_load($nid);
+	
+	return $node->cmtls_context_button;
+}
+
+/**
+ * Returns the Drupal path to the node, false if no pathing function is found
+ * Each module should implement the node type pathing function <NODE_TYPE>_path($node, $group)
+ *
+ * @param integer $nid node ID
+ * @param mixed $group the group node object or the group node ID, defaults to current group
+ * @return mixed
+ */
+function cmtls_path_to_node($node, $group = NULL)
+{
+	static $nodes;
+	
+	if(!is_object($node)) $node = node_load($node);
+	
+	if(isset($nodes[$node->nid])) return $nodes[$node->nid];
+	
+	if($group && !is_object($group)) $group = node_load($group);
+	
+	if(!$group->nid) $group = _cmtls_group_get_current();
+	
+	$path_function = $node->type.'_path';
+	
+	if(function_exists($path_function))
+	{
+		$nodes[$node->nid] = $path_function($node, $group);
+		return $nodes[$node->nid];
+	}
+	else 
+	{
+		return FALSE;
+	}
+}
+
+function cmtls_node_edit_page($node_type, $node = NULL)
+{
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+	
+	module_load_include('inc', 'node', 'node.pages');
+	
+	if(!$node)
+	{
+		return node_add($node_type);
+	}
+	else 
+	{
+		return node_page_edit($node);
+	}
+}
+
+function cmtls_mail($key, &$message, $params)
+{
+	$language = $message['language'];
+	//$variables = user_mail_tokens($params['account'], $language);
+	
+	if($key == 'cmtls_mail')
+	{
+		$message['subject'] = $params['subject'];
+		$message['body'][] = $params['body'];
+	}
+}
+
+/**
+ * Implementation of hook_perm
+ */
+function cmtls_perm()
+{
+	return array('administer cmtls');
+}
+
+/**
+ * Implementation of hook_menu
+ */
+function cmtls_menu()
+{
+	$items = array();
+	
+	$items['admin/build/cmtls'] = array(
+		'title' => 'Community Tools',
+		'description' => 'Community Tools',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('cmtls_admin_settings'),
+		'access arguments' => array('administer cmtls'),
+		'type' => MENU_NORMAL_ITEM
+	);
+	
+	$items['cmtls/node/%node'] = array(
+		'title callback' => 'node_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'node_page_view',
+		'page arguments' => array(2),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 2),
+		'type' => MENU_CALLBACK
+	);
+   
+	return $items;
+}
+
+function cmtls_admin_settings()
+{
+	$form = array();
+	
+	// Define Form
+	$form['cmtls_map_default_layer'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Default map layer'),
+		'#description' => t('Default map layer machine name: osm_mapnik, google_satellite, google_hybrid, google_normal, google_physical'),
+		'#default_value' => variable_get('cmtls_map_default_layer', 'osm_mapnik'),
+	);
+	
+	$form['cmtls_map_default_centerpoint'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Default map centerpoint'),
+		'#description' => t('Geo coordinate: latitude, longitude. Example: 24.734559058178, 59.424735894784'),
+		'#default_value' => variable_get('cmtls_map_default_centerpoint', '25.013607,58.595272'),
+	);
+	
+	$form['cmtls_map_default_zoom'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Default map zoom'),
+		'#description' => t('The zoom state'),
+		'#default_value' => variable_get('cmtls_map_default_zoom', '8'),
+	);
+	
+	$form['cmtls_comment_notifications'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Send notifications about new comments to users'),
+		'#description' => t('Notifications are sent the owner of the commented node and all commenters in that node'),
+		'#default_value' => variable_get('cmtls_comment_notifications', '1'),
+	);
+	
+	$form['cmtls_daily_digest'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Send daily e-mail about new content to users'),
+		'#description' => t('Notifications are sent daily about new content and commented content within last 24hrs'),
+		'#default_value' => variable_get('cmtls_daily_digest', '1'),
+	);
+	
+	// Make a system setting form and return
+	return system_settings_form($form);
+}
+
+function cmtls_block($op = 'list', $delta = 0, $edit = array())
+{
+	global $user;
+		
+	if($op == 'list')
+	{
+		$blocks = array();
+		
+		$blocks['cmtls_site_menu'] = array(
+			'info' => t('Community Tools: site menu'),
+			'status' => 1,
+			'region' => 'cmtls_site_menu',
+		);
+		
+		return $blocks;
+	}
+	
+	if($op == 'view' && $delta == 'cmtls_site_menu')
+	{
+		$menu = menu_tree_all_data('cmtls-site-menu');
+		
+		//printr($menu); exit;
+		
+		foreach ($menu as &$data) if(strpos($data['link']['href'], 'node/') === 0)
+		{
+			$data['link']['href'] = 'cmtls/'.$data['link']['href'];
+		}
+		
+		// page add link for admins
+		if($user->uid == 1 || in_array('admin', $user->roles))
+		{
+			$menu['cmtls_site_menu_add'] = array(
+				'link' => array(
+					'link_title' => t('+ Add page'),
+					'link_path' => 'node/add/page',
+					'title' => t('+ Add page'),
+					'href' => 'node/add/page',
+					'localized_options' => array(
+						'query' => 'preselect_menu=cmtls-site-menu',
+						'attributes' => array(
+							'target' => '_blank',
+						),
+					),
+				),
+			);
+		}
+		
+		//printr($menu); exit;
+		
+		$block = array(
+			'content' => theme('cmtls_site_menu', menu_tree_output($menu)),
+		);
+		
+		return $block;
+	}
+}
+
+function cmtls_fbconnect_config_alter(&$config)
+{
+	// the fbconnect and wysiwyg_imageupload do not get along so this removes fbconnect footer additions from edit and add forms
+	if(arg(0) == 'wysiwyg_imageupload' && arg(1) == 'upload')
+	{
+		unset($config['api_key']);
+		unset($config['secret_api_key']);
+	}
+	
+}
+
+function cmtls_cron()
+{
+	if(!variable_get('cmtls_daily_digest', '1')) return;
+	
+	//variable_set('cmtls_daily_digest_send', 1);
+	$last_daily_send = variable_get('cmtls_daily_digest_send', 1);
+	
+	$daily_interval = time() - (60 * 60 * 23.5);
+	//printr($last_daily_send);
+	//printr($daily_interval);
+	
+	if($last_daily_send > $daily_interval) return;
+	
+	//$daily_interval = strtotime('today');
+	//$daily_interval = strtotime('2010-10-01');
+	
+	printr($daily_interval);
+	
+	$mail_contents = array(
+		'new_groups' => array(),
+		'new_content' => array(),
+		'commented_content' => array(),
+	);
+	
+	// get users and their groups
+	$users = array();
+	
+	$users_sent = 0;
+	
+	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, (SELECT group_concat(sub_og_uid.nid) FROM {og_uid} AS sub_og_uid WHERE sub_og_uid.uid = users.uid) AS groups FROM {users} AS users LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2";
+	$result = db_query($sql);
+	while ($user = db_fetch_object($result))
+	{
+		$user->groups = explode(',', $user->groups);
+		
+		$users[$user->uid] = $user;
+	}
+	
+	// get all the groups
+	$groups = array();
+	
+	$sql = "SELECT * FROM {node} WHERE type = 'cmtls_group' AND status = 1";
+	$result = db_query($sql);
+	while ($group = db_fetch_object($result))
+	{
+		if($group->created > $daily_interval)
+		{
+			$group->new = 1;
+			
+			$mail_contents['new_groups'][$group->nid] = $group->title.' by '.$users[$group->uid]->name;
+		}
+		else 
+		{
+			$group->new = 0;
+		}
+		
+		$groups[$group->nid] = $group;
+	}
+	
+	$apps = array();
+	
+	// get all the apps
+	$sql = "SELECT * FROM {node} AS node LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid WHERE node.type = 'cmtls_app' AND node.status = 1 AND nodehierarchy.parent <> 0";
+	$result = db_query($sql, $daily_interval);
+	while ($app = db_fetch_object($result))
+	{
+		$groups[$app->parent]->apps[$app->nid] = $app;
+	}
+	
+	// get fresh content
+	$sql = "SELECT * FROM
+	{node} AS node
+	LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid
+	LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON node.nid = node_comment_statistics.nid
+	WHERE
+	node.type NOT IN ('cmtls_group', 'cmtls_app')
+	AND node.type LIKE 'cmtls_%'
+	AND node.status = 1
+	AND nodehierarchy.parent <> 0
+	AND (node.created > %d OR (node_comment_statistics.comment_count > 0 AND node_comment_statistics.last_comment_timestamp > %d))
+	";
+	
+	//printr($sql);
+	$new_content_group_ids = array();
+	$new_content_app_ids = array();
+	
+	$result = db_query($sql, $daily_interval, $daily_interval);
+	while ($content = db_fetch_object($result))
+	{
+		foreach ($groups as $group_id => &$group)
+		{
+			if(in_array($content->parent, array_keys($group->apps)))
+			{
+				$group->apps[$content->parent]->content[$content->nid] = $content;
+				
+				if(!in_array($group_id, $new_content_group_ids))
+				{
+					$new_content_group_ids[$group_id] = $group_id;
+				}
+				
+				if(!in_array($content->parent, $new_content_app_ids))
+				{
+					$new_content_app_ids[$content->parent] = $content->parent;
+				}
+				
+				break;
+			}
+		}
+		
+		if($content->created > $daily_interval)
+		{
+			$mail_contents['new_content'][$content->parent][$content->nid] = '- '.$group->apps[$content->parent]->title.' > '.$content->title.($content->comment_count && $content->last_comment_timestamp > $a_interval ? ' ('.$content->comment_count.') ' : ' ').url(cmtls_path_to_node($content->nid, $group), array('absolute' => TRUE));
+		}
+		else 
+		{
+			$mail_contents['commented_content'][$content->parent][$content->nid] = '- '.$group->apps[$content->parent]->title.' > '.$content->title.($content->comment_count ? ' ('.$content->comment_count.') ' : ' ').url(cmtls_path_to_node($content->nid, $group), array('absolute' => TRUE));
+		}
+	}
+	
+	if(!empty($mail_contents['new_content']) || !empty($mail_contents['commented_content']) || !empty($mail_contents['new_groups']))
+	{
+		$site_name = variable_get('site_name', 'CT');
+		
+		foreach($users as $user_id => &$user)
+		{
+			// if any users groups has new content
+			$user_new_content_group_ids = array_intersect($user->groups, $new_content_group_ids);
+			
+			if(!empty($user_new_content_group_ids) || !empty($mail_contents['new_groups']))
+			{
+				$body = '';
+				
+				foreach ($user_new_content_group_ids as &$group_id)
+				{
+					$user_new_content_app_ids = array_intersect(array_keys($groups[$group_id]->apps), $new_content_app_ids);
+					
+					$i = 0;
+					foreach ($user_new_content_app_ids as &$app_id)
+					{
+						if(!empty($mail_contents['new_content'][$app_id]))
+						{
+							$i++;
+							
+							if($i == 1) $body .= t('New content in !groupname', array('!groupname' => $groups[$group_id]->title))."\n";
+							$body .= implode("\n", $mail_contents['new_content'][$app_id])."\n";
+						}
+					}
+						
+					if($i > 0) $body .= "\n";
+						
+					$i = 0;
+					foreach ($user_new_content_app_ids as &$app_id)
+					{
+						if(!empty($mail_contents['commented_content'][$app_id]))
+						{
+							$i++;
+							
+							if($i == 1) $body .= t('New comments has been posted in !groupname', array('!groupname' => $groups[$group_id]->title))."\n";
+							$body .= implode("\n", $mail_contents['commented_content'][$app_id])."\n";
+						}
+					}
+					
+					if($i > 0) $body .= "\n";
+				}
+				
+				if(!empty($mail_contents['new_groups']))
+				{
+					$body .= t('The following new groups have been created')."\n\n";
+					$body .= implode("\n", $mail_contents['new_groups'])."\n";
+					$body .= url('cmtls/list', array('absolute' => TRUE));
+				}
+				
+				$message = array(
+					'subject' => t('!sitename daily summary', array('!sitename' => $site_name)),
+					'body' =>
+						t('Hello !username', array('!username' => $user->name)).','."\n\n".
+						t('Here\'s a summary of !sitename daily changes', array('!sitename' => $site_name)).':'."\n\n".
+						$body.
+						"\n"."\n".'---'."\n".
+						'Community Tools'."\n"
+					,
+				);
+				
+				//printr($message);
+				drupal_mail('cmtls', 'cmtls_mail', $user->mail, language_default(), $message);
+				//drupal_mail('cmtls', 'cmtls_mail', 'user@example.com', language_default(), $message);
+				//exit;
+				
+				$users_sent++;
+			}
+		}
+	}
+	
+	watchdog('cmtls', 'Daily digest sent to '.$users_sent.' members.');
+	
+	variable_set('cmtls_daily_digest_send', time());
+}
+
+/**
+ * Implements hook_theme()
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_theme($existing)
+{
+	return array(
+		// pager
+		'cmtls_pager' => array(
+			'arguments' => array(),
+			'template' => 'cmtls-pager',
+			'path' => drupal_get_path('module', 'cmtls').'/theme',
+		),
+		'cmtls_site_menu' => array(
+			'arguments' => array('content' => NULL),
+			'template' => 'cmtls-site-menu',
+			'path' => drupal_get_path('module', 'cmtls').'/theme',
+		),
+		'cmtls_sm_share' => array(
+			'arguments' => array('href' => NULL),
+			'template' => 'cmtls-sm-share',
+			'path' => drupal_get_path('module', 'cmtls').'/theme',
+		),
+	);
+}
+
+function cmtls_ajax_response($content)
+{
+	// add features
+	$features = cmtls_map_format_features(_cmtls_map_features('get'));
+	
+	print drupal_json(array('content' => $content, 'features' => $features));
+	exit;
+}
+
+/**
+ * Add comments to fields view
+ * 
+ * @param object $vars
+ */
+function cmtls_preprocess(&$vars, $hook)
+{
+	if ($hook != 'cmtls_sm_share' && strpos($hook, 'views_view_fields') === 0 && isset($vars['view']) && isset($vars['fields']) && isset($vars['fields']['nid']))
+	{
+		global $base_url;
+		
+		$vars['sm_share_buttons'] = theme('cmtls_sm_share', $base_url.'/'.cmtls_path_to_node($vars['fields']['nid']->raw));
+	}
+}
+
+/*
+=======
+* inserts values from $arr2 after (or before) $key in $arr1
+* if $key is not found, values from $arr2 are appended to the end of $arr1
+*
+* This function uses array_merge() so be aware that values from conflicting keys
+* will overwrite each other
+*
+* @param $arr1
+*   array to insert into
+* @param $key
+*   key of $arr1 to insert after (or before)
+* @param $arr2
+*   array whose values should be inserted
+* @param $before
+*   boolean. insert before the given key. defaults to inserting after
+* @return
+*   merged array
+*/
+function drupal_array_insert($arr1, $key, $arr2, $before = FALSE) {
+  $index = array_search($key, array_keys($arr1));
+  if($index === FALSE){
+    $index = count($arr1); // insert @ end of array if $key not found
+  }
+  else {
+    if(!$before){
+      $index++;
+    }
+  }
+  $end = array_splice($arr1, $index);
+  return array_merge($arr1, $arr2, $end);
+}
+
+/*
+// EXAMPLE //////////////////
+
+$arr1 = array('one' => 1, 'two' => 2, 'three' => 3, 'four' => 4);
+$arr2 = array('first' => 1, 'second' => 2, 'third' => 3, 'fourth' => 4);
+
+$new_array = drupal_array_insert($arr1, 'three', $arr2);
+
+print_r($new_array);
+*/
+
+function cmtls_page_title($node = NULL)
+{
+	if(!$node)
+	{
+		return FALSE;
+	}
+	
+	return $node->title;
+}

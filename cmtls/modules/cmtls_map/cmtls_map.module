@@ -1,0 +1,787 @@
+<?php
+
+include_once('cmtls_map.features.inc');
+
+define ('CMTLS_MAP_NONE', -1);
+define ('CMTLS_MAP_VIEW_HIDDEN', 1);
+define ('CMTLS_MAP_VIEW_HALF_PAGE', 2);
+define ('CMTLS_MAP_VIEW_FULL_PAGE', 3);
+
+function cmtls_map_cmtls_app_general_config($node_type, $node_config)
+{
+	//printr($node_config); exit;
+	
+	$config = module_invoke($node_type, 'cmtls_map_config');
+	
+	if(!empty($config))
+	{
+		$config = $config[$node_type];
+		
+		$form = array('cmtls_map' => array());
+		
+		$translations = array(
+			CMTLS_MAP_NONE => t('No map'),
+			CMTLS_MAP_VIEW_HIDDEN => t('Map is hidden'),
+			CMTLS_MAP_VIEW_HALF_PAGE => t('Map is half page'),
+			CMTLS_MAP_VIEW_FULL_PAGE => t('Map is full page'),
+		);
+		
+		$map_default_state_options = array();
+		
+		foreach ($config['map views'] as $map_view)
+		{
+			$map_default_state_options[$map_view] = $translations[$map_view];
+		}
+		
+		$form['cmtls_map']['map_default_state'] = array(
+			'#type' => 'radios',
+			'#title' => t('Default map state'),
+			'#default_value' => (!empty($node_config['cmtls_map']['map_default_state']) ? $node_config['cmtls_map']['map_default_state'] : $config['default map view']),
+			'#options' => $map_default_state_options,
+		);
+		
+		if(isset($config['default map styles']))
+		{
+			$map_icon_options = array();
+			
+			foreach (cmtls_map_openlayers_styles() as $style)
+			{
+				if(!empty($style->cmtls_inline))
+				{
+					$map_icon_options[$style->name] = $style->title;
+					
+					if(isset($style->data['externalGraphic']))
+					{
+						$map_icon_options[$style->name] = '<img src="'.$style->cmtls_inline.'"> '.$style->title;
+					}
+				}
+			}
+			
+			$form['cmtls_map']['map_icon'] = array(
+				'#type' => 'radios',
+				'#title' => t('Map icon'),
+				'#default_value' => (!empty($node_config['cmtls_map']['map_icon']) ? $node_config['cmtls_map']['map_icon'] : $config['default map styles']['default']),
+				'#options' => $map_icon_options,
+			);
+		}
+		
+		return $form;
+	}
+	else 
+	{
+		return NULL;
+	}
+}
+
+function cmtls_map_get_icon($nid)
+{
+	static $icons;
+	
+	if(!isset($icons[$nid]))
+	{
+		$styles = cmtls_map_openlayers_styles();
+		
+		$config = cmtls_app_get_config($nid);
+		
+		if(isset($config['cmtls_map']['map_icon']) && isset($styles[$config['cmtls_map']['map_icon']]->data['externalGraphic']))
+		{
+			$icons[$nid] = '<img src="'.$styles[$config['cmtls_map']['map_icon']]->cmtls_inline.'">';
+		}
+		else 
+		{
+			global $base_url;
+			
+			$module_path = drupal_get_path('module', 'cmtls_map');
+	
+			$default_styles = cmtls_map_default_styles();
+			
+			$icons[$nid] = '<img src="'.$base_url.'/'.$module_path.'/icons/'.$default_styles['default'].'-inline.png'.'">';
+		}
+	}
+	
+	return $icons[$nid];
+}
+
+function hook_cmtls_map_config()
+{
+	return array(
+		'example_module' => array(
+			'map views' => array(
+				CMTLS_MAP_NONE,
+				CMTLS_MAP_VIEW_HIDDEN,
+				CMTLS_MAP_VIEW_HALF_PAGE,
+				CMTLS_MAP_VIEW_FULL_PAGE,
+			),
+			'default map view' => CMTLS_MAP_FULL_PAGE,
+			'map view changable' => TRUE,
+			'default map styles' => array(
+				'default' => 'cmtls-location-white',
+				'select' => 'cmtls-location-white-hover',
+				'temporary' => 'cmtls-location-white',
+			),
+		),
+	);
+}
+
+function cmtls_map_default_styles()
+{
+	return array(
+		'default' => 'cmtls-location-white',
+		'select' => 'cmtls-location-white-hover',
+		'temporary' => 'cmtls-location-white',
+	);
+}
+
+function cmtls_map_cmtls_app_callback_alter($app, $output)
+{
+	$map_config = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_map_config');
+
+	if($map_config)
+	{
+		$app_map_config = cmtls_app_get_config($app);
+		$app_map_config = $app_map_config['cmtls_map'];
+		
+		if($app_map_config['map_default_state'] != CMTLS_MAP_NONE)
+		{
+			return $output.cmtls_map_page();
+		}
+		else 
+		{
+			return $output;
+		}
+	}
+	else 
+	{
+		return $output;
+	}
+}
+
+/**
+ * Implements hook_preprocess()
+ * Adds current groups current app node to template variables
+ *
+ * @param unknown_type $vars
+ * @param unknown_type $hook
+ */
+function cmtls_map_preprocess(&$vars, $hook)
+{
+	static $cache;
+	
+	if(arg(1) != 'node') // so cmtls/node pages won't get map, the site menu system needs a better solution
+	{
+		if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
+		
+		if($cache)
+		{
+			$vars['cmtls'] += $cache;
+			return;
+		}
+		
+		$current_group = _cmtls_group_get_current();
+		$current_app = _cmtls_app_get_current($current_group);
+	
+		$map_config = module_invoke($current_app->field_cmtls_app_type[0]['value'], 'cmtls_map_config');
+		
+		if($map_config)
+		{
+			$map_config = array_pop($map_config);
+			
+			if(!empty($map_config))
+			{
+				$app_map_config = cmtls_app_get_config($current_app);
+				$app_map_config = $app_map_config['cmtls_map'];
+				
+				if(isset($app_map_config['map_default_state']))
+				{
+					$map_config['default map view'] = $app_map_config['map_default_state'];
+				}
+				
+				switch ($map_config['default map view'])
+				{
+					case CMTLS_MAP_VIEW_HIDDEN: $map_class = 'text-only'; break;
+					case CMTLS_MAP_VIEW_FULL_PAGE: $map_class = 'map-only'; break;
+					case CMTLS_MAP_VIEW_HALF_PAGE: $map_class = 'text-map'; break;
+					default: $map_class = 'text-only'; break;
+				}
+				
+				$vars['cmtls'] += $cache = array(
+					'map' => array(
+						'app_config' => $map_config,
+						'class' => $map_class,
+					),
+				);
+			}
+		}
+	}
+}
+
+
+/**
+ * Implements hook_init()
+ *
+ */
+function cmtls_map_init()
+{
+	drupal_add_js(drupal_get_path('module', 'cmtls_map') .'/js/cmtls_map.js');
+}
+
+function cmtls_map_page()
+{
+	$map = cmtls_map_openlayers_presets();
+	
+	//printr($map); exit;
+	
+	$output = '<div id="map">';
+	$output .= openlayers_render_map($map['cmtls_map']->data);
+	$output .= '</div>';
+	
+	return $output;
+}
+
+function cmtls_map_openlayers_styles()
+{
+	global $base_url;
+	
+	$styles = array();
+	
+	$module_path = drupal_get_path('module', 'cmtls_map');
+	
+	$markers = array(
+		'cmtls-location-white' => array(
+			'title' => t('White'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-white.png',
+			'inline' => $base_url.'/'.$module_path.'/icons/location-white-inline.png',
+		),
+		'cmtls-location-white-hover' => array(
+			'title' => t('White selected'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-white-hover.png',
+		),
+		'cmtls-location-red' => array(
+			'title' => t('Red'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-red.png',
+			'inline' => $base_url.'/'.$module_path.'/icons/location-red-inline.png',
+		),
+		'cmtls-location-red-hover' => array(
+			'title' => t('Red selected'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-red-hover.png',
+		),
+		'cmtls-location-blue' => array(
+			'title' => t('Blue'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-blue.png',
+			'inline' => $base_url.'/'.$module_path.'/icons/location-blue-inline.png',
+		),
+		'cmtls-location-blue-hover' => array(
+			'title' => t('Blue selected'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-blue-hover.png',
+		),
+		'cmtls-location-yellow' => array(
+			'title' => t('Yellow'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-yellow.png',
+			'inline' => $base_url.'/'.$module_path.'/icons/location-yellow-inline.png',
+		),
+		'cmtls-location-yellow-hover' => array(
+			'title' => t('Yellow selected'),
+			'marker' => $base_url.'/'.$module_path.'/icons/location-yellow-hover.png',
+		),
+	);
+	
+	foreach ($markers as $key => $marker)
+	{
+		$style = new stdClass();
+		$style->cmtls_inline = (isset($marker['inline']) ? $marker['inline'] : NULL);
+		$style->api_version = 1;
+		$style->name = $key; 
+		$style->title = $marker['title'];
+		$style->description = t('Community Tools: map marker');
+		$style->data = array(
+			'fillOpacity' => 1,
+			'externalGraphic' => $marker['marker'],
+			'pointRadius' => 11.5,
+			'cursor' => 'pointer',
+		);
+		$styles[$style->name] = $style;
+		
+	}
+	
+	// maki icons
+	/*
+	$icon_templates = array(
+		t('Bank') => 'bank-%s.png',
+		t('Building: Collapsed') => 'building-collapsed-%s.png',
+		t('Building: Damaged') => 'building-damaged-%s.png',
+		t('Bus') => 'bus-%s.png',
+		t('Cafe') => 'cafe-%s.png',
+		t('Campsite') => 'campsite-%s.png',
+		t('Cemetery') => 'cemetery-%s.png',
+		t('Cemetery: Christian') => 'cemetery-christian-%s.png',
+		t('Cemetery: Jewish') => 'cemetery-jewish-%s.png',
+		t('Cemetery: Muslim') => 'cemetery-muslim-%s.png',
+		t('Cinema') => 'cinema-%s.png',
+		t('Circle') => 'circle-7.png',
+		t('Embassy') => 'embassy-%s.png',
+		t('Fuel') => 'fuel-%s.png',
+		t('Garden') => 'garden-%s.png',
+		t('Grocery') => 'grocery-%s.png',
+		t('Historic') => 'historic-%s.png',
+		t('Infrastructure: Damaged') => 'infrastructure-damaged-%s.png',
+		t('Infrastructure: Destroyed') => 'infrastructure-destroyed-%s.png',
+		t('Landslide') => 'landslide-%s.png',
+		t('Library') => 'library-%s.png',
+		t('Lodging') => 'lodging-%s.png',
+		t('Medical') => 'medical-%s.png',
+		t('Metro') => 'metro-%s.png',
+		t('Monument') => 'monument-%s.png',
+		t('Museum') => 'museum-%s.png',
+		t('Park') => 'park-%s.png',
+		t('Parking garage') => 'parking-garage-%s.png',
+		t('Parking log') => 'parking-lot-%s.png',
+		t('Playground') => 'playground-%s.png',
+		t('Port') => 'port-%s.png',
+		t('Post') => 'post-%s.png',
+		t('Religious: Christian') => 'religious-christian-%s.png',
+		t('Religious: Jewish') => 'religious-jewish-%s.png',
+		t('Religious: Muslim') => 'religious-muslim-%s.png',
+		t('Restaurant') => 'restaurant-%s.png',
+		t('School: College') => 'school-college-%s.png',
+		t('School: Elementary') => 'school-elementary-%s.png',
+		t('Settlement: Temporary') => 'settlement-temporary-%s.png',
+		t('Shopping') => 'shopping-%s.png',
+		t('Sports') => 'sports-%s.png',
+		t('Tourism') => 'tourism-%s.png',
+		t('Town Hall') => 'town-hall-%s.png'
+	);
+	
+	foreach ($icon_templates as $icon_title => $icon_template)
+	{
+		$icon_url = $base_url . '/' . drupal_get_path('module', 'cmtls_map') . '/maki/' . sprintf($icon_template, 15);
+		$icon_name = strtr(basename($icon_template, '.png'), array('-%s' => ''));
+		
+		$style = new stdClass();
+		$style->api_version = 1;
+		$style->name = $icon_name; 
+		$style->title = $icon_title;
+		$style->description = t('Maki icon');
+		$style->data = array(
+			'fillOpacity' => 1,
+			'externalGraphic' => $icon_url,
+			'pointRadius' => 7.5,
+			'cursor' => 'pointer',
+		);
+		$styles[$style->name] = $style;
+	}
+	*/
+	
+	return $styles;
+}
+
+
+function cmtls_map_openlayers_presets()
+{
+	$items = array();
+	
+	$layers = array(
+		'osm_mapnik' => 'osm_mapnik',
+		'google_satellite' => 'google_satellite',
+		'google_hybrid' => 'google_hybrid',
+		'google_normal' => 'google_normal',
+		'google_physical' => 'google_physical',
+ 	);
+	
+	$layer_activated = array();
+	
+	$layer_switcher = array();
+	
+	$features = _cmtls_map_features('get');
+	
+	$layer_styles = array();
+	
+	$default_styles = cmtls_map_default_styles();
+	
+	if(sizeof($features)) foreach ($features as &$feature)
+	{
+		if(!isset($layers[$feature->app_title]))
+		{
+			$layers[$feature->app_title] = $feature->app_title;
+			$layer_activated[$feature->app_title] = $feature->app_title;
+			$layer_switcher[$feature->app_title] = $feature->app_title;
+			
+			$config = module_invoke($feature->app_type, 'cmtls_map_config');
+			
+			if($config && $config[$feature->app_type] && $config[$feature->app_type]['default map styles'])
+			{
+				if($feature->style)
+				{
+					$styles = array(
+						'default' => $feature->style,
+						'select' => $feature->style.'-hover',
+						'temporary' => $feature->style,
+					);
+				}
+				else 
+				{
+					$styles = array_merge($default_styles, $config[$feature->app_type]['default map styles']);
+				}
+				
+				$layer_styles[$feature->app_title] = $styles;
+			}
+		}
+	}
+	
+	$openlayers_presets = new stdClass;
+	$openlayers_presets->disabled = FALSE; // Edit this to true to make a default openlayers_presets disabled initially
+	$openlayers_presets->api_version = 1;
+	$openlayers_presets->name = 'cmtls_map';
+	$openlayers_presets->title = 'Community Tools: Map';
+	$openlayers_presets->description = 'Community Tools: Map';
+	$openlayers_presets->data = array(
+		'width' => '300px',
+		'height' => '300px',
+		'image_path' => 'sites/all/libraries/openlayers/img/',
+		'css_path' => 'sites/all/libraries/openlayers/theme/default/style.css',
+		'proxy_host' => '',
+		'hide_empty_map' => 0,
+		'center' => array(
+			'initial' => array(
+			'centerpoint' => variable_get('cmtls_map_default_centerpoint', '24.734559058178, 59.424735894784'),
+			'zoom' => variable_get('cmtls_map_default_zoom', '14'),
+			),
+			'restrict' => array(
+				'restrictextent' => 0,
+				'restrictedExtent' => '',
+			),
+		),
+		'behaviors' => array(
+			'openlayers_behavior_attribution' => array(),
+			'cmtls_map_behavior_popup' => array(),
+			'openlayers_behavior_keyboarddefaults' => array(),
+			'openlayers_behavior_layerswitcher' => array(
+				'ascending' => 1,
+			),
+			'openlayers_behavior_navigation' => array(
+				'zoomWheelEnabled' => 1,
+			),
+			'openlayers_behavior_panzoombar' => array(),
+			'openlayers_behavior_zoomtolayer' => array(
+				'zoomtolayer' => current($layer_activated),
+				'point_zoom_level' => '14',
+			),
+			/*
+			'openlayers_behavior_cluster' => array(
+				'clusterlayer' => $layer_activated,
+				'distance' => '20',
+				'threshold' => '2',
+			),
+			*/
+		),
+		'default_layer' => variable_get('cmtls_map_default_layer', 'osm_mapnik'),
+		'layers' => $layers,
+		'layer_styles' => $layer_styles,
+		'layer_activated' => $layer_activated,
+		'layer_switcher' => $layer_switcher,
+		'projection' => '900913',
+		'displayProjection' => '4326',
+		'styles' => $default_styles,
+		'preset_name' => 'cmtls_map',
+	);
+	
+	$items['cmtls_map'] = $openlayers_presets;
+	
+	return $items;
+}
+
+function _cmtls_map_features($op = 'set', $feature = NULL)
+{
+	static $features;
+	
+	if($op == 'set')
+	{
+		$features[] = $feature;
+	}
+	
+	if($op == 'get')
+	{
+		return $features;
+	}
+}
+
+function cmtls_map_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
+{
+	static $parents;
+	
+	if($op == 'load' && strpos($node->type, 'cmtls_') === 0)
+	{
+		$wkt = $node->field_cmtls_geoinfo[0]['openlayers_wkt'];
+		
+		if(!$wkt)
+		{
+			// try to load wkt
+			$wkt = db_fetch_array(db_query('SELECT field_cmtls_geoinfo_openlayers_wkt FROM {content_field_cmtls_geoinfo} WHERE nid = %d', $node->nid));
+			
+			if(!$wkt['field_cmtls_geoinfo_openlayers_wkt'] || $wkt['field_cmtls_geoinfo_openlayers_wkt'] == 'GEOMETRYCOLLECTION()')
+			{
+				return;
+			}
+			else 
+			{
+				$wkt = $wkt['field_cmtls_geoinfo_openlayers_wkt'];
+			}
+		}
+		else if($node->field_cmtls_geoinfo[0]['openlayers_wkt'] == 'GEOMETRYCOLLECTION()') 
+		{
+			return;
+		}
+		
+		if(!$node->parent)
+		{
+			$node->parent = db_fetch_array(db_query('SELECT parent FROM {nodehierarchy} WHERE nid = %d', $node->nid));
+			$node->parent = $node->parent['parent'];
+			
+			if(!isset($parents[$node->parent]))
+			{
+				// load parent
+				$parent = db_fetch_object(db_query('SELECT node.nid, type, title, parent, field_cmtls_app_type_value AS app_type, field_cmtls_app_config_value AS cmtls_app_config FROM {node} AS node LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid LEFT JOIN {content_type_cmtls_app} AS content_type_cmtls_app ON node.nid = content_type_cmtls_app.nid WHERE node.nid = %d', $node->nid));
+				
+				if(!$parent->parent)
+				{
+					$parent->app_type = $parent->type;
+					$parent->title = t($parent->type);
+				}
+				
+				while($parent->type != 'cmtls_app' && $parent->parent)
+				{
+					$i++;
+					if($i > 100) exit;
+					
+					$parent = db_fetch_object(db_query('SELECT node.nid, type, title, parent, field_cmtls_app_type_value AS app_type, field_cmtls_app_config_value AS cmtls_app_config FROM {node} AS node LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid LEFT JOIN {content_type_cmtls_app} AS content_type_cmtls_app ON node.nid = content_type_cmtls_app.nid WHERE node.nid = %d', $parent->parent));
+				}
+				
+				$config = unserialize($parent->cmtls_app_config);
+				$parent->style = isset($config['cmtls_map']['map_icon']) ? $config['cmtls_map']['map_icon'] : NULL;
+				
+				$parents[$node->parent] = $parent;
+			}
+			
+		}
+		
+		$feature = (object)array(
+			'nid' => $node->nid,
+			'title' => $node->title,
+			'body' => strip_tags($node->body),
+			'wkt' => $wkt,
+			'app_type' => $parents[$node->parent]->app_type,
+			'app_title' => $parents[$node->parent]->title,
+			'app_nid' => $parents[$node->parent]->nid,
+			'style' => $parent->style,
+		);
+		
+		_cmtls_map_features('set', $feature);
+	}
+}
+
+
+/**
+ * Implementation of hook_openlayers_layers().
+ */
+function cmtls_map_openlayers_layers()
+{
+	$layers = array();
+
+	$features = _cmtls_map_features('get');
+	
+	//printr($features); exit;
+	
+	if(sizeof($features)) foreach ($features as &$feature)
+	{
+		if(!isset($layers[$feature->app_title]))
+		{
+	        $layer = new stdClass();
+	        $layer->api_version = 1;
+	        $layer->name = $feature->app_title;
+	        $layer->title = $feature->app_title;
+	        $layer->description = $feature->app_title;
+	        $layer->data = array(
+	          'layer_type' => 'cmtls_map_vector',
+	          'projection' => array('4326'),
+	          'baselayer' => FALSE,
+	          'type' => 'Vector',
+	          'url' => array(),
+	          'options' => array(),
+	          'events' => array(),
+	        );
+	        $layers[$layer->name] = $layer;
+		}
+		
+		
+		$layers[$feature->app_title]->data['features'][$feature->nid] = cmtls_map_format_feature($feature);
+	}
+	
+	//printr($layers); exit;
+	return $layers;
+}
+
+function cmtls_map_format_features($features)
+{
+	foreach ($features as $key => $feature)
+	{
+		if($key != $feature->nid) unset($features[$key]);
+		
+		$features[$feature->nid] = cmtls_map_format_feature($feature);
+	}
+	
+	return $features;
+}
+
+function cmtls_map_format_feature($feature)
+{
+	$attributes = array(
+		'id' => $feature->nid,
+		'title' => $feature->title,
+		'layer' => $feature->app_title,
+	);
+	
+	$content = module_invoke($feature->app_type, 'cmtls_map_popup_content', $feature);
+	
+	if($content)
+	{
+		$attributes['content'] = '<div id="cmtls-map-popup-content-'.$feature->nid.'" class="cmtls-map-popup-content hidden '.$feature->app_type.'">'.$content.'</div>';
+	}
+	
+	$feature = array(
+		'wkt' => $feature->wkt,
+		'projection' => '4326',
+		'attributes' => $attributes,
+	);
+	
+	return $feature;
+}
+
+
+/**
+ * Implementation of hook_openlayers_layer_types()
+ */
+function cmtls_map_openlayers_layer_types()
+{
+	return array(
+		'cmtls_map_vector' => array(
+			'title' => t('cmtls_map'),
+			'description' => t('Community Tools: Map vector layer type'),
+			'layer_type' => array(
+				'path' => drupal_get_path('module', 'cmtls_map'),
+				'file' => 'cmtls_map.module',
+				'class' => 'openlayers_layer_type_cmtls_map_vector',
+				'parent' => 'openlayers_layer_type',
+			),
+		),
+	);
+}
+
+/**
+ * @file
+ * OpenLayers Views Vector Layer Type
+ */
+class openlayers_layer_type_cmtls_map_vector extends openlayers_layer_type
+{
+	function options_init()
+	{
+		return array(
+			'layer_type' => 'openlayers_layer_type_cmtls_map_vector',
+			'layer_handler' => 'cmtls_map_vector',
+			'vector' => TRUE,
+		);
+	}
+
+	function options_form()
+	{
+		return array(
+		);
+	}
+
+	function render(&$map)
+	{
+		drupal_add_js(drupal_get_path('module', 'cmtls_map') . '/js/cmtls_map_vector.js');
+		
+		return $this->options;
+	}
+}
+
+
+/**
+ * Implementation of hook_openlayers_behaviors().
+ *
+ */
+function cmtls_map_openlayers_behaviors()
+{
+	return array(
+		'cmtls_map_behavior_popup' => array(
+			'title' => t('Pop Up'),
+			'description' => t('Adds clickable info boxes to points or shapes on maps.'),
+			'type' => 'layer',
+			'path' => drupal_get_path('module', 'cmtls_map'),
+			'file' => 'cmtls_map.module',
+			'behavior' => array(
+				'class' => 'cmtls_map_behavior_popup',
+				'parent' => 'openlayers_behavior',
+			),
+		),
+	);
+}
+
+/**
+ *  Behavior
+ */
+class cmtls_map_behavior_popup extends openlayers_behavior
+{
+	/**
+	* Provide initial values for options.
+	*/
+	function options_init()
+	{
+		return array(
+			'layers' => array(),
+		);
+	}
+	
+	/**
+	* Form defintion for per map customizations.
+	*/
+	function options_form($defaults)
+	{
+		return array();
+	}
+	
+	/**
+	* Render.
+	*/
+	function render(&$map)
+	{
+		drupal_add_js(drupal_get_path('module', 'cmtls_map') . '/js/cmtls_map_behavior_popup.js');
+		return $this->options;
+	}
+}
+
+function cmtls_map_parse_wkt($wkt)
+{
+	//"GEOMETRYCOLLECTION(POINT(24.738464355469 59.428708675493))";
+	
+	// strip GEOMETRYCOLLECTION()
+	if(strpos($wkt, 'GEOMETRYCOLLECTION(') === 0)
+	{
+		$wkt = preg_replace('/^GEOMETRYCOLLECTION\(/', '', $wkt);
+		$wkt = preg_replace('/\)$/', '', $wkt);
+	}
+	
+	// point
+	if(strpos($wkt, 'POINT(') === 0)
+	{
+		$wkt = preg_replace('/^POINT\(/', '', $wkt);
+		$wkt = preg_replace('/\)$/', '', $wkt);
+		
+		$wkt = explode(' ', $wkt);
+		$wkt = array(
+			'lat' => $wkt[0],
+			'lon' => $wkt[1],
+		);
+	}
+	
+	return $wkt;
+}

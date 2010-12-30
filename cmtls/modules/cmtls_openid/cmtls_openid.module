@@ -1,0 +1,170 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_openid_menu()
+{
+	$items = array();
+
+	/*
+	 * Admin pages
+	 */
+	/*$items['admin/settings/cmtls-authentication/facebook'] = array(
+		'title' => 'Facebook',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('cmtls_fb_admin'),
+		'access arguments' => array('access administration pages'),
+		'type' => MENU_LOCAL_TASK, // TODO: needs some checking, currently half-operational
+	);*/
+
+	/*
+	 * Public pages
+	 */
+
+	$items['cmtls/login/openid'] = array(
+		'title' => 'Connect with ID card',
+		'page callback' => 'cmtls_openid_login',
+		'page arguments' => array(),
+	 	'access callback' => 'user_is_anonymous',
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+
+/**
+ * Implementation of hook_user()
+ */
+function cmtls_openid_user($op, &$edit, &$account, $category = NULL){
+	if('cmtls_openid' != cmtls_auth_authentication_module()){ return; }
+
+	// Get authentication maps
+	$authmaps = user_get_authmaps($account->name);
+
+	switch($op){
+		case 'login':
+			break;
+		case 'logout':
+			// Session's openid gets cleared after successful login,
+			// but just to be sure if for some reason something's left tangling
+			unset($_SESSION['cmtls']['openid']);
+			break;
+	}
+}
+
+/**
+ * Implementation of hook_form_alter()
+ */
+function cmtls_openid_form_alter(&$form, &$form_state, $form_id){
+	switch($form_id){
+		/**
+		 * User login form
+		 */
+		case 'user_login':
+			// Create ID card login button
+			$form['idcard_integration'] = array(
+				'#type' => 'button',
+				'#external_authentication' => TRUE,
+				'#value' => t("Connect with ID card"),
+				'#submit' => array('cmtls_openid_user_login_submit'),
+				'#executes_submit_callback' => TRUE,
+			);
+			
+			#'#value' => '<a href="' . url('cmtls/login/openid') .'" id="openid-login" class="modalframe-exclude"><img src="' . url(drupal_get_path('module', 'cmtls_openid') . '/images/login.gif') . '" alt="' . t('Connect with ID card') .'" /></a>',
+
+			unset($form['openid_links']);
+
+			drupal_add_css(drupal_get_path('module', 'cmtls_openid') . '/css/cmtls_openid.css');
+
+			break;
+
+		/**
+		 * User registration form
+		 */
+		case 'user_register':
+			// To the authentication module check to see if we should display OpenId specific form fields with corresponding values
+			if('cmtls_openid' == cmtls_auth_authentication_module()){
+				$session = cmtls_openid_get_session();
+
+				// Paranoia FTW. If we got here somehow without actually authenticating user, don't try to populate form
+				if($session['status'] == 'success'){
+					
+					// Populate form
+					$form['profile_cmtls_member_name']['#default_value'] = isset($session['nick']) ? $session['nick'] : '';
+					$form['name']['#default_value'] = cmtls_auth_recommend_user_name($session['nick']);
+					$form['mail']['#default_value'] = isset($session['email']) ? $session['email'] : '';
+	
+					// Attach some additional data to the form
+					$form['euid'] = array(
+						'#type' => 'value',
+						'#value' => $session['euid'],
+					);
+				}
+			}
+
+			break;
+	}
+}
+
+
+/**
+ * Submit callback for user_login
+ */
+function cmtls_openid_user_login_submit($form, &$form_state){
+	// TODO: Make these configurable from the admin
+	$claimed_id = 'https://openid.ee:10443';
+	$return_to = url('cmtls/login/openid', array('absolute' => TRUE));
+
+	openid_begin($claimed_id, $return_to);
+}
+
+
+/**
+ * Account login page callback
+ */
+function cmtls_openid_login(){
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+
+	$session = cmtls_openid_get_session();
+
+	if($session['status'] == 'success'){
+		return cmtls_auth_user_login($session['euid'], 'cmtls_openid');
+	}elseif($openid_session['status'] == 'cancel'){
+		drupal_set_message(t("Authentication cancelled."));
+		drupal_goto('cmtls/login');
+	}else{
+		drupal_set_message(t("Authentication failed."), 'error');
+		drupal_goto('cmtls/login');
+	}
+}
+
+
+/**
+ * OpenID session fetcher helper
+ */
+function cmtls_openid_get_session(){
+	if(!isset($_SESSION['cmtls']['openid']) or empty($_SESSION['cmtls']['openid']) or $_SESSION['cmtls']['openid']['status'] == 'failed' or $_SESSION['cmtls']['openid']['status'] == 'cancel'){
+		$_session = openid_complete();
+
+		if($_session['status'] == 'success'){
+			$session = array(
+				'status' => $_session['status'],
+				'euid' => md5($_session['openid.identity']),
+				'nick' => $_session['openid.sreg.nickname'],
+				'email' => $_session['openid.sreg.email'],
+				
+			);
+		}else{
+			$session = array('status' => $_session['status']);
+		}
+		
+		$_SESSION['cmtls']['openid'] = $session;
+	}
+	
+	return $_SESSION['cmtls']['openid'];
+}

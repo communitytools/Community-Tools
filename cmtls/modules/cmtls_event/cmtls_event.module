@@ -1,0 +1,537 @@
+<?php
+
+require_once('cmtls_event.features.inc');
+
+/**
+ * Implements hook_cmtls_context()
+ * 
+ * The edit button for events
+ *
+ * @return unknown
+ */
+function cmtls_event_cmtls_context() {
+	return array(
+		'cmtls_event' => array(
+			'cmtls_event_edit' => array(
+				'title' => t('Edit event'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update', 'node'),
+			),
+		),
+		'script' => drupal_get_path('module', 'cmtls_event') . '/js/context_actions.js',
+	);
+}
+
+function cmtls_event_init() {
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	if ($current_app->field_cmtls_app_type[0]['value'] == 'cmtls_event') {
+		drupal_add_feed(url('cmtls/' . $current_group->nid . '/' . $current_app->nid . '/rss', array('absolute' => TRUE)), $app->title);
+	}
+
+	drupal_add_js(drupal_get_path('module', 'cmtls_event') . '/js/app.js');
+}
+
+/**
+ * Implementation of hook_cmtls_app()
+ *
+ * @return unknown
+ */
+function cmtls_event_cmtls_app()
+{
+	return array(
+		'cmtls_event' => array(
+			'title' => t('Events'),
+			'callback' => 'cmtls_events_page',
+		),
+	);
+}
+
+/**
+ * Implementation of hook_cmtls_map_config()
+ *
+ * @return array
+ */
+function cmtls_event_cmtls_map_config()
+{
+	return array(
+		'cmtls_event' => array(
+			'map views' => array(
+				CMTLS_MAP_NONE,
+				CMTLS_MAP_VIEW_HIDDEN,
+				CMTLS_MAP_VIEW_HALF_PAGE,
+				CMTLS_MAP_VIEW_FULL_PAGE,
+			),
+			'default map view' => CMTLS_MAP_VIEW_HALF_PAGE,
+			'map view changable' => TRUE,
+			'default map styles' => array(
+				'default' => 'cmtls-location-white',
+				'select' => 'cmtls-location-white-hover',
+				'temporary' => 'cmtls-location-white',
+			),
+		),
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_event_menu() {
+	$items = array();
+	
+	$items['cmtls/%node/%node/event/%node'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_event_page',
+		'page arguments' => array(1, 2, 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/event/%node/edit'] = array(
+		'title' => 'event',
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_event', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/event/%node/delete'] = array(
+		'title' => 'Delete event',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 4),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['cmtls/%node/%node/event/add'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_event'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_event')),
+		'type' => MENU_CALLBACK,
+	);
+
+    $items['cmtls/%node/%node/event/%node/add_to_calendar.ics'] = array(
+       'title' => 'Add to calendar',
+       'page callback' => 'cmtls_event_ics_download',
+       'page arguments' => array(4),
+       'access callback' => 'node_access',
+       'access arguments' => array('view', 4),
+       'type' => MENU_CALLBACK,
+    );
+   
+	$items['cmtls/%node/%node/event/tag/%'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_event_page_taxonomy',
+		'page arguments' => array(1, 2, 5),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 2),
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+/**
+ * Event detail view
+ *
+ * @param node $group
+ * @param node $app
+ * @param node $event
+ * @return string
+ */
+function cmtls_event_page($group, $app, $event) {
+	if ($event->type != 'cmtls_event') {
+		return t('This is not an event.');
+	}
+	
+	return views_embed_view('cmtls_events', 'default', $app->nid, $event->nid) . cmtls_map_page();
+}
+
+/**
+ * Events filtered by taxonomy term/tag view
+ *
+ * @param node $group
+ * @param node $app
+ * @param string $taxonomy
+ * @return string
+ */
+function cmtls_event_page_taxonomy($group, $app, $taxonomy) {
+	return views_embed_view('cmtls_events', 'default', $app->nid, 'all', $taxonomy) . cmtls_map_page();
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+
+function cmtls_event_form_alter(&$form, &$form_state, $form_id) {
+	// prepare event node form for cleanup
+	if($form_id == 'cmtls_event_node_form' && _cmtls_is())
+	//if($form_id == 'cmtls_event_node_form')
+	{
+		drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.core.css');
+		drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.theme.css');
+		drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.datepicker.css');
+
+		$form['name'] = $form['author']['name'];
+		$form['name']['#type'] = 'value';
+		$form['date'] = $form['author']['date'];
+		$form['date']['#type'] = 'value';
+		//$form['body'] = $form['body_field']['body'];
+		
+		$form['revision_information'] = NULL;
+		$form['author'] = NULL;
+		//$form['body_field'] = NULL;
+		$form['options'] = NULL;
+		$form['buttons']['preview'] = NULL;
+		
+		$group = _cmtls_group_get_current();
+		$app = _cmtls_app_get_current($group);
+		
+		if ($form['buttons']['delete'])
+		{
+			$node = $form['#node'];
+			
+			$form['buttons']['delete']['#type'] = 'markup';
+			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/' . $group->nid . '/' . $app->nid . '/event/' . $node->nid . '/delete', array('attributes' => array('class' => 'modalframe-processed')));
+		}
+
+		// new form
+		if (!$form['nid']['#value'])
+		{
+			$form['field_cmtls_event_date'][0]['#default_value']['value'] = date('Y-m-d 10:00', strtotime('tomorrow'));
+			$form['field_cmtls_event_date'][0]['#default_value']['value2'] = date('Y-m-d 11:00', strtotime('tomorrow'));
+		}
+
+		$form['#after_build'][] = 'cmtls_event_node_form_after_build';
+		$form['#submit'][] = 'cmtls_event_form_submit';
+
+		//printr($form);
+
+	}
+	
+	//printr($form);
+}
+
+/**
+ * Clean up and defaults for event node
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function cmtls_event_node_form_after_build($form, &$form_state) {
+	$node = $form['#node'];
+	
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	cmtls_group_set_og_form_values($form, $form_state);
+	
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+	
+	
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
+	
+	$form['hierarchy'] = NULL;
+	$form['attachments'] = NULL;
+	$form['sections'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['og_nodeapi'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+	$form['field_cmtls_attender_count'] = NULL;
+	
+	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
+	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
+	
+	//printr($form); exit;
+	
+	return $form;
+}
+
+/**
+ * Group node form submit, closes modalframe window
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_event_form_submit($form, &$form_state) {
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the event view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_event_theme($existing) {
+	return array(
+		// stance
+/*		'cmtls_stance' => array (
+			'arguments' => array('node' => NULL, 'form' => NULL),
+			'template' => 'cmtls-stance',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),*/
+		// events page
+		'cmtls_events_content' => array (
+			'arguments' => array('app_id' => NULL, 'pager' => NULL),
+			'template' => 'cmtls-events-content',
+			'path' => drupal_get_path('module', 'cmtls_event').'/theme',
+		),
+		// events view
+		'views_view__cmtls_events__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-events--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),
+		'views_view_unformatted__cmtls_events__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-events--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),
+		'views_view_fields__cmtls_events__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-events--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),
+		// events dashboard contents
+		'views_view__cmtls_events__block_1' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-events--block-1',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),
+		'views_view_unformatted__cmtls_events__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-events--block-1',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),
+		'views_view_fields__cmtls_events__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-events--block-1',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),
+	);
+}
+
+/**
+ * Get the relative path of the event
+ *
+ * @param node $event
+ * @param node $group
+ * @return string
+ */
+function cmtls_event_path($event, $group = NULL) {
+	if (!$group) $group = _cmtls_group_get_current();
+	
+	return 'cmtls/' . $group->nid . '/' . $event->parent . '/event/' . $event->nid;
+}
+
+/**
+ * Implements hook_cmtls_dashboard_block_content()
+ *
+ * @param unknown_type $group
+ * @param unknown_type $app
+ * @return unknown
+ */
+function cmtls_event_cmtls_dashboard_block_content($group, $app) {
+	return views_embed_view('cmtls_events', 'block_1', $app->nid);
+}
+
+function cmtls_event_cmtls_map_popup_content($feature) {
+	$node = node_load($feature->nid);
+	
+	
+	$body = explode(' ', strip_tags(check_markup($node->body)));
+	
+	if (sizeof($body) > 25) {
+		$body = array_slice($body, 0, 25);
+		$body[] = '...';
+	}
+	
+	$body = implode(' ', $body);
+	
+	$output = '<h1><a href="' . base_path() . cmtls_event_path($node) . '">' . $node->title . '</a></h1>';
+	$output .= '<div class="content">' . $body . '</div>';
+	
+	return $output;
+}
+
+/**
+ * Generate and show .ics Calendar file
+ * 
+ * @param node $node
+ */
+function cmtls_event_ics_download($node) {
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	$title = $node->title;
+    $description = "Read more at " . url('cmtls/' . $current_group->nid . '/' . $current_app->nid . '/event/' . $node->nid, array('absolute' => TRUE));
+    $location = $node->field_cmtls_address[0]['value'];
+
+	if ($node->field_cmtls_event_lasts_all_day[0]['value']) {
+		$dtstart = 'DTSTART;VALUE=DATE:' . date("Ymd", strtotime($node->field_cmtls_event_date[0]['value']));
+		$dtend = 'DTEND;VALUE=DATE:' . date("Ymd", strtotime($node->field_cmtls_event_date[0]['value2']));
+	}
+	else {
+		$dtstart = 'DTSTART:' . date("Ymd\THi00", strtotime($node->field_cmtls_event_date[0]['value']));
+		$dtend = 'DTEND:' . date("Ymd\THi00", strtotime($node->field_cmtls_event_date[0]['value2']));
+	}
+
+	//DTSTART;VALUE=DATE:20100101
+	//DTEND;VALUE=DATE:20100101
+
+    $retval = "BEGIN:VCALENDAR
+PRODID:-//Calendar//Calendar Event//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+$dtstart
+$dtend
+SUMMARY:$title
+DESCRIPTION:$description
+LOCATION:$location
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR";
+
+    drupal_set_header('Content-Type: text/calendar; charset=utf-8;');
+    drupal_set_header('Content-Disposition: inline; filename="add_to_calendar.ics";');
+
+    print $retval;
+   
+    exit();
+}
+
+function cmtls_events_page($app_id)
+{
+	if ($_POST['ajax'] == 1)
+	{
+		cmtls_ajax_response(views_embed_view('cmtls_events', 'default', $app_id));
+	}
+	
+	return theme('cmtls_events_content', $app_id, theme('cmtls_pager'));
+}
+
+/**
+ * Implements hook_cmtls_stance_info()
+ *
+ */
+function cmtls_event_cmtls_stance_info()
+{
+	return array(
+		'cmtls_event' => array(
+			'stance choices' => array(
+				1 => t('Yes'),
+				2 => t('Maybe'),
+				3 => t('No'),
+				0 => t('Unanswered'),
+			),
+			'default stance choice' => 0,
+			'visible stance choices' => array(1, 2, 3),
+			'stance form title' => t('Attending'),
+		),
+	);
+}
+
+
+/**
+ * Implements hook_cmtls_filter_info()
+ *
+ */
+function cmtls_event_cmtls_filter_info()
+{
+	return array(
+		'cmtls_event' => array(
+			'filter predefined options' => array(
+				array(
+					'title' => t('Latest posts'),
+					'default values' => array(
+						'sort' => 0,
+						'date from' => '-7 days',
+						'date to' => 'now',
+						'search' => '',
+					),
+					'where' => array(
+						'clauses' => array(),
+						'args' => array(),
+					), // where
+				),
+
+				array(
+					'title' => t('Most commented'),
+					'default values' => array(
+						'sort' => 0,
+						'date from' => '-7 days',
+						'date to' => 'now',
+						'search' => '',
+					),
+					'where' => array(
+						'clauses' => array(),
+						'args' => array(),
+					), // where
+				),
+			), // filter predefined options
+
+			'filter fields' => array(
+				'tag' => TRUE,
+				'search' => TRUE,
+				'date from' => TRUE,
+				'date to' => TRUE,
+				'sort' => TRUE,
+			), // filter fields
+
+			'taxonomy dictionary id' => NULL,
+
+			'sort options' => array(
+				array(
+					'field' => 'node_created',
+					'direction' => 'DESC',
+					'title' => t('Time added'),
+				),
+				array(
+					'field' => 'node_title',
+					'direction' => 'ASC',
+					'title' => t('Title'),
+				),
+			), // sort options
+
+			'default values' => array(
+				'sort' => 0,
+				'date from' => '-7 days',
+				'date to' => 'now',
+			),
+
+		), // node type
+	);
+}

@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * Implementation of hook_install()
+ */
+function cmtls_upload_install() {
+	content_notify('install','cmtls_upload');
+	drupal_install_schema('cmtls_upload');
+	
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function cmtls_upload_uninstall() {
+	content_notify('uninstall','cmtls_upload');
+	drupal_uninstall_schema('cmtls_upload');
+}
+
+/**
+ * Implementation of hook_enable()
+ */
+function cmtls_upload_enable() {
+	content_notify('enable','cmtls_upload');
+}
+
+/**
+ * Implementation of hook_disable()
+ */
+function cmtls_upload_disable() {
+	content_notify('disable','cmtls_upload');
+}
+
+function cmtls_upload_schema() {
+	$schema['cache_cmtls_upload'] = array(
+		'fields' => array(
+			'fid' => array(
+				'type' => 'int',
+				'not null'  =>  TRUE,
+				'default' => 0,
+				'length' => 11,
+				'description' => t('Id of the file uploaded'),
+			),
+			'uid' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => 0,
+				'length' => 11,
+				'description' => t('Id of the user who uploaded the file'),
+			),
+			'parent' => array(
+				'type' => 'char',
+				'not null' => TRUE,
+				'default' => '',
+				'length' => 11,
+				'description' => t('Id of the parent node'),
+			),
+			// Mostly for future purposes
+			'sid' => array(
+				'type' => 'char',
+				'not null' => TRUE,
+				'default' => '',
+				'length' => 32,
+				'description' => t('Session id of the upload'),
+			),
+		),
+	);
+	
+	return $schema;
+}

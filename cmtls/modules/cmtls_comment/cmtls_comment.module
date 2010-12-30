@@ -1,0 +1,329 @@
+<?php
+
+include_once('cmtls_comment.features.inc');
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ * prepare comment form for cleanup
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_comment_form_alter(&$form, &$form_state, $form_id)
+{
+	$form_uid = $form['#token'];
+	
+	// I'm sure this is not the best method of redirecting comment submit, but it'll have to do right now
+	//if($form_id == 'comment_form' && (_cmtls_is() || isset($_SESSION['cmtls'][$form_uid]['comment_redirect'])))
+	if($form_id == 'comment_form')
+	{
+		if(_cmtls_is() || !isset($_SESSION['cmtls'][$form_uid]['comment_redirect']))
+		{
+			$_SESSION['cmtls'][$form_uid]['comment_redirect'] = check_plain($_GET['q']);
+		}
+		
+		$form['comment'] = $form['comment_filter']['comment'];
+		
+		$form['_author'] = NULL;
+		$form['comment_filter'] = NULL;
+		$form['preview'] = NULL;
+		$form['subject'] = NULL;
+		$form['fbconnect_feed'] = NULL;
+		
+		if(variable_get('cmtls_comment_notifications', '1'))
+		{
+			$form['#submit'][] = 'cmtls_comment_submit_notification';
+		}
+		
+		if($_POST['ajax'] == 1)
+		{
+			$form['#submit'][] = 'cmtls_comment_submit_ajax_response';
+		}
+		else 
+		{
+			$form['#redirect'] = $_SESSION['cmtls'][$form_uid]['comment_redirect'];
+		}
+	}
+	
+	if($form_id == 'comment_confirm_delete' && _cmtls_is())
+	//if($form_id == 'comment_confirm_delete')
+	{
+		// Send the Modal Frame javascript for child windows to the page.
+		modalframe_child_js();
+		
+		if($form['actions']['cancel'])
+		{
+			$form['actions']['cancel'] = array(
+				'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+			);
+		}
+		
+		$form['#submit'][] = 'cmtls_comment_delete_confirm_submit';
+		
+	    $form_state['redirect']  = NULL;
+	}
+}
+
+function cmtls_comment_submit_notification($form, &$form_state)
+{
+	global $user;
+	
+	$node = node_load($form['nid']['#value']);
+	
+	if($node->nid)
+	{
+    	$current_group = _cmtls_group_get_current();
+    	
+		// notify node author
+		if($user->uid != $node->uid)
+		{
+			$author = user_load($node->uid);
+	    	profile_load_profile($author);
+	    	
+			$message = array(
+				'subject' => variable_get('site_name', 'CT').' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
+				'body' =>
+					t('User !username commented on !nodetitle:'."\n\n".'"'.$form['comment']['#value'].'"'."\n\n".'!nodelink',
+						array(
+							'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
+							'!nodetitle' => $node->title,
+							'!nodelink' => url(cmtls_path_to_node($node->nid, $current_group), array('absolute' => TRUE)),
+						)
+					)."\n",
+			);
+			
+			drupal_mail('cmtls', 'cmtls_mail', $author->mail, user_preferred_language($author), $message);
+		}
+		
+		// notify other commenters and node author
+		$result = db_query('SELECT DISTINCT uid FROM {comments} WHERE nid = %d AND uid NOT IN (0, %d, %d)', $node->nid, $user->uid, $node->uid);
+		while ($commenter_uid = db_fetch_array($result))
+	    {
+	    	$commenter = user_load($commenter_uid);
+	    	profile_load_profile($commenter);
+	    	
+			$message = array(
+				'subject' => variable_get('site_name', 'CT').' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
+				'body' =>
+					t('User !username commented on !nodetitle:'."\n\n".'"'.$form['comment']['#value'].'"'."\n\n".'!nodelink',
+						array(
+							'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
+							'!nodetitle' => $node->title,
+							'!nodelink' => url(cmtls_path_to_node($node->nid, $current_group), array('absolute' => TRUE)),
+						)
+					)."\n",
+			);
+			
+			drupal_mail('cmtls', 'cmtls_mail', $commenter->mail, user_preferred_language($commenter), $message);
+	    }
+	}
+	
+}
+
+
+/**
+ * Implements hook_theme()
+ * Adds the comment view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_comment_theme($existing)
+{
+	return array(
+		// comments container template
+		'cmtls_comments' => array (
+			'arguments' => array('node_id' => NULL, 'load_comments_with_ajax' => NULL),
+			'template' => 'cmtls-comments',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		// comments view
+		'views_view__cmtls_comments__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-comments--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		'views_view_unformatted__cmtls_comments__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-comments--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		'views_view_fields__cmtls_comments__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-comments--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		// forum thread comments view
+		'views_view__cmtls_comments__block_1' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-comments--block-1',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		'views_view_unformatted__cmtls_comments__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-comments--block-1',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		'views_view_fields__cmtls_comments__block_1' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-comments--block-1',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		// dashboard latst comments widget
+		'views_view__cmtls_comments__block_2' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-comments--block-2',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		'views_view_unformatted__cmtls_comments__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-comments--block-2',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+		'views_view_fields__cmtls_comments__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-comments--block-2',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_comment').'/theme',
+		),
+	);
+}
+
+/**
+ * Implements hook_cmtls_dashboard_widgets()
+ *
+ * @param unknown_type $group
+ * @param unknown_type $app
+ * @return unknown
+ */
+function cmtls_comment_cmtls_dashboard_widgets($group)
+{
+	return array(
+		'cmtls_comment_latest_widget' => array(
+			'title' => t('Latest comments'),
+			'content' => views_embed_view('cmtls_comments', 'block_2', $group->nid),
+		),
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_comment_menu()
+{
+	$items = array();
+	
+	$items['cmtls/comment/%/delete'] = array(
+		'title' => 'Delete comment',
+		'page callback' => 'cmtls_comment_delete',
+		'page arguments' => array(2),
+		'access callback' => 'cmtls_comment_delete_access',
+		'access arguments' => array(2),
+		'type' => MENU_CALLBACK,
+		'file' => 'comment.admin.inc',
+		'file path' => drupal_get_path('module', 'comment'),
+	);
+	
+	$items['cmtls/comments/%node/ajax'] = array(
+		'title' => 'Comments',
+		'page callback' => 'cmtls_comment_ajax_response',
+		'page arguments' => array(2),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 2),
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+function cmtls_comment_delete($cid)
+{
+	// Send the Modal Frame javascript for parent windows to the page.
+	modalframe_child_js();
+	
+	return comment_delete($cid);
+}
+
+function cmtls_comment_delete_access($cid)
+{
+	global $user;
+	
+	$comment = _comment_load($cid);
+	if(!$comment->cid) return FALSE;
+	
+	$node = node_load($comment->nid);
+	
+	$group = NULL;
+	
+	foreach ($node->og_groups as $group_id)
+	{
+		$group = node_load($group_id);
+		if(og_is_group_admin($group, $user)) break;
+	}
+	
+	if(!$group) return FALSE;
+
+	return cmtls_comment_is_deletable($group, $comment->uid, $comment->timestamp, $user);
+}
+
+function cmtls_comment_delete_confirm_submit($form, &$form_state)
+{
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+function cmtls_comment_is_deletable($group, $cuid, $c_time, $account)
+{
+	// group admins can alway delete
+	if(og_is_group_admin($group, $account)) return TRUE;
+	// can delete own comments
+	elseif($account->uid != $cuid) return FALSE;
+	// if they are not older than 5 minutes
+	elseif($c_time + (5 * 60) > time()) return TRUE;
+	else return FALSE;
+}
+
+/**
+ * Implements hook_init()
+ * 
+ */
+function cmtls_comment_init()
+{
+	drupal_add_js(drupal_get_path('module', 'cmtls_comment') .'/js/app.js');
+}
+
+function cmtls_comment_ajax_response($node)
+{
+	print drupal_json(array('content' => views_embed_view('cmtls_comments', 'default', $node->nid)));
+	exit;
+}
+
+function cmtls_comment_submit_ajax_response($form, &$form_state)
+{
+	cmtls_comment_ajax_response(node_load($form['nid']['#value']));
+}
+
+/**
+ * Add comments to fields view
+ * 
+ * @param object $vars
+ */
+function cmtls_comment_preprocess(&$vars, $hook)
+{
+	if($hook != 'cmtls_comments' && $vars['view'] && $vars['view']->name != 'cmtls_comments' && $vars['fields'] && $vars['fields']['nid'] && $vars['fields']['nid']->raw && strpos($hook, 'views_view_') === 0)
+	{
+		$vars['comments'] = theme('cmtls_comments', $vars['fields']['nid']->raw, ($vars['view']->args[1] ? FALSE : TRUE));
+	}
+}

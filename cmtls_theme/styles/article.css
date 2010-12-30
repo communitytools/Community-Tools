@@ -1,0 +1,408 @@
+/* Text-blocks
+------------------------------------------------------------------------------ */
+
+.node-head {
+	font-size: 12px;
+	padding-bottom: 4px;
+}
+
+	.node-head h1 {
+		margin-bottom: 3px;
+		display: block;
+	}
+
+.node-content {
+	margin-top: 7px;
+}
+
+	.node-content p {
+		margin-bottom: 15px;
+	}
+
+.text-only node-content {
+	-moz-column-width: 300px;
+	-webkit-column-width: 300px;
+	-moz-column-gap: 25px;
+	-webkit-column-gap: 25px;
+	-moz-column-rule: 1px solid #ccc;
+	-webkit-column-rule: 1px solid #ccc;
+}
+
+.node-footer {
+	font-size: 12px;
+}
+
+/* Text-node common widgets
+------------------------------------------------------------------------------ */
+
+/* Author */
+.meta-author {
+	display: inline;
+}
+
+.meta-author a.avatar {
+	margin-top: 2px;
+}
+
+.meta-author a.avatar:hover {
+	border: none;
+}
+
+.meta-author img.avatar {
+	display: inline;
+	vertical-align: middle;
+	margin-bottom: 2px;
+	margin-right: 1px;
+}
+
+/* Timestamp */
+.meta-time {
+	display: inline;
+	color: #777;
+}
+
+/* Tags */
+.meta-tags {
+	display: inline-block;
+	padding-left: 20px;
+	background: url('../images/tags.png') no-repeat 0 2px;
+	color: #777;
+}
+
+
+/* Social media share */
+.meta-share {
+	display: inline;
+
+}
+	/* Facebook like */
+	.meta-share iframe {
+		margin-bottom: -6px;
+	}
+
+
+/* Address and geo info */
+.meta-address {
+	display: inline;
+	color: #777;
+	float: right;
+}
+
+.meta-geo {
+	display: inline;
+	margin-left: 3px;
+	float: right;
+}
+
+	.meta-geo a img {
+		margin-bottom: -3px;
+	}
+
+	.meta-geo img {
+		cursor: pointer;
+	}
+
+/* Status */
+.meta-status {
+	display: inline;
+	background: #888;
+	padding: 1px 4px 2px 4px;
+	color: #fff;
+	font-size: 11px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+
+/* Attached files */
+
+.meta-files {
+	margin-bottom: 15px;
+}
+
+.meta-files .meta-file {
+    background: none repeat scroll 0 0 #F2F2F2;
+    border: 1px solid #E2E2E2;
+    height: 52px;
+    width: 52px;
+    padding: 4px;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+	.meta-files .meta-file a,
+	.meta-files .meta-file a:hover {
+		border: none;
+	}
+
+		.meta-files .meta-file a img {
+			height: 52px;
+			width: 52px;
+		}
+
+/* Comments
+------------------------------------------------------------------------------ */
+
+a.comments-button {
+		padding-left: 20px;
+		background: url('../images/comments.png') no-repeat 0 0;
+	}
+
+		a.comments-button:hover {
+			border: none;
+		}
+
+
+.comments-container {
+	margin-top: 10px;
+	position: relative;
+}
+
+	.comments-container .comment {
+		border-top: 1px solid #ccc;
+		margin: 5px 0;
+		padding: 5px 0;
+		min-height: 35px;
+	}
+
+		.comments-container .comment .avatar {
+			float: left;
+		}
+
+		.comments-container .comment .avatar img {
+			display: block;
+		}
+
+		.comments-container .comment .comment-content {
+			margin-left: 50px;
+			font-size: 12px;
+		}
+
+			.comments-container .comment .comment-content .author {
+				display: inline;
+				margin: 0;
+			}
+
+			.comments-container .comment .comment-content .comment-text {
+				font-weight: normal;
+				color: #333;
+			}
+
+			.comments-container .comment .comment-content .comment-text p {
+				margin: 0;
+			}
+
+			.comments-container .form-item {
+				padding: 0 0 0 50px;
+				margin-top: -5px;
+			}
+
+				.comments-container .form-item label {
+					display: none;
+				}
+
+				.comments-container textarea.form-textarea {
+					border: 1px solid #ccc;
+					padding: 5px;
+					height: 50px;
+					margin-top: 5px;
+					font-size: 12px;
+				}
+
+					.comments-container textarea:focus {
+						border: 2px solid #AED9A7;
+						padding: 4px;
+					}
+
+				.comments-container .form-submit {
+					margin: -5px 0 0 50px;
+				}
+
+
+	.comment:hover .comment-delete-button {
+		display: block;
+		float: right;
+		width: 15px;
+		height: 15px;
+		padding: 0;
+		background: url(../images/deletebutton.png) 0px 0px no-repeat;
+		border-bottom: none;
+		margin: 3px 0 0 0;
+	}
+	.comment:hover .comment-delete-button:hover {
+		background: url(../images/deletebutton.png) 0px -15px no-repeat;
+	}
+
+	.forum tr:hover .comment-delete-button {
+		display: block;
+		float: right;
+		width: 15px;
+		height: 15px;
+		padding: 0;
+		background: url(../images/deletebutton.png) 0px 0px no-repeat;
+		border-bottom: none;
+		margin: 5px 0 0 0;
+		clear: both;
+	}
+	.forum tr:hover .comment-delete-button:hover {
+		background: url(../images/deletebutton.png) 0px -15px no-repeat;
+	}
+
+/* Stances
+------------------------------------------------------------------------------ */
+
+.stance-container {
+	font-size: 12px;
+}
+
+	.stance-container .form-radios .form-item {
+		display: inline-block;
+	}
+
+	.stance-container .stance h2 {
+		display: inline;
+		font-size: 12px;
+	}
+
+/* Content Toolbar - includes content add button and filter button
+------------------------------------------------------------------------------ */
+
+.toolbar {
+	display: block;
+	margin-bottom: 5px;
+	font-size: 12px;
+}
+
+/* Content filter
+------------------------------------------------------------------------------ */
+
+.content-filter-toggle {
+	display: inline-block;
+}
+
+	.content-filter-toggle a.selected {
+		background: #e9e9e9;
+		color: #fff;
+	}
+
+.content-filter {
+	padding: 20px;
+	background: #e9e9e9;
+	font-size: 12px;
+	text-align: center;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+	.content-filter .pre-defined {
+		text-align: center;
+	}
+
+	.content-filter table.filter-fields {
+		margin-top: 10px;
+		display: inline-block;
+	}
+
+		.content-filter table.filter-fields td {
+			padding: 0 10px 5px 0;
+			text-align: left;
+		}
+
+		.content-filter table.filter-fields th {
+			text-align: right;
+			white-space: nowrap;
+		}
+
+	.content-filter label {
+		padding-right: 5px;
+	}
+
+	.content-filter .filter-input {
+		border: 1px solid #ccc;
+		padding: 2px;
+		font-size: 12px;
+		background: #fff;
+		-moz-border-radius: 2px;
+		-webkit-border-radius: 2px;
+		border-radius: 2px;
+	}
+
+		.content-filter .filter-input:focus {
+			border: 2px solid #AED9A7;
+			padding: 1px;
+		}
+
+	.content-filter input.form-submit {
+		background: #999 url(../images/alert-overlay.png) repeat-x;
+		text-shadow: none;
+		font-size: 12px;
+		font-weight: bolder;
+		padding: 3px 4px;
+	}
+
+
+.labeled-hr {
+	text-align: center;
+	margin: 5px 0;
+}
+	.labeled-hr span {
+		background-color: #e9e9e9;
+		text-align: center;
+		color: #888;
+		padding: 0 8px;
+	}
+	.labeled-hr hr {
+		background: none repeat scroll 0 0 #D9D9D9;
+		border-width: 0;
+		color: #D9D9D9;
+		height: 1px;
+		margin-top: -9px;
+	}
+
+
+/* Article Item
+------------------------------------------------------------------------------ */
+.article-node {
+	margin-bottom: 20px;
+	margin-top: 10px;
+	float: left;
+	width: 100%;
+	position: relative;
+}
+
+/* Event Item
+-------------------------------------------------------------- */
+.event-group-header {
+	padding: 0 0 0 10px;
+	margin: 0 0 -5px 0;
+	font-size: 12px;
+	font-weight: bold;
+	clear: both;
+}
+
+		.article-node .content .event-header {
+			font-size: 12px;
+		}
+
+			.article-node .content .event-header .time {
+				display: inline-block;
+				padding-left: 18px;
+				background: url('../images/time.png') no-repeat 0 0;
+			}
+
+/* Problem Item
+------------------------------------------------------------------------------ */
+
+.meta-status.open {
+	background: #C30000;
+}
+.meta-status.closed {
+	background: green;
+}
+
+/* Rich Text
+-------------------------------------------------------------- */
+
+.cke_show_borders p {
+	margin-bottom: 15px;
+}

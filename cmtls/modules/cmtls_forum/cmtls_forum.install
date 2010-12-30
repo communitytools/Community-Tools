@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implements hook_install()
+ *
+ */
+function cmtls_forum_install()
+{
+	cmtls_module_install('cmtls_forum');
+}

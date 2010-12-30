@@ -1,0 +1,7 @@
+core = "6.x"
+dependencies[] = "cmtls"
+description = "Community Tools: Authentication"
+name = "Community Tools: Authentication"
+package = "Community Tools"
+project = "cmtls"
+version = "6.x-0.1"

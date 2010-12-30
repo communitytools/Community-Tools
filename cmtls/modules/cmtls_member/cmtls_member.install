@@ -1,0 +1,401 @@
+<?php
+
+/**
+ * Implements hook_install()
+ * Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
+ * Adds the user profile fields
+ * Adds activity triggers and actions
+ *
+ */
+function cmtls_member_install()
+{
+	cmtls_module_install('cmtls_member');
+	
+	// profiles
+	db_query("INSERT INTO {profile_fields} (fid, title, name, explanation, category, page, type, weight, required, register, visibility, autocomplete, options) VALUES ('2', 'Name', 'profile_cmtls_member_name', '', 'Community Tools: Member', '', 'textfield', '-10', '1', '1', '3', '0', '')");
+	db_query("INSERT INTO {profile_fields} (fid, title, name, explanation, category, page, type, weight, required, register, visibility, autocomplete, options) VALUES ('3', 'Skype', 'profile_cmtls_member_skype', '', 'Community Tools: Member', '', 'textfield', '-7', '0', '1', '3', '0', '')");
+	db_query("INSERT INTO {profile_fields} (fid, title, name, explanation, category, page, type, weight, required, register, visibility, autocomplete, options) VALUES ('4', 'Phone', 'profile_cmtls_member_phone', '', 'Community Tools: Member', '', 'textfield', '-8', '0', '1', '3', '0', '')");
+	db_query("INSERT INTO {profile_fields} (fid, title, name, explanation, category, page, type, weight, required, register, visibility, autocomplete, options) VALUES ('5', 'Address', 'profile_cmtls_member_address', '', 'Community Tools: Member', '', 'textfield', '-9', '0', '1', '3', '0', '')");
+	db_query("INSERT INTO {profile_fields} (fid, title, name, explanation, category, page, type, weight, required, register, visibility, autocomplete, options) VALUES ('6', 'Homepage', 'profile_cmtls_member_url', '', 'Community Tools: Member', '', 'url', '0', '0', '1', '3', '0', '')");
+	db_query("INSERT INTO {profile_fields} (fid, title, name, explanation, category, page, type, weight, required, register, visibility, autocomplete, options) VALUES ('7', 'Description', 'profile_cmtls_member_description', '', 'Community Tools: Member', '', 'textfield', '-5', '0', '1', '3', '0', '')");
+	
+	
+	
+/*
+
+# activity triggers
+insert into `actions` (`aid`, `type`, `callback`, `parameters`, `description`) values('6','activity','activity_record','a:4:{s:15:\"node-pattern-en\";s:559:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas sündmuse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:19:\"everyone-pattern-en\";s:559:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas sündmuse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:14:\"activity_types\";a:1:{s:11:\"cmtls_event\";s:11:\"cmtls_event\";}s:3:\"aid\";s:1:\"6\";}','Record an activity message when: node insert types Community Tools: Event');
+insert into `actions` (`aid`, `type`, `callback`, `parameters`, `description`) values('7','activity','activity_record','a:4:{s:15:\"node-pattern-en\";s:555:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas teema <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:19:\"everyone-pattern-en\";s:555:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas teema <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:14:\"activity_types\";a:1:{s:11:\"cmtls_forum\";s:11:\"cmtls_forum\";}s:3:\"aid\";s:1:\"7\";}','Record an activity message when: node insert types Community Tools: Forum');
+insert into `actions` (`aid`, `type`, `callback`, `parameters`, `description`) values('8','activity','activity_record','a:4:{s:15:\"node-pattern-en\";s:683:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas teemasse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]\">[cmtls-forum-name]</a> uue arutelu <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:19:\"everyone-pattern-en\";s:683:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas teemasse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]\">[cmtls-forum-name]</a> uue arutelu <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:14:\"activity_types\";a:1:{s:12:\"cmtls_thread\";s:12:\"cmtls_thread\";}s:3:\"aid\";s:1:\"8\";}','Record an activity message when: node insert types Community Tools: Forum thread');
+insert into `actions` (`aid`, `type`, `callback`, `parameters`, `description`) values('9','activity','activity_record','a:6:{s:18:\"comment-pattern-en\";s:596:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari arutlusse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:15:\"node-pattern-en\";s:596:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari arutlusse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:30:\"node_comment_author-pattern-en\";s:596:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari arutlusse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:19:\"everyone-pattern-en\";s:596:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari arutlusse <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:14:\"activity_types\";a:1:{s:12:\"cmtls_thread\";s:12:\"cmtls_thread\";}s:3:\"aid\";s:1:\"9\";}','Record an activity message when: comment insert types Community Tools: Forum thread');
+insert into `actions` (`aid`, `type`, `callback`, `parameters`, `description`) values('3','activity','activity_record','a:6:{s:18:\"comment-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari artiklile <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:15:\"node-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari artiklile <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:30:\"node_comment_author-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari artiklile <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:19:\"everyone-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari artiklile <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:14:\"activity_types\";a:1:{s:13:\"cmtls_article\";s:13:\"cmtls_article\";}s:3:\"aid\";s:1:\"3\";}','Record an activity message when: comment insert types Community Tools: Article');
+insert into `actions` (`aid`, `type`, `callback`, `parameters`, `description`) values('4','activity','activity_record','a:4:{s:15:\"node-pattern-en\";s:559:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas artikli <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:19:\"everyone-pattern-en\";s:559:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas artikli <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[raw]</span></div>\r\n</div>\r\n\";s:14:\"activity_types\";a:1:{s:13:\"cmtls_article\";s:13:\"cmtls_article\";}s:3:\"aid\";s:1:\"4\";}','Record an activity message when: node insert types Community Tools: Article');
+insert into `actions` (`aid`, `type`, `callback`, `parameters`, `description`) values('5','activity','activity_record','a:6:{s:18:\"comment-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari sündmusele <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:15:\"node-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari sündmusele <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:30:\"node_comment_author-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari sündmusele <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:19:\"everyone-pattern-en\";s:581:\"<div class=\"cmtls-data\">\r\n	<span class=\"cmtls-group-id\">[og-id]</span>\r\n	<span class=\"cmtls-group-name\">[ogname]</span>\r\n	<span class=\"cmtls-app-id\">[cmtls-app-id]</span>\r\n	<span class=\"cmtls-app-name\">[cmtls-app-name]</span>\r\n</div>\r\n<div class=\"content\">\r\n	<div class=\"author\">\r\n		<a href=\"\" class=\"small-avatar\">[cmtls-member-avatar-url]</a>\r\n		[cmtls-member-name-link]\r\n	</div> \r\n	lisas kommentaari sündmusele <a href=\"[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]\">[title]</a> <div class=\"time\">&middot; <span class=\"unix-timestamp\">[comment-raw]</span></div>\r\n</div>\r\n\";s:14:\"activity_types\";a:1:{s:11:\"cmtls_event\";s:11:\"cmtls_event\";}s:3:\"aid\";s:1:\"5\";}','Record an activity message when: comment insert types Community Tools: Event');
+
+insert into `actions_aid` (`aid`) values('3');
+insert into `actions_aid` (`aid`) values('4');
+insert into `actions_aid` (`aid`) values('5');
+insert into `actions_aid` (`aid`) values('6');
+insert into `actions_aid` (`aid`) values('7');
+insert into `actions_aid` (`aid`) values('8');
+insert into `actions_aid` (`aid`) values('9');
+
+insert into `trigger_assignments` (`hook`, `op`, `aid`, `weight`) values('nodeapi','insert','4','1');
+insert into `trigger_assignments` (`hook`, `op`, `aid`, `weight`) values('comment','insert','3','1');
+insert into `trigger_assignments` (`hook`, `op`, `aid`, `weight`) values('comment','insert','5','1');
+insert into `trigger_assignments` (`hook`, `op`, `aid`, `weight`) values('nodeapi','insert','6','1');
+insert into `trigger_assignments` (`hook`, `op`, `aid`, `weight`) values('nodeapi','insert','7','1');
+insert into `trigger_assignments` (`hook`, `op`, `aid`, `weight`) values('nodeapi','insert','8','1');
+insert into `trigger_assignments` (`hook`, `op`, `aid`, `weight`) values('comment','insert','9','1');
+
+*/	
+
+$activities = array(
+	6 => array(
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas s&uuml;ndmuse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas s&uuml;ndmuse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_event' => 'cmtls_event',
+		),
+		'aid' => 6,
+	),
+	7 => array(
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas teema <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas teema <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_forum' => 'cmtls_forum',
+		),
+		'aid' => 7,
+	),
+	8 => array(
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas teemasse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]">[cmtls-forum-name]</a> uue arutelu <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+	    'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas teemasse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]">[cmtls-forum-name]</a> uue arutelu <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_thread' => 'cmtls_thread',
+		),
+		'aid' => 8,
+	),
+	9 => array(
+		'comment-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari arutlusse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari arutlusse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+    'node_comment_author-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari arutlusse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+    'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari arutlusse <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/forum/[cmtls-forum-id]/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_thread' => 'cmtls_thread',
+		),
+		'aid' => 9,
+	),
+	3 => array(
+		'comment-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari artiklile <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari artiklile <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'node_comment_author-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari artiklile <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari artiklile <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_article' => 'cmtls_article',
+		),
+		'aid' => 3,
+	),
+	4 => array(
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas artikli <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas artikli <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/article/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_article' => 'cmtls_article',
+		),
+		'aid' => 4,
+	),
+	5 => array(
+		'comment-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari s&uuml;ndmusele <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari s&uuml;ndmusele <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'node_comment_author-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari s&uuml;ndmusele <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari s&uuml;ndmusele <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/event/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_event' => 'cmtls_event',
+		),
+		'aid' => 5
+	),
+);
+	// activities
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('3', 'activity', 'activity_record', '%s', 'Record an activity message when: comment insert types Community Tools: Article')", serialize($activities[3]));
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('4', 'activity', 'activity_record', '%s', 'Record an activity message when: node insert types Community Tools: Article')", serialize($activities[4]));
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('5', 'activity', 'activity_record', '%s', 'Record an activity message when: comment insert types Community Tools: Event')", serialize($activities[5]));
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('6', 'activity', 'activity_record', '%s', 'Record an activity message when: node insert types Community Tools: Event')", serialize($activities[6]));
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('7', 'activity', 'activity_record', '%s', 'Record an activity message when: node insert types Community Tools: Forum')", serialize($activities[7]));
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('8', 'activity', 'activity_record', '%s', 'Record an activity message when: node insert types Community Tools: Forum thread')", serialize($activities[8]));
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('9', 'activity', 'activity_record', '%s', 'Record an activity message when: comment insert types Community Tools: Forum thread')", serialize($activities[9]));
+	
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('3')");
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('4')");
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('5')");
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('6')");
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('7')");
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('8')");
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('9')");
+	
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', '4', '1')");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('comment', 'insert', '3', '1')");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('comment', 'insert', '5', '1')");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', '6', '1')");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', '7', '1')");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', '8', '1')");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('comment', 'insert', '9', '1')");
+}
+
+/**
+ * Removes the user profile fields
+ *
+ * @todo remove also the profile fields user data
+ * @todo remove also the activity data
+ */
+function cmtls_member_uninstall()
+{
+	// profiles
+	db_query("DELETE FROM {profile_fields} WHERE fid IN (2, 3, 4, 5, 6, 7)");
+	
+	// activities
+	db_query("DELETE FROM {actions} WHERE aid IN (3, 4, 5, 6, 7, 8, 9)");
+	db_query("DELETE FROM {actions_aid} WHERE aid IN (3, 4, 5, 6, 7, 8, 9)");
+	db_query("DELETE FROM {trigger_assignments} WHERE aid IN (3, 4, 5, 6, 7, 8, 9)");
+}
+
+

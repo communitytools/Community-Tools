@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_install()
+ * Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
+ *
+ */
+function cmtls_comment_install()
+{
+	cmtls_module_install('cmtls_comment');
+}
