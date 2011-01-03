@@ -51,7 +51,7 @@
 
 <div id="node-<?php print $node->nid; ?>" class="node-content">
 
-  <h1><?php if (node_access('update', $node)) print '<a href="'.base_path().'node/'.$node->nid.'/edit" target="_blank" class="edit-node"><img src="'.base_path().'/sites/all/themes/cmtls_theme/images/edit.png" height="18" width="18" alt="'.t('Edit').'"></a> '?><?php print $title ?></h1>
+  <h1><?php if (node_access('update', $node)) print '<a href="'.base_path().'node/'.$node->nid.'/edit" target="_blank" class="edit-node"><img src="'.base_path().'sites/all/themes/cmtls_theme/images/edit.png" height="18" width="18" alt="'.t('Edit').'"></a> '?><?php print $title ?></h1>
 
   <?php print $content ?>
 </div>

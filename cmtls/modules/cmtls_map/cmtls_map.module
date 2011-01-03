@@ -89,13 +89,7 @@ function cmtls_map_get_icon($nid)
 		}
 		else 
 		{
-			global $base_url;
-			
-			$module_path = drupal_get_path('module', 'cmtls_map');
-	
-			$default_styles = cmtls_map_default_styles();
-			
-			$icons[$nid] = '<img src="'.$base_url.'/'.$module_path.'/icons/'.$default_styles['default'].'-inline.png'.'">';
+			$icons[$nid] = '<img src="'.$styles['cmtls-location-white']->cmtls_inline.'">';
 		}
 	}
 	
