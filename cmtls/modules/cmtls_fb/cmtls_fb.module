@@ -47,6 +47,7 @@ function cmtls_fb_user($op, &$edit, &$account, $category = NULL){
 	
 	switch($op){
 		case 'login':
+			if(!isset($account->euid)) $account->euid = $_SESSION['cmtls']['fb']['euid'];
 			// Check if the user was authenticated by this module
 			if('cmtls_fb' == cmtls_auth_authentication_module()){
 				// Pull in fresh data from Facebook
@@ -64,7 +65,7 @@ function cmtls_fb_user($op, &$edit, &$account, $category = NULL){
 						if($file){
 							// If use_fb_avatar flag is set for user, use existing setting, else default to true (when user has freshly registered for example)
 							$use_fb_avatar = $account->use_fb_avatar ? $account->use_fb_avatar : 1;
-							user_save($account, array('fb_avatar' => $file, 'use_fb_avatar' => $use_fb_avatar)); // If user save should fail, it fails silently intentionally
+							user_save($account, array('fb_avatar' => $file, 'use_fb_avatar' => $use_fb_avatar, 'euid' => $account->euid)); // If user save should fail, it fails silently intentionally
 						}
 					}
 				}
@@ -76,6 +77,33 @@ function cmtls_fb_user($op, &$edit, &$account, $category = NULL){
 	}
 }
 
+function cmtls_fb_add_form_fields($form)
+{
+	if($fb_app_id = variable_get('fb_app_id', ''))
+	{
+		// Create Facebook login button
+		$form['fb_integration'] = array(
+			'#external_authentication' => TRUE,
+			'#type' => 'button',
+			'#value' => t("Connect with Facebook"),
+			'#submit' => array('cmtls_fb_user_login_submit'),
+			'#executes_submit_callback' => TRUE,
+		);
+	
+		// Create container for Facebook's JSDK
+		$form['fb_jsdk_container'] = array(
+			'#type' => 'markup',
+			'#value' => '<div id="fb-root"></div>',
+			'#weight' => 500, // Sink the element
+		);
+	
+		drupal_add_css(drupal_get_path('module', 'cmtls_fb') . '/css/cmtls_fb.css');
+		drupal_add_js(drupal_get_path('module', 'cmtls_fb') . '/js/fb.js');
+		drupal_add_js(array('cmtls' => array('Facebook' => array('appId' => $fb_app_id, 'loginPage' => url('cmtls/login/facebook')))), 'setting');
+	}
+	
+	return $form;
+}
 
 /**
  * Implementation of hook_form_alter()
@@ -86,25 +114,8 @@ function cmtls_fb_form_alter(&$form, &$form_state, $form_id){
 		 * User login form
 		 */
 		case 'user_login':
-			// Create Facebook login button
-			$form['fb_integration'] = array(
-				'#external_authentication' => TRUE,
-				'#type' => 'button',
-				'#value' => t("Connect with Facebook"),
-				'#submit' => array('cmtls_fb_user_login_submit'),
-				'#executes_submit_callback' => TRUE,
-			);
-
-			// Create container for Facebook's JSDK
-			$form['fb_jsdk_container'] = array(
-				'#type' => 'markup',
-				'#value' => '<div id="fb-root"></div>',
-				'#weight' => 500, // Sink the element
-			);
-
-			drupal_add_css(drupal_get_path('module', 'cmtls_fb') . '/css/cmtls_fb.css');
-			drupal_add_js(drupal_get_path('module', 'cmtls_fb') . '/js/fb.js');
-			drupal_add_js(array('cmtls' => array('Facebook' => array('appId' => variable_get('fb_app_id', ''), 'loginPage' => url('cmtls/login/facebook')))), 'setting');
+			
+			$form = cmtls_fb_add_form_fields($form);
 
 			break;
 
@@ -113,7 +124,9 @@ function cmtls_fb_form_alter(&$form, &$form_state, $form_id){
 		 */
 		case 'user_register':
 			// Do the authentication module check to see if we should display Facebook specific form fields with corresponding values
-			if('cmtls_fb' == cmtls_auth_authentication_module()){
+			$module = cmtls_auth_authentication_module();
+			
+			if('cmtls_fb' == $module){
 				$session = cmtls_fb_get_session();
 
 				if($session['status'] == 'success'){
@@ -128,6 +141,10 @@ function cmtls_fb_form_alter(&$form, &$form_state, $form_id){
 						'#value' => $session['euid'],
 					);
 				}
+			}
+			elseif(!$module)
+			{
+				$form = cmtls_fb_add_form_fields($form);
 			}
 
 			break;
@@ -213,6 +230,7 @@ function cmtls_fb_user_login_submit($form, &$form_state){
 	if($session['status'] == 'success'){
 		$form_state['redirect'] = 'cmtls/login/facebook';
 	}else{
+		$facebook = cmtls_fb_get_facebook();
 		$form_state['redirect'] = $facebook->getLoginUrl(array('scope' => 'email'));
 	}
 }
@@ -224,6 +242,9 @@ function cmtls_fb_user_login_submit($form, &$form_state){
 function cmtls_fb_login(){
 	// Send the Modal Frame javascript for child windows to the page.
 	//modalframe_child_js();
+	
+	$GLOBALS['conf']['cache'] = FALSE;
+	
 	$session = cmtls_fb_get_session();
 
 	// If we have session, try to log the user in

@@ -45,7 +45,7 @@ function cmtls_filter_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
 	
 	static $filter_types;
 
-	if ($op == 'load')
+	if ($op == 'load' && $node->type == 'cmtls_app')
 	{
 		if (!is_array($filter_types))
 		{
@@ -73,32 +73,41 @@ function cmtls_filter_answer_form(&$form_state, $node)
 {
 	global $user;
 
-	/* these mess up the title bar in modalframe
 	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.core.css');
 	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.theme.css');
 	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.datepicker.css');
-	*/
 
-	/*date_popup_load();*/
+	$from_date = $node->filters->info['default values']['date from'] ? strtotime($node->filters->info['default values']['date from']) : NULL;
+	$from_to = $node->filters->info['default values']['date to'] ? strtotime($node->filters->info['default values']['date to']) : NULL;
 
-	$from_date = strtotime($node->filters->info['default values']['date from']);
-	$from_to = strtotime($node->filters->info['default values']['date to']);
-
+	if (is_numeric($_GET['date_to']))
+	{
+		// add 24hrs to user given date else the selected day will be excluded
+		$user_date_to = $_GET['date_to'] + 60 * 60 * 24;
+	}
+	
 	// If user has chosen a predefined option, set the values of $_GET array
 	// Those values are also used by cmtls_filter_views_query_alter below
 	if (is_numeric($_GET['predefined_choice']))
 	{
-		$_GET['date_from'] = strtotime($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date from']);
-		$_GET['date_to'] = strtotime($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date to']);
-		$_GET['sort'] = $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['sort'];
-		$_GET['search'] = $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['search'];
+		if($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date from'])
+			$_GET['date_from'] = strtotime($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date from']);
+		
+		if($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date to'])
+			$_GET['date_to'] = strtotime($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['date to']);
+			
+		if($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['sort'])
+			$_GET['sort'] = $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['sort'];
+		
+		if($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['search'])	
+			$_GET['search'] = $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['default values']['search'];
 	}
 
 	if ($node->filters->info['filter fields']['date from'])
 	{
 		$form['date_from'] = array(
 			'#type' => 'date_popup',
-			'#default_value' => date('Y-m-d', $from_date),
+			'#default_value' => $from_date ? date('Y-m-d', $from_date) : NULL,
 			'#size' => 8,
 			'#maxlength' => 20,
 			'#attributes' => array('class' => 'filter-input'),
@@ -114,7 +123,7 @@ function cmtls_filter_answer_form(&$form_state, $node)
     {
 		$form['date_to'] = array(
 			'#type' => 'date_popup',
-			'#default_value' => date('Y-m-d', $from_to),
+			'#default_value' => $from_to ? date('Y-m-d', $from_to) : NULL,
 			'#size' => 8,
 			'#maxlength' => 20,
 			'#attributes' => array('class' => 'filter-input'),
@@ -124,6 +133,11 @@ function cmtls_filter_answer_form(&$form_state, $node)
 		{
 			$form['date_to']['#value'] = date('Y-m-d', $_GET['date_to']);
 		}
+	}
+	
+	if(isset($user_date_to))
+	{
+		$_GET['date_to'] = $user_date_to;
 	}
 
 	$options = array();
@@ -146,14 +160,11 @@ function cmtls_filter_answer_form(&$form_state, $node)
 		}
 	}
 
-	// used to clear "Keyword" text when field is clicked/focused
-	drupal_add_js('edit_search_focused = false;', 'inline');
-
 	if ($node->filters->info['filter fields']['search'])
 	{
 		$form['search'] = array(
 			'#type' => 'textfield',
-			'#default_value' => t('Keyword'),
+			'#default_value' => NULL,
 			'#size' => 8,
 			'#maxlength' => 128,
 			'#attributes' => array('class' => 'filter-input'),
@@ -162,9 +173,6 @@ function cmtls_filter_answer_form(&$form_state, $node)
 		if ($_GET['search'])
 		{
 			$form['search']['#value'] = $_GET['search'];
-			
-			// There's no need no clear the text, since it's user submitted or predefined
-			drupal_add_js('edit_search_focused = true;', 'inline');
 		}
 	}
 
@@ -271,10 +279,10 @@ function cmtls_filter_answer_form_submit($form, &$form_state)
  */
 function cmtls_filter_preprocess(&$vars, $hook)
 {
-	if ($hook != 'cmtls_filter' && $vars['view']->name != 'cmtls_filter')
+	if ($hook != 'cmtls_filter' && $vars['view']->name != 'cmtls_filter' && $vars['app_id'])
 	{
 		$node = node_load($vars['app_id']);
-
+		
 		if (isset($node->filters->info))
 		{
 			$vars['filter'] = theme(
@@ -321,20 +329,20 @@ function cmtls_filter_views_query_alter(&$view, &$query)
 
 		if ($_GET['action'] == 'search' && $_GET['date_from'] && $node->filters->info['filter fields']['date from'])
 		{
-			$query->where[0]['clauses'][] = '{node}.created >= %d';
+			$query->where[0]['clauses'][] = 'node.created >= %d';
 			$query->where[0]['args'][] = $_GET['date_from'];
 		}
 
 		if ($_GET['action'] == 'search' && $_GET['date_to'] && $node->filters->info['filter fields']['date to'])
 		{
-			$query->where[0]['clauses'][] = '{node}.created <= %d';
+			$query->where[0]['clauses'][] = 'node.created <= %d';
 			$query->where[0]['args'][] = $_GET['date_to'];
 		}
 
 		if ($_GET['action'] == 'search' && $_GET['search'] && $node->filters->info['filter fields']['search'])
 		{
 			$search_clause_position = count($query->where[0]['clauses']);
-			$query->where[0]['clauses'][] = '({node}.title LIKE \'%s\' OR node_revisions.body LIKE \'%s\')';
+			$query->where[0]['clauses'][] = '(node.title LIKE \'%s\' OR node_revisions.body LIKE \'%s\')';
 			$query->where[0]['args'][] = '%' . $_GET['search'] . '%';
 			$query->where[0]['args'][] = '%' . $_GET['search'] . '%';
 
@@ -381,11 +389,23 @@ function cmtls_filter_views_query_alter(&$view, &$query)
 				}
 			}
 		}
+		
+		if ($_GET['action'] == 'search' && is_numeric($_GET['predefined_choice']) && $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['where'] && !empty($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['where']['clauses']))
+		{
+			$query->where[0]['clauses'] = array_merge($query->where[0]['clauses'], $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['where']['clauses']);
+			if($node->filters->info['filter predefined options'][$_GET['predefined_choice']]['where']['args'])
+			{
+				$query->where[0]['args'] = array_merge($query->where[0]['args'], $node->filters->info['filter predefined options'][$_GET['predefined_choice']]['where']['args']);
+			}
+		}
+
 
 		if ($_GET['action'] == 'search' && is_numeric($_GET['sort']) && $node->filters->info['filter fields']['sort'])
 		{
 			$query->orderby = array($node->filters->info['sort options'][$_GET['sort']]['field'] . ' ' . $node->filters->info['sort options'][$_GET['sort']]['direction']);
 		}
+
+		//printr($query); exit;
 	}
 }
 

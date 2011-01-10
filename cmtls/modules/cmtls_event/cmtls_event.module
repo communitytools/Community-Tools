@@ -4,7 +4,7 @@ require_once('cmtls_event.features.inc');
 
 /**
  * Implements hook_cmtls_context()
- * 
+ *
  * The edit button for events
  *
  * @return unknown
@@ -25,7 +25,7 @@ function cmtls_event_cmtls_context() {
 function cmtls_event_init() {
 	$current_group = _cmtls_group_get_current();
 	$current_app = _cmtls_app_get_current($current_group);
-	
+
 	if ($current_app->field_cmtls_app_type[0]['value'] == 'cmtls_event') {
 		drupal_add_feed(url('cmtls/' . $current_group->nid . '/' . $current_app->nid . '/rss', array('absolute' => TRUE)), $app->title);
 	}
@@ -81,7 +81,7 @@ function cmtls_event_cmtls_map_config()
  */
 function cmtls_event_menu() {
 	$items = array();
-	
+
 	$items['cmtls/%node/%node/event/%node'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(4),
@@ -100,7 +100,7 @@ function cmtls_event_menu() {
 		'access arguments' => array('update', 4),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/%node/event/%node/delete'] = array(
 		'title' => 'Delete event',
 		'page callback' => 'drupal_get_form',
@@ -111,7 +111,7 @@ function cmtls_event_menu() {
 		'file path' => drupal_get_path('module', 'node'),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/%node/event/add'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(2),
@@ -130,7 +130,7 @@ function cmtls_event_menu() {
        'access arguments' => array('view', 4),
        'type' => MENU_CALLBACK,
     );
-   
+
 	$items['cmtls/%node/%node/event/tag/%'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(2),
@@ -140,7 +140,7 @@ function cmtls_event_menu() {
 		'access arguments' => array('view', 2),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	return $items;
 }
 
@@ -156,8 +156,8 @@ function cmtls_event_page($group, $app, $event) {
 	if ($event->type != 'cmtls_event') {
 		return t('This is not an event.');
 	}
-	
-	return views_embed_view('cmtls_events', 'default', $app->nid, $event->nid) . cmtls_map_page();
+
+	return views_embed_view('cmtls_events', 'default', $app->nid, $event->nid);
 }
 
 /**
@@ -169,7 +169,7 @@ function cmtls_event_page($group, $app, $event) {
  * @return string
  */
 function cmtls_event_page_taxonomy($group, $app, $taxonomy) {
-	return views_embed_view('cmtls_events', 'default', $app->nid, 'all', $taxonomy) . cmtls_map_page();
+	return views_embed_view('cmtls_events', 'default', $app->nid, 'all', $taxonomy);
 }
 
 /**
@@ -193,20 +193,20 @@ function cmtls_event_form_alter(&$form, &$form_state, $form_id) {
 		$form['date'] = $form['author']['date'];
 		$form['date']['#type'] = 'value';
 		//$form['body'] = $form['body_field']['body'];
-		
+
 		$form['revision_information'] = NULL;
 		$form['author'] = NULL;
 		//$form['body_field'] = NULL;
 		$form['options'] = NULL;
 		$form['buttons']['preview'] = NULL;
-		
+
 		$group = _cmtls_group_get_current();
 		$app = _cmtls_app_get_current($group);
-		
+
 		if ($form['buttons']['delete'])
 		{
 			$node = $form['#node'];
-			
+
 			$form['buttons']['delete']['#type'] = 'markup';
 			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/' . $group->nid . '/' . $app->nid . '/event/' . $node->nid . '/delete', array('attributes' => array('class' => 'modalframe-processed')));
 		}
@@ -224,7 +224,7 @@ function cmtls_event_form_alter(&$form, &$form_state, $form_id) {
 		//printr($form);
 
 	}
-	
+
 	//printr($form);
 }
 
@@ -237,20 +237,20 @@ function cmtls_event_form_alter(&$form, &$form_state, $form_id) {
  */
 function cmtls_event_node_form_after_build($form, &$form_state) {
 	$node = $form['#node'];
-	
+
 	$current_group = _cmtls_group_get_current();
 	$current_app = _cmtls_app_get_current($current_group);
-	
+
 	cmtls_group_set_og_form_values($form, $form_state);
-	
+
 	$form['comment'] = $form['comment_settings']['comment'];
 	$form['comment']['#type'] = 'value';
-	
-	
+
+
 	$form['parent'] = $form['hierarchy']['parent'];
 	$form['parent']['#type'] = 'value';
 	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
-	
+
 	$form['hierarchy'] = NULL;
 	$form['attachments'] = NULL;
 	$form['sections'] = NULL;
@@ -259,12 +259,12 @@ function cmtls_event_node_form_after_build($form, &$form_state) {
 	$form['menu'] = NULL;
 	$form['path'] = NULL;
 	$form['field_cmtls_attender_count'] = NULL;
-	
+
 	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
 	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
-	
+
 	//printr($form); exit;
-	
+
 	return $form;
 }
 
@@ -352,7 +352,7 @@ function cmtls_event_theme($existing) {
  */
 function cmtls_event_path($event, $group = NULL) {
 	if (!$group) $group = _cmtls_group_get_current();
-	
+
 	return 'cmtls/' . $group->nid . '/' . $event->parent . '/event/' . $event->nid;
 }
 
@@ -369,32 +369,33 @@ function cmtls_event_cmtls_dashboard_block_content($group, $app) {
 
 function cmtls_event_cmtls_map_popup_content($feature) {
 	$node = node_load($feature->nid);
-	
-	
+
+
 	$body = explode(' ', strip_tags(check_markup($node->body)));
-	
+
 	if (sizeof($body) > 25) {
 		$body = array_slice($body, 0, 25);
 		$body[] = '...';
 	}
-	
+
 	$body = implode(' ', $body);
-	
+
 	$output = '<h1><a href="' . base_path() . cmtls_event_path($node) . '">' . $node->title . '</a></h1>';
+	$output .= '<div class="address">'.$node->field_cmtls_address[0]['value'].'</div>';
 	$output .= '<div class="content">' . $body . '</div>';
-	
+
 	return $output;
 }
 
 /**
  * Generate and show .ics Calendar file
- * 
+ *
  * @param node $node
  */
 function cmtls_event_ics_download($node) {
 	$current_group = _cmtls_group_get_current();
 	$current_app = _cmtls_app_get_current($current_group);
-	
+
 	$title = $node->title;
     $description = "Read more at " . url('cmtls/' . $current_group->nid . '/' . $current_app->nid . '/event/' . $node->nid, array('absolute' => TRUE));
     $location = $node->field_cmtls_address[0]['value'];
@@ -429,7 +430,7 @@ END:VCALENDAR";
     drupal_set_header('Content-Disposition: inline; filename="add_to_calendar.ics";');
 
     print $retval;
-   
+
     exit();
 }
 
@@ -439,7 +440,7 @@ function cmtls_events_page($app_id)
 	{
 		cmtls_ajax_response(views_embed_view('cmtls_events', 'default', $app_id));
 	}
-	
+
 	return theme('cmtls_events_content', $app_id, theme('cmtls_pager'));
 }
 
@@ -475,31 +476,34 @@ function cmtls_event_cmtls_filter_info()
 		'cmtls_event' => array(
 			'filter predefined options' => array(
 				array(
-					'title' => t('Latest posts'),
+					'title' => t('Next 7 days'),
 					'default values' => array(
 						'sort' => 0,
-						'date from' => '-7 days',
-						'date to' => 'now',
-						'search' => '',
 					),
 					'where' => array(
-						'clauses' => array(),
-						'args' => array(),
+						'clauses' => array(
+							'node_data_field_cmtls_event_date.field_cmtls_event_date_value >= NOW()',
+							'node_data_field_cmtls_event_date.field_cmtls_event_date_value <= DATE_ADD(NOW(), INTERVAL 7 DAY)',
+						),
 					), // where
 				),
-
+				array(
+					'title' => t('Next 30 days'),
+					'default values' => array(
+						'sort' => 0,
+					),
+					'where' => array(
+						'clauses' => array(
+							'node_data_field_cmtls_event_date.field_cmtls_event_date_value >= NOW()',
+							'node_data_field_cmtls_event_date.field_cmtls_event_date_value <= DATE_ADD(NOW(), INTERVAL 30 DAY)',
+						),
+					), // where
+				),
 				array(
 					'title' => t('Most commented'),
 					'default values' => array(
-						'sort' => 0,
-						'date from' => '-7 days',
-						'date to' => 'now',
-						'search' => '',
+						'sort' => 2,
 					),
-					'where' => array(
-						'clauses' => array(),
-						'args' => array(),
-					), // where
 				),
 			), // filter predefined options
 
@@ -524,12 +528,15 @@ function cmtls_event_cmtls_filter_info()
 					'direction' => 'ASC',
 					'title' => t('Title'),
 				),
+				array(
+					'field' => 'node_comment_statistics_comment_count',
+					'direction' => 'DESC',
+					'title' => t('Most commented'),
+				),
 			), // sort options
 
 			'default values' => array(
 				'sort' => 0,
-				'date from' => '-7 days',
-				'date to' => 'now',
 			),
 
 		), // node type

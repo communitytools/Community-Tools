@@ -7,7 +7,6 @@
 <html dir="<?php print $language->dir; ?>" xml:lang="<?php print $language->language ?>" lang="<?php print $language->language ?>" xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 
 <head>
-  <?php /*<script src="<?php print $base_path; ?>sites/all/libraries/Firebug/firebug.js"></script> */ ?>
   <?php print $head; ?>
   <title><?php print $head_title; ?></title>
   <?php print $styles; ?>
@@ -107,13 +106,11 @@
 	<?php print views_embed_view('cmtls_apps', 'default', $cmtls['current_group']->nid); ?>
 	
 	<div id="content" class="<?php print $cmtls['map']['class'] ? $cmtls['map']['class'] : 'text-only'; ?>">
-		<?php if(arg(1) == 'node'): ?>
-			<div id="text-container">
-				<?php print $content; ?>
-			</div>
-		<?php else: ?>
+		<div id="text-container">
 			<?php print $content; ?>
-		<?php endif; ?>
+		</div>
+		
+		<div id="map"><?php print $cmtls['map']['output']; ?></div>
 	</div>
 
 	<script type='text/javascript'>

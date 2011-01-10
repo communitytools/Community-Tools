@@ -229,6 +229,9 @@ function cmtls_profile_tasks(&$task, $url)
 			node_type_save($type);
 		}
 
+		// Default date popup styles (this is the actual default, but there seems to be some error with it)
+		variable_set('node_options_page', 'sites/all/modules/date/date_popup/themes/datepcker.1.7.css');
+		
 		// Default page to not be promoted and have comments disabled.
 		variable_set('node_options_page', array('status'));
 		variable_set('comment_page', COMMENT_NODE_DISABLED);

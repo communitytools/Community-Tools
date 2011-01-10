@@ -30,7 +30,7 @@
  */
 
 ?>
-<div id="text-container" class="cmtls-threads-container">
+<div class="cmtls-threads-container">
 
 	<div class="toolbar">
 		<?php print l('&larr; '.t("Back to topics' page"), _cmtls_app_get_path().'/forum', array('html' => TRUE, 'attributes' => array('class' => 'back-button'))); ?>

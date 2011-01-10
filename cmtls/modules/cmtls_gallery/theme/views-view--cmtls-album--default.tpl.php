@@ -1,4 +1,4 @@
-<div id="text-container" class="cmtls-files-container">
+<div class="cmtls-files-container">
 
 	<div class="gallery">
 		

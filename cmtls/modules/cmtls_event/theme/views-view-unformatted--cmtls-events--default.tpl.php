@@ -20,7 +20,7 @@ $dividers = array();
 foreach($view->result as $id => $result)
 {
 	$start_timestamp = strtotime($result->node_data_field_cmtls_event_date_field_cmtls_event_date_value);
-	
+
 	$start_year = date('Y', $start_timestamp);
 	$start_date = date('d.m', $start_timestamp).($current_year != $start_year ? '.'.$start_year : '');
 
@@ -43,12 +43,11 @@ foreach($view->result as $id => $result)
 	<div class="event-group-header">
 		<?php print $divider; ?>
 	</div>
-	<div class="article-node">
-		<?php foreach ($row_ids as $id): ?>
-			<div class="content">
-				<?php print $rows[$id]; ?>
-			</div>
-		<?php endforeach; ?>
-	</div>
-<?php endforeach; ?>
 
+	<?php foreach ($row_ids as $id): ?>
+		<div class="text-node">
+			<?php print $rows[$id]; ?>
+		</div>
+	<?php endforeach; ?>
+
+<?php endforeach; ?>

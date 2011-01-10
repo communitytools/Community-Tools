@@ -80,8 +80,10 @@ function cmtls_idea_strongarm() {
     'options' => '2',
     'comment_settings' => '4',
     'menu' => '-3',
+    'taxonomy' => '-3',
     'path' => '3',
     'attachments' => '5',
+    'og_nodeapi' => '0',
   );
 
   $export['content_extra_weights_cmtls_idea'] = $strongarm;

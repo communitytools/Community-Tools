@@ -20,7 +20,7 @@
  */
 
 ?>
-<div class="comment">
+<div class="comment<?php print $user->uid == $fields['uid']->raw ? ' authors-comment' : NULL; ?>">
 
 	<div class="avatar">
 		<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 40); ?>
@@ -34,7 +34,7 @@
 		<div class="meta-time">
 			<?php print $fields['timestamp']->content; ?>
 		</div>
-<?php if(cmtls_comment_is_deletable($cmtls['current_group'], $fields['uid']->raw, $fields['timestamp']->raw, $user)): ?>
+			<?php if(cmtls_comment_is_deletable($cmtls['current_group'], $fields['uid']->raw, $fields['timestamp']->raw, $user)): ?>
 				<?php print l('', 'cmtls/comment/'.$fields['cid']->raw.'/delete', array('attributes' => array('class' => 'modalframe-child comment-delete comment-delete-button', 'alt' => t('Delete comment'), 'title' => t('Delete comment')))); ?>
 			<?php endif; ?>
 		<div class="comment-text">

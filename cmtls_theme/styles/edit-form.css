@@ -274,3 +274,23 @@ input.form-submit {
 	.form-column input.form-text {
 		width: 80%;
 	}
+	
+/* Datepicker
+-------------------------------------------------------------- */	
+
+.ui-datepicker-div, .ui-datepicker-inline, #ui-datepicker-div {
+	padding: 5px !important;
+}
+
+.ui-datepicker-next,
+.ui-datepicker-prev {
+    background: transparent none !important;
+}
+
+.ui-datepicker-next {
+    left: 13.36em !important;
+}
+
+#ui-datepicker-div, #ui-datepicker-div table, .ui-datepicker-div, .ui-datepicker-div table, .ui-datepicker-inline, .ui-datepicker-inline table {
+    font-size: 11px !important;
+}

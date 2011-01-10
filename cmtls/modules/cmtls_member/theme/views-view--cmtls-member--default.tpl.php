@@ -29,7 +29,7 @@
  * @ingroup views_templates
  */
 ?>
-<div id="text-container" class="cmtls-member-container">
+<div class="cmtls-member-container">
 
     <?php if ($rows): ?>
             <?php print $rows; ?>

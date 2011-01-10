@@ -18,8 +18,17 @@
 	background: #fff;
 }
 
-.cmtls-map-popup-contents h1 {
-	font-size: 15px;
+.cmtls-map-popup-content h1 {
+	font-size: 17px;
+	width: 255px;
+}
+
+.cmtls-map-popup-content .address {
+	font-style: italic;
+	margin: -8px 0 3px 0;
+}
+
+.cmtls-map-popup-content .content {
 }
 
 .cmtls-map-popup-contents a.cmtls-map-popup-close {

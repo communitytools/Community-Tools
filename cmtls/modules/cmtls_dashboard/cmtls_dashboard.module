@@ -32,7 +32,7 @@ function cmtls_dashboard_page($app_id)
 {
 	$group = _cmtls_group_get_current();
 	
-	$build = '<div id="text-container"><div class="dashboard-1">';
+	$build = '<div class="dashboard-1">';
 	
 	// get all groups apps
 	$result = db_query('SELECT nodehierarchy.nid FROM {nodehierarchy} nodehierarchy WHERE nodehierarchy.parent = '.(int)$group->nid.' ORDER BY order_by');
@@ -71,7 +71,7 @@ function cmtls_dashboard_page($app_id)
 			$build .= '</div></div>';
 		}
 		
-		$build .= '</div></div><!-- text-container -->';
+		$build .= '</div><!-- dashboard-1 -->';
 	}
 				//	lisas kommentaari artiklile
 	

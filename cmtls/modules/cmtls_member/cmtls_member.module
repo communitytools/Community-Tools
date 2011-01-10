@@ -146,6 +146,13 @@ function cmtls_member_page($group, $uid)
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
 	
+	// set map settings, currently there is no map for members pages
+	cmtls_map_set_config(array(
+		'cmtls_member' => array(
+			'default map view' => CMTLS_MAP_NONE,
+		),
+	));
+	
 	return views_embed_view('cmtls_member', 'default', $group->nid, $uid);
 }
 
@@ -162,6 +169,13 @@ function cmtls_members_page($group)
 	
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
+	
+	// set map settings, currently there is no map for members pages
+	cmtls_map_set_config(array(
+		'cmtls_member' => array(
+			'default map view' => CMTLS_MAP_NONE,
+		),
+	));
 	
 	return views_embed_view('cmtls_members', 'default', $group->nid);
 }

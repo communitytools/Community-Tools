@@ -29,7 +29,7 @@
  * @ingroup views_templates
  */
 ?>
-<div id="text-container" class="cmtls-thread-comments-container">
+<div class="cmtls-thread-comments-container">
 
 	<?php print l('&larr; '.t('Go back'), _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid, array('html' => TRUE, 'attributes' => array('class' => 'back-button'))); ?>
 	<div style="clear: both;"></div>

@@ -11,7 +11,7 @@
 		<?php print $form; ?>
 	<?php else: ?>
 		<div class="">
-			<?php print t('Please <a !params>log in</a> to submit your stance.', array('!params' => 'href="'.$base_url.'cmtls/login" class="modalframe-child"')); ?>
+			<?php print t('Please <a !params>log in</a> to submit your stance.', array('!params' => 'href="'.base_path().'cmtls/login" class="modalframe-child"')); ?>
 		</div>
 	<?php endif; ?>
 

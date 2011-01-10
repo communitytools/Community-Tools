@@ -1,4 +1,4 @@
-<div id="text-container" class="cmtls-folders-container">
+<div class="cmtls-folders-container">
 
 	<div class="toolbar">
 	    <?php if(cmtls_group_can_create_content($cmtls['current_group'], $user)): ?>

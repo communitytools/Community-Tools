@@ -6,16 +6,15 @@
  * 
  */
 
-?><div id="text-container" class="cmtls-events-container">
+?><div class="cmtls-events-container">
 
 	<div class="toolbar">
 	    
-	<?php if(cmtls_group_can_create_content($cmtls['current_group'], $user)): print l(t('+ Add event'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/event/add', array('attributes' => array('class' => 'button modalframe-child', 'id' => 'add-event-button', 'modal_frame_width' => 820))) ?><?php endif; ?>
-	    <?php /*
-	    <div class="content-filter-toggle">
-			<a href="#" class="button">v <?php print t('Latest posts'); ?></a>
-	    </div>
-	    */ ?>
+		<?php if(cmtls_group_can_create_content($cmtls['current_group'], $user)): print l(t('+ Add event'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/event/add', array('attributes' => array('class' => 'button modalframe-child', 'id' => 'add-event-button', 'modal_frame_width' => 820))) ?><?php endif; ?>
+		
+		<div class="content-filter-toggle">
+			<a href="javascript:void(0);" class="button">v <?php print t('Filter'); ?></a>
+		</div>
 	</div> <!-- toolbar -->
 
 	<?php print $filter; ?>
@@ -25,5 +24,4 @@
 	</div>
 
 	<?php print $pager; ?>
-	
 </div>

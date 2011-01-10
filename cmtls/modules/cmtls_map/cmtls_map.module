@@ -126,30 +126,6 @@ function cmtls_map_default_styles()
 	);
 }
 
-function cmtls_map_cmtls_app_callback_alter($app, $output)
-{
-	$map_config = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_map_config');
-
-	if($map_config)
-	{
-		$app_map_config = cmtls_app_get_config($app);
-		$app_map_config = $app_map_config['cmtls_map'];
-		
-		if($app_map_config['map_default_state'] != CMTLS_MAP_NONE)
-		{
-			return $output.cmtls_map_page();
-		}
-		else 
-		{
-			return $output;
-		}
-	}
-	else 
-	{
-		return $output;
-	}
-}
-
 /**
  * Implements hook_preprocess()
  * Adds current groups current app node to template variables
@@ -161,20 +137,22 @@ function cmtls_map_preprocess(&$vars, $hook)
 {
 	static $cache;
 	
-	if(arg(1) != 'node') // so cmtls/node pages won't get map, the site menu system needs a better solution
-	{
-		if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
-		
-		if($cache)
-		{
-			$vars['cmtls'] += $cache;
-			return;
-		}
-		
-		$current_group = _cmtls_group_get_current();
-		$current_app = _cmtls_app_get_current($current_group);
+	// to get the map rendering properly, two hooks are used
+	// the block because of Google map is included with drupal_set_html_head
+	// to use it in page hook is too late (no idea why)
+	// and page for actually getting the map variable to the page template
 	
-		$map_config = module_invoke($current_app->field_cmtls_app_type[0]['value'], 'cmtls_map_config');
+	if(arg(1) != 'node' && $hook == 'block' && !$cache)
+	{
+		$map_config = cmtls_map_get_config();
+		
+		if(!$map_config)
+		{
+			$current_group = _cmtls_group_get_current();
+			$current_app = _cmtls_app_get_current($current_group);
+			
+			$map_config = module_invoke($current_app->field_cmtls_app_type[0]['value'], 'cmtls_map_config');
+		}
 		
 		if($map_config)
 		{
@@ -185,9 +163,17 @@ function cmtls_map_preprocess(&$vars, $hook)
 				$app_map_config = cmtls_app_get_config($current_app);
 				$app_map_config = $app_map_config['cmtls_map'];
 				
-				if(isset($app_map_config['map_default_state']))
+				if(!isset($app_map_config['map_default_state']))
+				{
+					$app_map_config['map_default_state'] = $map_config['default map view'];
+				}
+				
+				if(isset($app_map_config['map_default_state']) && $app_map_config['map_default_state'] != CMTLS_MAP_NONE)
 				{
 					$map_config['default map view'] = $app_map_config['map_default_state'];
+					
+					$map = cmtls_map_openlayers_presets();
+					$map = openlayers_render_map($map['cmtls_map']->data, 'cmtls_map');
 				}
 				
 				switch ($map_config['default map view'])
@@ -202,11 +188,28 @@ function cmtls_map_preprocess(&$vars, $hook)
 					'map' => array(
 						'app_config' => $map_config,
 						'class' => $map_class,
+						'output' => $map,
 					),
 				);
 			}
 		}
 	}
+	
+	if(arg(1) != 'node' && $hook == 'page' && $cache)
+	{
+		$vars['cmtls'] += $cache;
+	}
+}
+
+function cmtls_map_set_config($config)
+{
+	$GLOBALS['conf']['cmtls']['map']['config'] = $config;
+}
+
+function cmtls_map_get_config()
+{
+	return isset($GLOBALS['conf']['cmtls']['map']['config']) ? $GLOBALS['conf']['cmtls']['map']['config'] : NULL;
+
 }
 
 
@@ -217,19 +220,6 @@ function cmtls_map_preprocess(&$vars, $hook)
 function cmtls_map_init()
 {
 	drupal_add_js(drupal_get_path('module', 'cmtls_map') .'/js/cmtls_map.js');
-}
-
-function cmtls_map_page()
-{
-	$map = cmtls_map_openlayers_presets();
-	
-	//printr($map); exit;
-	
-	$output = '<div id="map">';
-	$output .= openlayers_render_map($map['cmtls_map']->data);
-	$output .= '</div>';
-	
-	return $output;
 }
 
 function cmtls_map_openlayers_styles()

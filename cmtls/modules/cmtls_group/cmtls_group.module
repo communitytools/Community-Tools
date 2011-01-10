@@ -168,6 +168,13 @@ function cmtls_group_page($group = NULL)
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
 	
+	// set map settings
+	cmtls_map_set_config(array(
+		'cmtls_member' => array(
+			'default map view' => CMTLS_MAP_VIEW_HALF_PAGE,
+		),
+	));
+	
 	$result = db_query('SELECT nid FROM {nodehierarchy} WHERE parent = '.(int)$group->nid.' ORDER BY order_by LIMIT 1');
 	$aid = db_fetch_array($result);
 	$aid = $aid['nid'];
@@ -202,12 +209,20 @@ function cmtls_groups_page()
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
 	
+	// set map settings
+	cmtls_map_set_config(array(
+		'cmtls_member' => array(
+			'default map view' => CMTLS_MAP_VIEW_HALF_PAGE,
+		),
+	));
+	
+	$output = '<div class="cmtls-groups-container">';
 	$output = '<div id="text-container" class="cmtls-groups-container">';
 	$output .= views_embed_view('cmtls_groups', 'block_2', $user->uid);
 	$output .= views_embed_view('cmtls_groups', 'block_1');
 	$output .= '</div><!-- cmtls-groups-container -->';
 	
-	return $output.cmtls_map_page();
+	return $output;
 }
 
 /**
@@ -702,7 +717,7 @@ function cmtls_group_cmtls_map_popup_content($feature)
 {
 	$node = node_load($feature->nid);
 	
-	$output = '<h1><a href="'.base_path().'cmtls/'.$node->id.'">'.$node->title.'</a></h1>';
+	$output = '<h1><a href="'.base_path().'cmtls/'.$node->nid.'">'.$node->title.'</a></h1>';
 	$output .= '<div class="content">'.$node->og_description.'</div>';
 	
 	return $output;

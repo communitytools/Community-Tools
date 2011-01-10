@@ -37,7 +37,7 @@ $node = node_load($node_id);
 	
 	<?php if(!$user->uid): ?>
 		<div class="comment">
-			<?php print t('Please <a href="@href" class="@class">log in</a> to leave a comment.', array('@href' => $base_url.'cmtls/login', '@class' => 'modalframe-child')); ?> 
+			<?php print t('Please <a href="@href" class="@class">log in</a> to leave a comment.', array('@href' => base_path().'cmtls/login', '@class' => 'modalframe-child')); ?> 
 		</div>
 	<?php endif; ?>
 	

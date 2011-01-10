@@ -288,7 +288,7 @@ function cmtls_event_content_default_fields() {
       ),
       'autocompletion_field_cmtls_address_enable' => 1,
       'autocompletion_field_cmtls_address_override' => 1,
-      'autocompletion_field_cmtls_address_content' => '',
+      'autocompletion_field_cmtls_address_content' => '[street_address]',
       'autocompletion_field_cmtls_address_type' => 'input',
       'position' => '10',
       'label' => 'Geo info',

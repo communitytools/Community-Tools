@@ -57,6 +57,56 @@ function cmtls_idea_content_default_fields() {
     ),
   );
 
+  // Exported field: field_cmtls_files
+  $fields['cmtls_idea-field_cmtls_files'] = array(
+    'field_name' => 'field_cmtls_files',
+    'type_name' => 'cmtls_idea',
+    'display_settings' => array(
+      'weight' => '5',
+      'parent' => '',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'filefield',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'filefield',
+    'active' => '1',
+    'list_field' => '0',
+    'list_default' => 1,
+    'description_field' => '1',
+    'widget' => array(
+      'file_extensions' => '',
+      'file_path' => '',
+      'progress_indicator' => 'bar',
+      'max_filesize_per_file' => '10M',
+      'max_filesize_per_node' => '50M',
+      'label' => 'Files',
+      'weight' => '10',
+      'description' => '',
+      'type' => 'filefield_widget',
+      'module' => 'filefield',
+    ),
+  );
+
   // Exported field: field_cmtls_geoinfo
   $fields['cmtls_idea-field_cmtls_geoinfo'] = array(
     'field_name' => 'field_cmtls_geoinfo',
@@ -243,6 +293,7 @@ function cmtls_idea_content_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Files');
   t('Geo info');
   t('Location');
   t('Post on facebook wall');

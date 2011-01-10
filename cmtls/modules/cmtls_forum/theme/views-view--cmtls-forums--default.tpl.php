@@ -29,7 +29,7 @@
  * @ingroup views_templates
  */
 ?>
-<div id="text-container" class="cmtls-forums-container">
+<div class="cmtls-forums-container">
 	<div class="forum">
 		<div class="forum-topics-list">
 			<ul>

@@ -4,7 +4,7 @@ include_once('cmtls_problem.features.inc');
 
 /**
  * Implements hook_cmtls_context()
- * 
+ *
  * The edit button for problems
  *
  * @return unknown
@@ -30,18 +30,18 @@ function cmtls_problem_cmtls_dashboard_block_content($group, $app)
 
 /**
  * Implements hook_init()
- * 
+ *
  */
 function cmtls_problem_init()
 {
 	$current_group = _cmtls_group_get_current();
 	$current_app = _cmtls_app_get_current($current_group);
-	
+
 	if($current_app->field_cmtls_app_type[0]['value'] == 'cmtls_problem')
 	{
 		drupal_add_feed(url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/rss', array('absolute' => TRUE)), $app->title);
 	}
-	
+
 	//drupal_add_js(drupal_get_path('module', 'cmtls_problem') .'/js/app.js');
 }
 
@@ -94,7 +94,7 @@ function cmtls_problem_cmtls_map_config()
 function cmtls_problem_menu()
 {
 	$items = array();
-	
+
 	$items['cmtls/%node/%node/problem/%node'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(4),
@@ -104,7 +104,7 @@ function cmtls_problem_menu()
 		'access arguments' => array('view', 4),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/%node/problem/%node/edit'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(4),
@@ -114,7 +114,7 @@ function cmtls_problem_menu()
 		'access arguments' => array('update', 4),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/%node/problem/%node/delete'] = array(
 		'title' => 'Delete problem',
 		'page callback' => 'drupal_get_form',
@@ -125,7 +125,7 @@ function cmtls_problem_menu()
 		'file path' => drupal_get_path('module', 'node'),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/%node/problem/add'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(2),
@@ -135,7 +135,7 @@ function cmtls_problem_menu()
 		'access arguments' => array('create', (object)array('type' => 'cmtls_problem')),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/%node/problem/tag/%'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(4),
@@ -155,7 +155,7 @@ function cmtls_problems_page($app_id)
 	{
 		cmtls_ajax_response(views_embed_view('cmtls_problems', 'default', $app_id));
 	}
-	
+
 	//return theme('cmtls_pager');
 	return theme('cmtls_problems_content', $app_id, theme('cmtls_pager'));
 }
@@ -169,7 +169,7 @@ function cmtls_problems_page($app_id)
  * @return string
  */
 function cmtls_problem_page_taxonomy($group, $app, $taxonomy) {
-	return views_embed_view('cmtls_problems', 'default', $app->nid, 'all', $taxonomy) . cmtls_map_page();
+	return views_embed_view('cmtls_problems', 'default', $app->nid, 'all', $taxonomy);
 }
 
 /**
@@ -186,8 +186,8 @@ function cmtls_problem_page($group, $app, $problem)
 	{
 		return t('This not a problem.');
 	}
-	
-	return views_embed_view('cmtls_problems', 'default', $app->nid, $problem->nid).cmtls_map_page();
+
+	return views_embed_view('cmtls_problems', 'default', $app->nid, $problem->nid);
 }
 
 /**
@@ -209,22 +209,22 @@ function cmtls_problem_form_alter(&$form, &$form_state, $form_id)
 		$form['date'] = $form['author']['date'];
 		$form['date']['#type'] = 'value';
 		//$form['body'] = $form['body_field']['body'];
-		
+
 		$form['revision_information'] = NULL;
 		$form['author'] = NULL;
 		//$form['body_field'] = NULL;
 		$form['options'] = NULL;
 		$form['buttons']['preview'] = NULL;
-		
+
 		$group = _cmtls_group_get_current();
 		$app = _cmtls_app_get_current($group);
 
 		$form['field_cmtls_problem_status'] = NULL;
-		
+
 		if($form['buttons']['delete'])
 		{
 			$node = $form['#node'];
-			
+
 			$form['buttons']['delete']['#type'] = 'markup';
 			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$group->nid.'/'.$app->nid.'/problem/'.$node->nid.'/delete', array('attributes' => array('class' => 'modalframe-processed')));
 		}
@@ -232,7 +232,7 @@ function cmtls_problem_form_alter(&$form, &$form_state, $form_id)
 		$form['#after_build'][] = 'cmtls_problem_node_form_after_build';
 		$form['#submit'][] = 'cmtls_problem_form_submit';
 	}
-	
+
 	if ($form_id == 'comment_form')
 	{
 		$node = node_load($form['nid']['#value']);
@@ -270,28 +270,28 @@ function cmtls_problem_form_alter(&$form, &$form_state, $form_id)
 function cmtls_problem_node_form_after_build($form, &$form_state)
 {
 	//printr($form); exit;
-	
+
 	$node = $form['#node'];
-	
+
 	$current_group = _cmtls_group_get_current();
 	$current_app = _cmtls_app_get_current($current_group);
-	
+
 	cmtls_group_set_og_form_values($form, $form_state);
-	
+
 	$form['comment'] = $form['comment_settings']['comment'];
 	$form['comment']['#type'] = 'value';
-	
+
 	$form['parent'] = $form['hierarchy']['parent'];
 	$form['parent']['#type'] = 'value';
 	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
-	
+
 	$form['hierarchy'] = NULL;
 	$form['sections'] = NULL;
 	$form['attachments'] = NULL;
 	$form['comment_settings'] = NULL;
 	$form['menu'] = NULL;
 	$form['path'] = NULL;
-	
+
 	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
 	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
 
@@ -415,28 +415,30 @@ function cmtls_problem_theme($existing)
 function cmtls_problem_path($problem, $group = NULL)
 {
 	if(!$group) $group = _cmtls_group_get_current();
-	
+
 	return 'cmtls/'.$group->nid.'/'.$problem->parent.'/problem/'.$problem->nid;
 }
 
 function cmtls_problem_cmtls_map_popup_content($feature)
 {
 	$node = node_load($feature->nid);
-	
-	
+//	printr($node->field_cmtls_address[0]['value']); exit;
+
+
 	$body = explode(' ', strip_tags(check_markup($node->body)));
-	
+
 	if(sizeof($body) > 25)
 	{
 		$body = array_slice($body, 0, 25);
 		$body[] = '...';
 	}
-	
+
 	$body = implode(' ', $body);
-	
+
 	$output = '<h1><a href="'.base_path().cmtls_problem_path($node).'">'.$node->title.'</a></h1>';
+	$output .= '<div class="address">'.$node->field_cmtls_address[0]['value'].'</div>';
 	$output .= '<div class="content">'.$body.'</div>';
-	
+
 	return $output;
 }
 
@@ -454,28 +456,35 @@ function cmtls_problem_cmtls_filter_info()
 					'title' => t('Latest posts'),
 					'default values' => array(
 						'sort' => 0,
-						'date from' => '-7 days',
-						'date to' => 'now',
-						'search' => '',
+					),
+				),
+				array(
+					'title' => t('Not fixed'),
+					'default values' => array(
+						'sort' => 0,
 					),
 					'where' => array(
-						'clauses' => array(),
-						'args' => array(),
+						'clauses' => array(
+							'node_data_field_cmtls_problem_status.field_cmtls_problem_status_value = 0',
+						),
 					), // where
 				),
-
+				array(
+					'title' => t('Fixed'),
+					'default values' => array(
+						'sort' => 0,
+					),
+					'where' => array(
+						'clauses' => array(
+							'node_data_field_cmtls_problem_status.field_cmtls_problem_status_value = 1',
+						),
+					), // where
+				),
 				array(
 					'title' => t('Most commented'),
 					'default values' => array(
-						'sort' => 0,
-						'date from' => '-7 days',
-						'date to' => 'now',
-						'search' => '',
+						'sort' => 2,
 					),
-					'where' => array(
-						'clauses' => array(),
-						'args' => array(),
-					), // where
 				),
 			), // filter predefined options
 
@@ -500,12 +509,15 @@ function cmtls_problem_cmtls_filter_info()
 					'direction' => 'ASC',
 					'title' => t('Title'),
 				),
+				array(
+					'field' => 'node_comment_statistics_comment_count',
+					'direction' => 'DESC',
+					'title' => t('Most commented'),
+				),
 			), // sort options
 
 			'default values' => array(
 				'sort' => 0,
-				'date from' => '-7 days',
-				'date to' => 'now',
 			),
 
 		), // node type

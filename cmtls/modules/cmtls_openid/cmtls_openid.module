@@ -56,6 +56,24 @@ function cmtls_openid_user($op, &$edit, &$account, $category = NULL){
 	}
 }
 
+function cmtls_openid_add_form_fields($form)
+{
+	// Create ID card login button
+	$form['idcard_integration'] = array(
+		'#type' => 'button',
+		'#external_authentication' => TRUE,
+		'#value' => t("Connect with ID card"),
+		'#submit' => array('cmtls_openid_user_login_submit'),
+		'#executes_submit_callback' => TRUE,
+	);
+	
+	unset($form['openid_links']);
+
+	drupal_add_css(drupal_get_path('module', 'cmtls_openid') . '/css/cmtls_openid.css');
+			
+	return $form;
+}
+
 /**
  * Implementation of hook_form_alter()
  */
@@ -65,20 +83,8 @@ function cmtls_openid_form_alter(&$form, &$form_state, $form_id){
 		 * User login form
 		 */
 		case 'user_login':
-			// Create ID card login button
-			$form['idcard_integration'] = array(
-				'#type' => 'button',
-				'#external_authentication' => TRUE,
-				'#value' => t("Connect with ID card"),
-				'#submit' => array('cmtls_openid_user_login_submit'),
-				'#executes_submit_callback' => TRUE,
-			);
 			
-			#'#value' => '<a href="' . url('cmtls/login/openid') .'" id="openid-login" class="modalframe-exclude"><img src="' . url(drupal_get_path('module', 'cmtls_openid') . '/images/login.gif') . '" alt="' . t('Connect with ID card') .'" /></a>',
-
-			unset($form['openid_links']);
-
-			drupal_add_css(drupal_get_path('module', 'cmtls_openid') . '/css/cmtls_openid.css');
+			$form = cmtls_openid_add_form_fields($form);
 
 			break;
 
@@ -86,8 +92,17 @@ function cmtls_openid_form_alter(&$form, &$form_state, $form_id){
 		 * User registration form
 		 */
 		case 'user_register':
+			
+			if($form_state['post']['op'] == t('Connect with ID card'))
+			{
+				cmtls_openid_user_login_submit($form, &$form_state);
+				return;
+			}
+			
 			// To the authentication module check to see if we should display OpenId specific form fields with corresponding values
-			if('cmtls_openid' == cmtls_auth_authentication_module()){
+			$module = cmtls_auth_authentication_module();
+			
+			if('cmtls_openid' == $module){
 				$session = cmtls_openid_get_session();
 
 				// Paranoia FTW. If we got here somehow without actually authenticating user, don't try to populate form
@@ -105,7 +120,11 @@ function cmtls_openid_form_alter(&$form, &$form_state, $form_id){
 					);
 				}
 			}
-
+			elseif(!$module)
+			{
+				$form = cmtls_openid_add_form_fields($form);
+			}
+			
 			break;
 	}
 }
@@ -127,6 +146,9 @@ function cmtls_openid_user_login_submit($form, &$form_state){
  * Account login page callback
  */
 function cmtls_openid_login(){
+	
+	$GLOBALS['conf']['cache'] = FALSE;
+	
 	// Send the Modal Frame javascript for child windows to the page.
 	modalframe_child_js();
 

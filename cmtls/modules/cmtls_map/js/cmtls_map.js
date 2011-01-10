@@ -257,7 +257,7 @@ function mapResize()
 		
 		map.updateSize();
 	}
-	else if(Drupal && Drupal.settings && Drupal.settings.openlayers && Drupal.settings.openlayers.maps["openlayers-map-auto-id-0"])
+	else if($('#openlayers-container-openlayers-map-auto-id-0').length > 0 && Drupal && Drupal.settings && Drupal.settings.openlayers && Drupal.settings.openlayers.maps["openlayers-map-auto-id-0"])
 	{
 		$("#openlayers-container-openlayers-map-auto-id-0").attr("style", "width: " + olmap_width + "px; height: " + olmap_height + "px;");
 		$("#openlayers-map-auto-id-0").attr("style", "width: " + olmap_width + "px; height: " + olmap_height + "px;");

@@ -31,7 +31,7 @@
 
 ?>
 
-<div id="text-container" class="cmtls-members-container">
+<div class="cmtls-members-container">
 	<div class="address-book">
 		<?php if ($rows): ?>
 			<?php print $rows; ?>
@@ -39,4 +39,4 @@
 			<?php print $empty; ?>
 		<?php endif; ?>
 	</div>
-</div> <!-- text-container -->
+</div> <!-- .cmtls-members-container -->

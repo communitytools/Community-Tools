@@ -328,6 +328,27 @@ function cmtls_app_form_alter(&$form, &$form_state, $form_id)
 		
 		//printr($form);
 	}
+	// title
+	/* messes up the title on all pages
+	elseif(strpos($form_id, 'cmtls_') === 0  && _cmtls_is())
+	{
+		if($form['#node']->nid)
+		{
+			$title = t('Edit post in');
+		}
+		else 
+		{
+			$title = t('New post in');
+		}
+		
+		$current_group = _cmtls_group_get_current();
+		$current_app = _cmtls_app_get_current($current_group);
+		
+		$title = $title.' "'.check_plain($current_app->title).'"';
+		
+		drupal_set_title($title);
+	}
+	*/
 }
 
 /**
@@ -466,7 +487,6 @@ function cmtls_app_theme($existing)
  * @param node $group group node
  * @return mixed
  * 
- * @todo caching so repeated calls would not load the whole function always
  */
 function _cmtls_app_get_current($group)
 {
@@ -475,7 +495,7 @@ function _cmtls_app_get_current($group)
 	if($app) return $app;
 	
 	$app = menu_get_object('node', 2);
-
+	
 	if($app->type != 'cmtls_app')
 	{
 		$result = db_query('SELECT nid FROM {nodehierarchy} WHERE parent = '.(int)$group->nid.' ORDER BY order_by LIMIT 1');
@@ -485,7 +505,7 @@ function _cmtls_app_get_current($group)
 		$app = node_load($aid);
 		if($app->type != 'cmtls_app')
 		{
-			$app = NULL;
+			$app = FALSE;
 		}
 	}
 	

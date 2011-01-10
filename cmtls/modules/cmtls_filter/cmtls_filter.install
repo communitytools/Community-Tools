@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * Implements hook_install()
+ * Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
+ *
+ */
+function cmtls_filter_install()
+{
+	// Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
+	db_query("UPDATE {system} SET weight = 20 WHERE type = 'module' AND name = '%s'", 'cmtls_filter');
+}
