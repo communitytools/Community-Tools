@@ -1,0 +1,46 @@
+
+.olControlPanel  {
+	position: relative;
+	right: 5px;
+	top: 5px;
+	font-size: 11px;
+}
+
+.olControlPanel div {
+	display: inline-block;
+	background: #000;
+	color: #aaa;
+	padding: 2px 5px;
+}
+
+/* Navigation item */
+.olControlPanel .olControlNavigationItemInactive,
+.olControlPanel .olControlNavigationItemActive {
+	-moz-border-radius: 4px 0 0 4px;
+	-webkit-border-radius: 4px 0 0 4px;
+	border-radius: 4px 0 0 4px;
+}
+
+/* New point item */
+.olControlPanel .olControlDrawFeaturePointItemActive,
+.olControlPanel .olControlDrawFeaturePointItemInactive  {
+	-moz-border-radius: 0 4px 4px 0;
+	-webkit-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;	
+}
+
+
+/* Inactive states */
+.olControlPanel .olControlNavigationItemInactive,
+.olControlPanel .olControlDrawFeaturePointItemInactive {
+	background: url("images/ui-bg_highlight-hard_75_ebebeb_1x100.png") repeat-x scroll 50% 50% #EBEBEB; 
+	border: 1px solid #D3D3D3;
+	color: #555555;	
+}
+
+/* Active states */
+.olControlPanel .olControlNavigationItemActive,
+.olControlPanel .olControlDrawFeaturePointItemActive {
+	background: white;
+	color: #333;
+}

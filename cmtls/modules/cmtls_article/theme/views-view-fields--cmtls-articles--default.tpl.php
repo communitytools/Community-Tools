@@ -56,10 +56,9 @@ $i = 0;
 
 	<div class="meta-files">
 		<?php foreach ((array)$node->field_cmtls_files as $file): ?>
-
 			<?php if (is_array($file)): ?>
 				<div class="meta-file">
-					<a href="<?php print url($file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
+					<a href="<?php print url($file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
 						<?php print $file['imagecache_icon']; ?>
 					</a>
 				</div>

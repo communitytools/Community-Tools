@@ -4,7 +4,7 @@ include_once('cmtls_group.features.inc');
 
 /**
  * Implements hook_cmtls_context()
- * 
+ *
  * The edit, delete, move buttons for groups
  *
  * @return array
@@ -38,16 +38,16 @@ function cmtls_group_init()
 function cmtls_group_menu()
 {
 	global $user;
-	
+
 	$items = array();
-	
+
 	$items['cmtls'] = array(
 		'title callback' => 'cmtls_page_title',
 		'page callback' => 'cmtls_group_page',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(1),
@@ -57,7 +57,7 @@ function cmtls_group_menu()
 		'access arguments' => array('view', 1),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/rss'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(1),
@@ -67,7 +67,7 @@ function cmtls_group_menu()
 		'access arguments' => array('view', 1),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/edit'] = array(
 		'title callback' => 'cmtls_page_title',
 		'title arguments' => array(1),
@@ -77,7 +77,7 @@ function cmtls_group_menu()
 		'access arguments' => array('update', 1),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/delete'] = array(
 		'title' => 'Delete group',
 		'page callback' => 'drupal_get_form',
@@ -88,7 +88,7 @@ function cmtls_group_menu()
 		'file path' => drupal_get_path('module', 'node'),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/add'] = array(
 		'title callback' => 'cmtls_page_title',
 		'page callback' => 'cmtls_node_edit_page',
@@ -97,14 +97,14 @@ function cmtls_group_menu()
 		'access arguments' => array('create', (object)array('type' => 'cmtls_group')),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/list'] = array(
 		'title' => 'Groups',
 		'page callback' => 'cmtls_groups_page',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/join'] = array(
 		'title' => 'Join group',
 		'page callback' => 'og_subscribe',
@@ -115,7 +115,7 @@ function cmtls_group_menu()
 		'file' => 'og.pages.inc',
 		'file path' => drupal_get_path('module', 'og'),
 	);
-	
+
 	$items['cmtls/%node/leave/%user'] = array(
 		'title' => 'Leave group',
 	    'page callback' => 'drupal_get_form',
@@ -126,7 +126,7 @@ function cmtls_group_menu()
 		'file' => 'og.pages.inc',
 		'file path' => drupal_get_path('module', 'og'),
 	);
-	
+
 	$items['cmtls/%node/join/%user/approve'] = array(
 		'title' => 'Join group',
 		'page callback' => 'cmtls_group_og_approve',
@@ -135,7 +135,7 @@ function cmtls_group_menu()
 		'access arguments' => array(1),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/join/%user/deny'] = array(
 		'title' => 'Join group',
 		'page callback' => 'cmtls_group_og_deny',
@@ -144,7 +144,7 @@ function cmtls_group_menu()
 		'access arguments' => array(1),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	return $items;
 }
 
@@ -157,42 +157,42 @@ function cmtls_group_menu()
 function cmtls_group_page($group = NULL)
 {
 	if(!$group) $group = _cmtls_group_get_main();
-	
+
 	if($group->type != 'cmtls_group')
 	{
 		return t('This is not a group.');
 	}
-	
+
 	global $user;
-	
+
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
-	
+
 	// set map settings
 	cmtls_map_set_config(array(
 		'cmtls_member' => array(
 			'default map view' => CMTLS_MAP_VIEW_HALF_PAGE,
 		),
 	));
-	
+
 	$result = db_query('SELECT nid FROM {nodehierarchy} WHERE parent = '.(int)$group->nid.' ORDER BY order_by LIMIT 1');
 	$aid = db_fetch_array($result);
 	$aid = $aid['nid'];
-	
+
 	$app = node_load($aid);
-	
+
 	//printr($app); exit;
-	
+
 	if($app && node_access('view', $app))
 	{
 		return cmtls_app_page($group, $app);
 	}
-	else 
+	else
 	{
 		$output = '<h1>'.t('Group has no content').'<h1>';
-		
+
 		if($user->uid && og_is_group_admin($group)) $output .= t('Start by adding tools on the left.');
-		
+
 		return $output;
 	}
 }
@@ -205,23 +205,23 @@ function cmtls_group_page($group = NULL)
 function cmtls_groups_page()
 {
 	global $user;
-	
+
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
-	
+
 	// set map settings
 	cmtls_map_set_config(array(
 		'cmtls_member' => array(
 			'default map view' => CMTLS_MAP_VIEW_HALF_PAGE,
 		),
 	));
-	
+
 	$output = '<div class="cmtls-groups-container">';
 	$output = '<div id="text-container" class="cmtls-groups-container">';
 	$output .= views_embed_view('cmtls_groups', 'block_2', $user->uid);
 	$output .= views_embed_view('cmtls_groups', 'block_1');
 	$output .= '</div><!-- cmtls-groups-container -->';
-	
+
 	return $output;
 }
 
@@ -236,15 +236,15 @@ function cmtls_group_preprocess(&$vars, $hook)
 {
 	$main_group = _cmtls_group_get_main();
 	$current_group = _cmtls_group_get_current();
-	
+
 	$group_properties = array(
 		'background_image' => ($current_group->field_cmtls_group_background[0]['filepath'] ? file_create_url($current_group->field_cmtls_group_background[0]['filepath']) : file_create_url($main_group->field_cmtls_group_background[0]['filepath'])),
 	);
-	
+
 	//printr($current_group); exit;
 
 	if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
-	
+
 	$vars['cmtls'] += array(
 		'main_group' => $main_group,
 		'current_group' => $current_group,
@@ -259,63 +259,92 @@ function cmtls_group_preprocess(&$vars, $hook)
  * @param unknown_type $form
  * @param unknown_type $form_state
  */
-function cmtls_group_form_alter(&$form, &$form_state, $form_id)
+function cmtls_group_form_og_confirm_unsubscribe_alter(&$form, &$form_state)
 {
-	if($form_id == 'og_confirm_subscribe' && _cmtls_is())
+	if(!_cmtls_is()) return;
+
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+
+	if($form['actions']['cancel'])
 	{
-		// Send the Modal Frame javascript for child windows to the page.
-		modalframe_child_js();
-		
-		if($form['actions']['cancel'])
-		{
-			$form['actions']['cancel'] = array(
-				'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
-			);
-		}
-		
-		$form['#submit'][] = 'cmtls_group_join_confirm_submit';
+		$form['actions']['cancel'] = array(
+			'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+		);
+	}
+
+	$form['#submit'][] = 'cmtls_forms_submit';
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ * prepare group node form for cleanup
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_group_form_og_confirm_subscribe_alter(&$form, &$form_state)
+{
+	if(!_cmtls_is()) return;
+
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+
+	if($form['actions']['cancel'])
+	{
+		$form['actions']['cancel'] = array(
+			'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
+		);
+	}
+
+	$form['#submit'][] = 'cmtls_group_join_confirm_submit';
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ * prepare group node form for cleanup
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_group_form_cmtls_group_node_form_alter(&$form, &$form_state)
+{
+	if(!_cmtls_is()) return;
+
+	$form['name'] = $form['author']['name'];
+	$form['name']['#type'] = 'value';
+	$form['date'] = $form['author']['date'];
+	$form['date']['#type'] = 'value';
+
+	$form['revision_information'] = NULL;
+	$form['author'] = NULL;
+	$form['body_field'] = NULL;
+	$form['options'] = NULL;
+	$form['buttons']['preview'] = NULL;
+
+	if($form['buttons']['delete'])
+	{
+		$node = $form['#node'];
+
+		$form['buttons']['delete']['#type'] = 'markup';
+		$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$node->nid.'/delete', array('attributes' => array('class' => 'modalframe-processed')));
 	}
 	
-	if($form_id == 'og_confirm_unsubscribe' && _cmtls_is())
-	{
-		// Send the Modal Frame javascript for child windows to the page.
-		modalframe_child_js();
-		
-		if($form['actions']['cancel'])
-		{
-			$form['actions']['cancel'] = array(
-				'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
-			);
-		}
-		
-		$form['#submit'][] = 'cmtls_group_leave_confirm_submit';
-	}
+	$form['geolocation'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Geolocation'),
+		'#tree' => TRUE,
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,    
+	);
 	
-	if($form_id == 'cmtls_group_node_form' && _cmtls_is())
+	if ($form['#node'] && $form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] && ($form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] != 'GEOMETRYCOLLECTION()'))
 	{
-		$form['name'] = $form['author']['name'];
-		$form['name']['#type'] = 'value';
-		$form['date'] = $form['author']['date'];
-		$form['date']['#type'] = 'value';
-		
-		$form['revision_information'] = NULL;
-		$form['author'] = NULL;
-		$form['body_field'] = NULL;
-		$form['options'] = NULL;
-		$form['buttons']['preview'] = NULL;
-		
-		if($form['buttons']['delete'])
-		{
-			$node = $form['#node'];
-			
-			$form['buttons']['delete']['#type'] = 'markup';
-			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$node->nid.'/delete', array('attributes' => array('class' => 'modalframe-processed')));
-		}
-		
-		$form['#after_build'][] = 'cmtls_group_node_form_after_build';
-		$form['#submit'][] = 'cmtls_group_form_submit';
-		//printr($form);
+		$form['geolocation']['#collapsible'] = FALSE;
 	}
+
+	$form['#after_build'][] = 'cmtls_group_node_form_after_build';
+	$form['#submit'][] = 'cmtls_forms_submit';
 }
 
 function cmtls_group_leave_confirm_submit($form, &$form_state)
@@ -328,22 +357,22 @@ function cmtls_group_leave_confirm_submit($form, &$form_state)
 function cmtls_group_join_confirm_submit($form, &$form_state)
 {
 	global $user;
-	
+
 	$group = node_load($form['gid']['#value']);
-	
+
 	if($group->og_selective == OG_MODERATED)
 	{
 		//printr($form_state); exit;
-		
+
 		$main_group = _cmtls_group_get_main();
-		
+
 		$sql = og_list_users_sql(1, 1, NULL);
         $res = db_query($sql, $group->nid);
-        
+
         while ($admin = db_fetch_object($res))
         {
         	profile_load_profile($admin);
-			
+
 			$message = array(
 				'subject' => variable_get('site_name', 'CT').' - '.t('Application to join group').': '.$group->title,
 				'body' =>
@@ -357,15 +386,15 @@ function cmtls_group_join_confirm_submit($form, &$form_state)
 					t('Deny').': '.url('cmtls/'.$group->nid.'/join/'.$user->uid.'/deny', array('absolute' => TRUE))."\n".
 					t('In self defence wrote').': '.$form_state['values']['request']."\n",
 			);
-			
+
 			drupal_mail('cmtls', 'cmtls_mail', $admin->mail, user_preferred_language($admin), $message);
         }
-        
+
 		modalframe_close_dialog(array(
 			'message' => t('Your application was sent successfully'),
 		));
 	}
-	else 
+	else
 	{
 		modalframe_close_dialog(array(
 			'refresh' => TRUE,
@@ -383,30 +412,35 @@ function cmtls_group_join_confirm_submit($form, &$form_state)
 function cmtls_group_node_form_after_build($form, &$form_state)
 {
 	//printr($form); exit;
-	
+
 	$node = $form['#node'];
 	
+	if(!$node->nid)
+	{
+		drupal_set_title(t('New').' '.t('group'));
+	}
+
 	$current_group = _cmtls_group_get_current();
-	
+
 	$form['comment'] = $form['comment_settings']['comment'];
 	$form['comment']['#type'] = 'value';
-	
+
 	$form['field_cmtls_group_main']['#type'] = 'value';
 	$form['field_cmtls_group_main']['#value']  = $form_state['values']['field_cmtls_group_main'] = $node->field_cmtls_group_main;
 	$form['field_cmtls_group_main']['value']['#value'] = $node->field_cmtls_group_main[0]['value'];
-	
+
 	//printr($form['og_selective']); exit;
 	//$form['og_selective'] = NULL; // group membership type
 	$form['og_language'] = NULL;
-	
+
 	$form['og_selective']['#options'][2] = NULL;
 	$form['og_selective']['#options'][3] = NULL;
 	$form['og_selective'][2] = NULL;
 	$form['og_selective'][3] = NULL;
-	
+
 	$form['og_register'] = NULL; // does this group appear in the registration form
 	$form['og_directory'] = NULL; // does the group appear in OG directory
-	
+
 	$form['themes'] = NULL;
 	$form['sections'] = NULL;
 	$form['hierarchy'] = NULL;
@@ -415,21 +449,25 @@ function cmtls_group_node_form_after_build($form, &$form_state)
 	$form['menu'] = NULL;
 	$form['path'] = NULL;
 	
+	// geoinfo settings
+	if($form['field_cmtls_geoinfo'] && $_GET['wkt']['lat'] && $_GET['wkt']['lon'] && !$form['field_cmtls_geoinfo']['#default_value'][0]['openlayers_wkt'])
+	{
+		$wkt = 'GEOMETRYCOLLECTION(POINT('.(float)$_GET['wkt']['lon'].' '.(float)$_GET['wkt']['lat'].'))';
+		
+		$form['field_cmtls_geoinfo']['#default_value'][0]['openlayers_wkt'] =
+		$form['field_cmtls_geoinfo']['#value'][0]['openlayers_wkt'] =
+		$form['field_cmtls_geoinfo']['openlayers_wkt']['#default_value'] =
+		$form['field_cmtls_geoinfo']['openlayers_wkt']['#value'] =
+		$wkt;
+	}
+	
+	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
+	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
+	
+	$form['geolocation']['field_cmtls_geoinfo'] = $form['field_cmtls_geoinfo'];
+	unset($form['field_cmtls_geoinfo']);
+	
 	return $form;
-}
-
-/**
- * Group node form submit, closes modalframe window
- *
- * @param unknown_type $form
- * @param unknown_type $form_state
- */
-function cmtls_group_form_submit($form, &$form_state)
-{
-	// Tell the parent window to close the modal frame dialog.
-	modalframe_close_dialog(array(
-		'refresh' => TRUE,
-	));
 }
 
 /**
@@ -510,16 +548,16 @@ function cmtls_group_theme($existing)
 function _cmtls_group_get_current()
 {
 	static $group;
-	
+
 	if($group) return $group;
-	
+
 	$group = menu_get_object('node', 1);
 
 	if($group->type != 'cmtls_group')
 	{
 		$group = _cmtls_group_get_main();
 	}
-	
+
 	return $group;
 }
 
@@ -531,33 +569,16 @@ function _cmtls_group_get_current()
 function _cmtls_group_get_main()
 {
 	static $group;
-	
+
 	if($group) return $group;
-	
+
 	$result = db_query('SELECT nid FROM {content_type_cmtls_group} WHERE field_cmtls_group_main_value = 1 LIMIT 1');
 	$nid = db_fetch_array($result);
 	$nid = $nid['nid'];
-	
+
 	$group = node_load($nid);
-	
+
 	return $group;
-}
-
-function cmtls_group_set_og_form_values(&$form, &$form_state)
-{
-	$node = $form['#node'];
-	$current_group = _cmtls_group_get_current();
-	
-	$form['og_groups'] = $form['og_nodeapi']['visible']['og_groups'];
-	$form['og_groups']['#options'] = $form['og_groups']['#type']=='select' ? form_options_flatten($form['og_groups']['#options']) : $form['og_groups']['#options'];
-	$form['og_groups']['#type'] = 'value';
-	$form['og_groups']['#value'] = $form_state['values']['og_groups'] = isset($node->og_groups) ? $node->og_groups : array($current_group->nid => $current_group->nid);
-
-	$form['og_public'] = $form['og_nodeapi']['visible']['og_public'];
-	$form['og_public']['#type'] = 'value';
-	$form['og_public']['#value'] = $form_state['values']['og_public'] = isset($node->og_public) ? $node->og_public : ($current_group->og_private ? 0 : 1);
-
-	$form['og_nodeapi'] = NULL;
 }
 
 function cmtls_group_og_approve($group, $account)
@@ -569,19 +590,19 @@ function cmtls_group_og_approve($group, $account)
 	else
 	{
 		global $user;
-		
+
 		og_save_subscription($group->nid, $account->uid, array('is_active' => 1));
-		
+
 		$main_group = _cmtls_group_get_main();
-		
+
 		// notify other group admins about approval
 		$sql = og_list_users_sql(1, 1, NULL);
         $res = db_query($sql, $group->nid);
-        
+
         while ($admin = db_fetch_object($res)) if($admin->uid != $user->uid)
         {
         	profile_load_profile($admin);
-			
+
 			$message = array(
 				'subject' => t('!sitename - Application to join group !groupname approved',array(
 					'!sitename' => variable_get('site_name','CT'),
@@ -596,10 +617,10 @@ function cmtls_group_og_approve($group, $account)
 					'!grouplink' => url('cmtls/'.$group->nid.'/', array('absolute' => TRUE)),
 				))."\n",
 			);
-			
+
 			drupal_mail('cmtls', 'cmtls_mail', $admin->mail, user_preferred_language($admin), $message);
         }
-        
+
         // notify member about approval
 		$message = array(
 			'subject' => t('!sitename - Application to join group !groupname approved',array(
@@ -613,30 +634,30 @@ function cmtls_group_og_approve($group, $account)
 				'!grouplink' => url('cmtls/'.$group->nid.'/', array('absolute' => TRUE)),
 			))."\n",
 		);
-		
+
 		drupal_mail('cmtls', 'cmtls_mail', $account->mail, user_preferred_language($account), $message);
 	}
-	
+
 	drupal_goto('cmtls/'.$group->nid.'/members');
 }
 
 function cmtls_group_og_deny($group, $account)
 {
 	global $user;
-	
+
 	og_delete_subscription($group->nid, $account->uid);
 	drupal_set_message(t('Membership request denied.'));
-		
+
 	$main_group = _cmtls_group_get_main();
-	
+
 	// notify other group admins about denial
 	$sql = og_list_users_sql(1, 1, NULL);
     $res = db_query($sql, $group->nid);
-    
+
     while ($admin = db_fetch_object($res)) if($admin->uid != $user->uid)
     {
     	profile_load_profile($admin);
-		
+
 		$message = array(
 			'subject' => t('!sitename - Application to join group !groupname rejected',array(
 				'!sitename' => variable_get('site_name','CT'),
@@ -651,10 +672,10 @@ function cmtls_group_og_deny($group, $account)
 				'!grouplink' => url('cmtls/'.$group->nid.'/', array('absolute' => TRUE)),
 			))."\n",
 		);
-		
+
 		drupal_mail('cmtls', 'cmtls_mail', $admin->mail, user_preferred_language($admin), $message);
     }
-    
+
     // notify member about denial
 	$message = array(
 		'subject' => t('!sitename - Application to join group !groupname rejected',array(
@@ -668,9 +689,9 @@ function cmtls_group_og_deny($group, $account)
 			'!grouplink' => url('cmtls/'.$group->nid.'/', array('absolute' => TRUE)),
 		))."\n",
 	);
-	
+
 	drupal_mail('cmtls', 'cmtls_mail', $account->mail, user_preferred_language($account), $message);
-	
+
 	drupal_goto('cmtls/'.$group->nid.'/members');
 }
 
@@ -706,20 +727,20 @@ function cmtls_group_node_access_records($node)
 			'grant_delete' => 0,
 			'priority' => 0,
 		);
-		
+
 		return $grants;
     }
-	
+
 	return NULL;
 }
 
 function cmtls_group_cmtls_map_popup_content($feature)
 {
 	$node = node_load($feature->nid);
-	
-	$output = '<h1><a href="'.base_path().'cmtls/'.$node->nid.'">'.$node->title.'</a></h1>';
-	$output .= '<div class="content">'.$node->og_description.'</div>';
-	
+
+	$output = '<h1>'.l($node->title, 'cmtls/'.$node->nid).'</h1>';
+	$output .= '<div class="content">'.check_plain($node->og_description).'</div>';
+
 	return $output;
 }
 
@@ -731,19 +752,19 @@ function cmtls_group_openlayers_map_preprocess_alter(&$map = array())
 		$layers_activated = $map['layer_activated'];
 		unset($layers_activated['cmtls_group']);
 		$map['layer_activated'] = $layers_activated;
-		
+
 		$layers_switcher = $map['layer_switcher'];
 		unset($layers_switcher['cmtls_group']);
 		$map['layer_switcher'] = $layers_switcher;
-		
+
 		$layers = $map['layers'];
 		unset($layers['cmtls_group']);
 		$map['layers'] = $layers;
-		
+
 		$openlayers_behavior_cluster = $map['behaviors']['openlayers_behavior_cluster']['clusterlayer'];
 		unset($openlayers_behavior_cluster['cmtls_group']);
 		$map['behaviors']['openlayers_behavior_cluster']['clusterlayer'] = $openlayers_behavior_cluster;
-		
+
 		reset($layers_activated);
 		$map['behaviors']['openlayers_behavior_zoomtolayer']['zoomtolayer'] = current($layers_activated);
 	}
@@ -752,10 +773,10 @@ function cmtls_group_openlayers_map_preprocess_alter(&$map = array())
 function cmtls_group_can_create_content($group = NULL, $account = NULL)
 {
 	global $user;
-	
+
 	if(!$group) $group = _cmtls_group_get_current();
 	if(!$account) $account = $user;
-	
+
 	if($account->uid)
 	{
 		// group admins can always create content
@@ -768,7 +789,7 @@ function cmtls_group_can_create_content($group = NULL, $account = NULL)
 		{
 			return TRUE;
 		}
-		else 
+		else
 		{
 			return FALSE;
 		}
@@ -782,7 +803,7 @@ function cmtls_group_can_create_content($group = NULL, $account = NULL)
 function cmtls_group_leave_access($group, $account)
 {
 	global $user;
-	
+
 	if($user->uid == $account->uid)
 	{
 		return og_is_group_member($group, TRUE, $account->uid);
@@ -795,5 +816,5 @@ function cmtls_group_leave_access($group, $account)
 
 function cmtls_group_rss_page($group)
 {
-	
+
 }

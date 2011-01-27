@@ -34,7 +34,7 @@
 
 	<div class="toolbar">
 		<?php print l('&larr; '.t("Back to topics' page"), _cmtls_app_get_path().'/forum', array('html' => TRUE, 'attributes' => array('class' => 'back-button'))); ?>
-		<?php if($user->uid && og_is_group_member($cmtls['current_group'], TRUE, $user->uid)) print l(t('+ Start a thread'), _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid.'/add', array('attributes' => array('class' => 'button add modalframe-child'))); ?>
+		<?php if($user->uid && og_is_group_member($cmtls['current_group'], TRUE, $user->uid)) print l(t('Start a thread'), _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid.'/add', array('attributes' => array('class' => 'cmtls-button-add modalframe-child'))); ?>
 	</div> <!-- toolbar -->
 						
 	<div class="forum">

@@ -26,7 +26,7 @@
 		margin-bottom: -1px;
 		border: 1px solid #ccc;
 	}
-	
+
 		.dashboard-item .content .title {
 			-moz-border-radius-topleft: 3px;
 			-border-top-left-radius: 5px;
@@ -40,26 +40,26 @@
 			text-transform: uppercase;
 			font-weight: bold;
 		}
-		
+
 		.dashboard-item .content a.see-all-link {
 			position: absolute;
 			right: 5px;
 			top: 5px;
 			font-size: 12px;
 		}
-	
+
 		.dashboard-item .content .item {
 			border-bottom: 1px dotted #ccc;
 			font-size: 12px;
 			position: relative;
 			padding: 5px 100px 5px 10px;
 		}
-			
+
 				.dashboard-item .content .author {
 					display: inline;
 					margin-left: 5px
 				}
-	
+
 				.dashboard-item .content .avatar {
 					float: left;
 				}
@@ -68,18 +68,18 @@
 				font-size: 15px;
 				display: inline;
 			}
-									
+
 			.dashboard-item .content .item .date {
 				position: absolute;
 				right: 5px;
 				top: 5px;
 				color: #999;
 			}
-			
+
 				.dashboard-item .content .item .date em {
 					font-style: normal;
 				}
-			
+
 			.dashboard-item .content .item .location {
 				-moz-border-radius-bottomleft: 5px;
 				-webkit-border-bottom-left-radius: 5px;
@@ -91,26 +91,26 @@
 				font-weight: bold;
 				position: absolute;
 				right: 0;
-				top: 0;	
-				padding: 2px 2px 3px 2px;	
+				top: 0;
+				padding: 2px 2px 3px 2px;
 			}
-				
+
 				.dashboard-item .content .item .location .address {
 					display: none;
 					padding-left: 5px;
 				}
-				
+
 					.dashboard-item .content .item .location:hover .address {
 						display: inline-block;
 					}
-		
+
 				.dashboard-item .content .item .location .icon {
 					background:url("../img/location-icon-10.png") no-repeat scroll 0 0;
 					display:inline-block;
 					height: 10px;
 					width: 10px;
 				}
-							
+
 			.dashboard-item .content .item .lead {
 				position: absolute;
 				background: #F0EFEC;
@@ -124,20 +124,20 @@
 				z-index: 50;
 				margin-top: 5px;
 				font-size: 12px;
-				
+
 				box-shadow: 2px 2px 10px #e2e2e2;
 				-webkit-box-shadow: 2px 2px 10px #e2e2e2;
 				-moz-box-shadow: 2px 2px 10px #e2e2e2;
 			}
-			
+
 				.dashboard-item .content .item:hover .lead {
 					display: inline-block;
 				}
-					
+
 		.dashboard-item .content .gallery-container {
 			padding: 12px 5px 5px 12px;
 		}
-		
+
 			.dashboard-item .content .gallery-container .gallery-item {
 				width: 95px;
 				height: 95px;
@@ -145,12 +145,12 @@
 				display: inline-block;
 				margin: 0 10px 10px 0;
 			}
-				
+
 				.dashboard-item .content .gallery-container .gallery-item .object-icon img {
 					width: 95px;
 					height: 95px;
 				}
-				
+
 				.dashboard-item .content .gallery-container .gallery-item .object-caption {
 					font-size: 12px;
 				}
@@ -165,33 +165,33 @@
 		margin: -20px 20px 20px 0;
 		float: left;
 	}
-	
+
 	.dashboard-item .content .comment-item {
 		font-size: 12px;
 		padding: 5px 100px 5px 10px;
 		border-bottom: 1px solid #ccc;
 		position: relative;
 	}
-	
+
 		.dashboard-item .content .comment-item:hover {
 		}
-	
+
 		.dashboard-item .content .comment-item .author {
 			display: inline;
 			margin-left: 5px
 		}
-	
+
 		.dashboard-item .content .comment-item .avatar {
 			float: left;
 		}
-		
+
 		.dashboard-item .content .comment-item .date {
 			position: absolute;
 			right: 5px;
 			top: 5px;
 			color: #999;
-		}	
-		
+		}
+
 			.dashboard-item .content .comment-item .date em {
 				font-style: normal;
-			}	
+			}

@@ -39,6 +39,17 @@ function cmtls_auth_menu()
 		'file' => 'user.pages.inc',
 		'file path' => drupal_get_path('module', 'user'),
 	);
+	/*
+	$items['cmtls/password'] = array(
+		'title' => 'Request new password',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('user_pass'),
+		'access callback' => 'user_is_anonymous',
+		'type' => MENU_CALLBACK,
+		'file' => 'user.pages.inc',
+		'file path' => drupal_get_path('module', 'user'),
+	);
+	*/
 
 	return $items;
 }
@@ -72,6 +83,13 @@ function cmtls_auth_settings_page(){
 function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 	switch($form_id){
 
+		case 'user_pass':
+			
+			modalframe_child_js();
+			
+			$form['#submit'][] = 'cmtls_auth_user_pass_submit';
+			
+			break;
 		/*
 		 * User login form
 		 */
@@ -84,10 +102,23 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 			$form['name']['#required'] = FALSE;
 			$form['pass']['#required'] = FALSE;
 			
+			$form['name']['#description'] = NULL;
+			$form['pass']['#description'] = NULL;
+			
+			
 			$form['#validate'] = array();
 			$form['#submit'] = array('cmtls_auth_user_login_submit');
 
 			$form['#after_build'][] = 'cmtls_auth_add_auth_modules';
+			
+			$form['password_remind'] = array(
+				'#type' => 'markup',
+				'#prefix' => '<div id="password-remind-link">',
+				'#value' => l(t('Forgot your password?'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.'), 'class' => 'modalframe-processed'))),
+				'#suffix' => '</div>',
+				'#weight' => 30,
+			);
+			
 			break;
 
 		/*
@@ -115,6 +146,7 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 			
 			// Use custom handler for user registration
 			$form['#submit'][] = 'cmtls_auth_user_register_submit';
+			
 			break;
 
 		/*
@@ -489,4 +521,11 @@ function cmtls_auth_recommend_user_name($name = ''){
 	}else{
 		return '';
 	}
+}
+
+function cmtls_auth_user_pass_submit($form, &$form_state)
+{
+	$form_state['redirect'] = NULL;
+	
+	return;
 }

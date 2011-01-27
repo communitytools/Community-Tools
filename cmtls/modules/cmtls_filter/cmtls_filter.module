@@ -73,10 +73,6 @@ function cmtls_filter_answer_form(&$form_state, $node)
 {
 	global $user;
 
-	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.core.css');
-	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.theme.css');
-	drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.datepicker.css');
-
 	$from_date = $node->filters->info['default values']['date from'] ? strtotime($node->filters->info['default values']['date from']) : NULL;
 	$from_to = $node->filters->info['default values']['date to'] ? strtotime($node->filters->info['default values']['date to']) : NULL;
 
@@ -323,22 +319,44 @@ function cmtls_filter_views_query_alter(&$view, &$query)
 				'relationship' => 'node',
 			);
 
-			$query->where[0]['clauses'][] = '{term_node}.tid = %d';
+			$query->where[0]['clauses'][] = 'term_node.tid = %d';
 			$query->where[0]['args'][] = $_GET['tag'];
 		}
 
 		if ($_GET['action'] == 'search' && $_GET['date_from'] && $node->filters->info['filter fields']['date from'])
 		{
-			$query->where[0]['clauses'][] = 'node.created >= %d';
-			$query->where[0]['args'][] = $_GET['date_from'];
+			if(is_array($node->filters->info['filter fields']['date from']))
+			{
+				foreach ($node->filters->info['filter fields']['date from'] as $clause)
+				{
+					$query->where[0]['clauses'][] = $clause;
+					$query->where[0]['args'][] = $_GET['date_from'];
+				}
+			}
+			else 
+			{
+				$query->where[0]['clauses'][] = 'node.created >= %d';
+				$query->where[0]['args'][] = $_GET['date_from'];
+			}
 		}
 
 		if ($_GET['action'] == 'search' && $_GET['date_to'] && $node->filters->info['filter fields']['date to'])
 		{
-			$query->where[0]['clauses'][] = 'node.created <= %d';
-			$query->where[0]['args'][] = $_GET['date_to'];
+			if(is_array($node->filters->info['filter fields']['date to']))
+			{
+				foreach ($node->filters->info['filter fields']['date to'] as $clause)
+				{
+					$query->where[0]['clauses'][] = $clause;
+					$query->where[0]['args'][] = $_GET['date_to'];
+				}
+			}
+			else 
+			{
+				$query->where[0]['clauses'][] = 'node.created <= %d';
+				$query->where[0]['args'][] = $_GET['date_to'];
+			}
 		}
-
+		
 		if ($_GET['action'] == 'search' && $_GET['search'] && $node->filters->info['filter fields']['search'])
 		{
 			$search_clause_position = count($query->where[0]['clauses']);
@@ -399,7 +417,6 @@ function cmtls_filter_views_query_alter(&$view, &$query)
 			}
 		}
 
-
 		if ($_GET['action'] == 'search' && is_numeric($_GET['sort']) && $node->filters->info['filter fields']['sort'])
 		{
 			$query->orderby = array($node->filters->info['sort options'][$_GET['sort']]['field'] . ' ' . $node->filters->info['sort options'][$_GET['sort']]['direction']);
@@ -420,7 +437,7 @@ function hook_cmtls_filter_info()
 		'example_node_type' => array(
 			'filter predefined options' => array(
 				array(
-					'title' => t('Title 1'),
+					'title' => 'Title 1',
 					'default values' => array(
 						'sort' => 0,
 						'date from' => '-7 days',
@@ -434,7 +451,7 @@ function hook_cmtls_filter_info()
 				),
 
 				array(
-					'title' => t('Title 2'),
+					'title' => 'Title 2',
 					'default values' => array(
 						'sort' => 0,
 						'date from' => '-7 days',
@@ -452,7 +469,11 @@ function hook_cmtls_filter_info()
 				'tag' => FALSE,
 				'search' => FALSE,
 				'date from' => FALSE,
+				// or
+				'date from' => array('node.created >= %d'), // default
 				'date to' => FALSE,
+				// or
+				'date to' => array('node.created <= %d'), // default
 				'sort' => FALSE,
 			), // filter fields
 

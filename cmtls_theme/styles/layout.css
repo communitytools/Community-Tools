@@ -1470,6 +1470,26 @@ body {
 						color: #999;
 						display: inline;
 					}
+					
+.notification-description {
+	font-size: 12px;
+}
+					
+#cmtls-member-notification-settings-form {
+	font-size: 12px;
+}
+
+
+	#cmtls-member-notification-settings-form legend {
+		display: inline-block;
+	}
+
+
+	#cmtls-member-notification-settings-form .form-item {
+		display: inline-block;
+	}
+
+					
 
 /* Groups
 -------------------------------------------------------------- */
@@ -1644,25 +1664,6 @@ body {
 
 /* Forms
 -------------------------------------------------------------- */
-a.button {
-	background: #eee;
-	padding: 4px 10px;
-	text-decoration: none;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
-	border: 0;
-	display: inline-block;
-	position: relative;
-}
-
-	a.button:hover {
-		background: #e9e9e9;
-	}
-	a.button:active {
-		top: 1px;
-	}
-
 .overlay {
 	position: absolute;
 	background: #000;
@@ -1675,10 +1676,11 @@ a.button {
 	filter:alpha(opacity=80);
 }
 
+/*
 .popup-form {
 	position: absolute;
 	border: 3px solid #ccc;
-	background: #F2F2F2;
+	background: #f2f2f2;
 	top: -50px;
 	left: 0;
 	z-index: 310;
@@ -1714,7 +1716,7 @@ a.button {
 .popup-map {
 	position: absolute;
 	border: 3px solid #ccc;
-	background: #F2F2F2;
+	background: #f2f2f2;
 	top: -30px;
 	left: 530px;
 	width: 300px;
@@ -1818,6 +1820,8 @@ a.button {
 		.form-group input.submit-button:active {
 			top: 1px;
 		}
+*/
+
 
 /* Custom Checkboxes + Radios
 -------------------------------------------------------------- */
@@ -1875,7 +1879,7 @@ label.label_check {
 	width: 400px;
 	display: block;
 	border: 3px solid #ccc;
-	background: #F2F2F2;
+	background: #f2f2f2;
 	padding: 15px 15px 0 15px;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
@@ -2174,22 +2178,31 @@ a.back-to-website-button {
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
-div.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {
+.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {
 	background: none transparent;
 	border: none;
 }
 
-div.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.modalframe.ui-draggable {
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.modalframe.ui-draggable {
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 	border-radius: 10px;
-	background-color: #F2F2F2;
+	background-color: #f2f2f2;
 	border: 3px solid #CCCCCC;
 	color: #000000;
 }
 
 #modalframe-container,
 #modalframe-container.ui-widget-content {
-	background-color: #F2F2F2;
+	background-color: #f2f2f2;
+	border: none;
+}
+
+.ui-dialog.modalframe a.ui-dialog-titlebar-close {
+	top: 30px;
+	right: 25px;
+}
+
+iframe#modalframe-element {
 	border: none;
 }

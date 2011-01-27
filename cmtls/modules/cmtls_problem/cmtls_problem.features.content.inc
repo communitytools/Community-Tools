@@ -146,7 +146,7 @@ function cmtls_problem_content_default_fields() {
       'polygon' => 0,
     ),
     'widget' => array(
-      'openlayers_cck_preset_map' => 'cmtls_map',
+      'openlayers_cck_preset_map' => 'cmtls_node_map',
       'openlayers_behaviors' => array(
         'openlayers_behavior_zoomtolayer' => array(
           'enabled' => 0,

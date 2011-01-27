@@ -28,24 +28,7 @@
  *
  * @ingroup views_templates
  */
-
-$total_pages = floor($view->total_rows / $view->pager['items_per_page']);
-
-$vars = array(
-	'cmtls' => array(
-		'pager' => array(
-			'totalPages' => $total_pages,
-			'currentPage' => $view->pager['current_page'],
-			'totalItems' => $view->total_rows,
-		),
-	),
-);
-
-drupal_add_js($vars, 'setting');
-
-?>
-
-<div class="clear"></div>
+?><div class="clear"></div>
 
 <?php if ($rows): ?>
         <?php print $rows; ?>

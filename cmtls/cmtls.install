@@ -114,3 +114,22 @@ function cmtls_uninstall()
 	// sections
 	db_query("DELETE FROM {sections_data} WHERE sid IN ('1', '2')");
 }
+
+function cmtls_update_6002(&$sandbox)
+{
+	// synchonize notifications actions
+	$actions = actions_list();
+	actions_synchronize($actions);
+	
+	// add trigger events
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', 'cmtls_notify_action', 2)");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('comment', 'insert', 'cmtls_notify_comment_action', 2)");
+	
+	// Add simple note
+	$ret[] = array(
+		'success' => TRUE,
+		'query' => 'Added notifications actions',
+	);
+
+	return $ret;
+}

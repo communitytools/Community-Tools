@@ -51,7 +51,7 @@ var CMTLSUploader = function(){
 				
 				jQuery('#start-upload')
 					.removeAttr('disabled')
-					.removeClass('disabled');
+					.button('refresh')
 			}
 		},
 		uploadStart: function(file){
@@ -87,7 +87,12 @@ var CMTLSUploader = function(){
 			if(successfulUploads>0){
 				jQuery('#edit-submit')
 					.removeAttr('disabled')
-					.removeClass('disabled');
+					.removeClass('disabled')
+					.button('refresh');
+				jQuery('#start-upload')
+					.attr('disabled',true)
+					.addClass('disabled')
+					.button('refresh');				
 			}
 		}
 	}
@@ -149,13 +154,11 @@ var CMTLSUploader = function(){
 				
 				var addFilesButton = jQuery('<div>')
 					.attr('id','add-files')
-					.addClass('small-button')
 					.text(Drupal.t('Add files'))
 					.append('<span id="upload-button-placeholder"></span>');
 				
 				var startUploadButton = jQuery('<button>')
 					.attr('id','start-upload')
-					.addClass('small-button disabled')
 					.text(Drupal.t('Start upload'))
 					.attr('disabled',true)
 					.bind('click',function(event){
@@ -166,7 +169,6 @@ var CMTLSUploader = function(){
 				var cancelUploadButton = jQuery('<button>')
 					.attr('id','cancel-upload')
 					.attr('href','#cancel-upload')
-					.addClass('small-button')
 					.text(Drupal.t('Cancel all uploads'))
 					.css('display','none');
 				
@@ -180,7 +182,13 @@ var CMTLSUploader = function(){
 				jQuery('#edit-submit')
 					.val(Drupal.t('Continue'))
 					.addClass('disabled')
-					.attr('disabled',true);
+					.attr('disabled',true)
+					.button('refresh');
+				
+				// jQuery UI sytles 
+				$('#add-files').button({icons: {primary:'ui-icon-plus'}});
+				$('#start-upload').button({icons: {primary:'ui-icon-disk'}});
+				$('#cancel-upload').button({icons: {primary:'ui-icon-cancel'}});
 				
 				status = true;
 			});

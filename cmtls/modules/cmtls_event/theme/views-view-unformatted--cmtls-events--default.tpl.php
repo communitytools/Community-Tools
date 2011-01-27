@@ -8,10 +8,10 @@
  */
 
 $today = strtotime('today');
-$today_name = date('l', $today);
+$today_name = t(date('l', $today));
 
 $tomorrow = $today + 60 * 60 * 24;
-$tomorrow_name = date('l', $tomorrow);
+$tomorrow_name = t(date('l', $tomorrow));
 
 $current_year = date('Y', $today);
 
@@ -19,6 +19,7 @@ $dividers = array();
 
 foreach($view->result as $id => $result)
 {
+
 	$start_timestamp = strtotime($result->node_data_field_cmtls_event_date_field_cmtls_event_date_value);
 
 	$start_year = date('Y', $start_timestamp);
@@ -26,15 +27,16 @@ foreach($view->result as $id => $result)
 
 	if(date('d.m', $today) == $start_date)
 	{
-		$dividers['Today, '.$today_name.' '.$start_date][] = $id;
+		$dividers[t('Today').', '.$today_name.' '.$start_date][] = $id;
 	}
 	else if(date('d.m', $tomorrow) == $start_date)
 	{
-		$dividers['Tomorrow, '.$tomorrow_name.' '.$start_date][] = $id;
+		$dividers[t('Tomorrow').', '.$tomorrow_name.' '.$start_date][] = $id;
 	}
 	else
 	{
-		$dividers[date('l', $start_timestamp).' '.$start_date][] = $id;
+		$dividers[t(date('l', $start_timestamp)).' '.$start_date][] = $id;
+
 	}
 }
 

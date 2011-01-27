@@ -27,7 +27,7 @@ function cmtls_stance_theme($existing) {
 
 /**
  * Implents hook_nodeapi()
- * 
+ *
  *
  * @param node $node
  * @param string $op
@@ -37,7 +37,7 @@ function cmtls_stance_theme($existing) {
  */
 function cmtls_stance_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 	global $user;
-	
+
 	static $stance_types;
 
 	if ($op == 'load' || $op == 'save') {
@@ -78,7 +78,7 @@ function cmtls_stance_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 			$result = db_query($sql, $node->nid);
 
 			$stances = new StdClass();
-	
+
 			$stances->info = $stance_types[$node->type];
 
 			$stances->user_stance = $stances->info['default stance choice'];
@@ -164,7 +164,8 @@ function cmtls_stance_answer_form(&$form_state, $node) {
 
 	$form['answer'] = array(
 		'#type' => 'radios',
-		'#title' => $node->stances->info['stance form title'],
+		//'#title' => $node->stances->info['stance form title'],
+		'#title' => NULL,
 		'#default_value' => $node->stances->user_stance,
 		'#options' => $options,
 		'#required' => true,
@@ -188,7 +189,7 @@ function cmtls_stance_answer_form(&$form_state, $node) {
 	if ($_POST['ajax'] == 1) {
 		$form['#submit'][] = 'cmtls_stance_answer_ajax_response';
 	}
-	
+
 	return $form;
 }
 
@@ -226,14 +227,14 @@ function cmtls_stance_answer_form_submit($form, &$form_state) {
 			$form_state['values']['answer']
 		);
 	}
-	
+
 	node_load($form_state['values']['nid'], NULL, TRUE);
 }
 
 /**
  * Implents hook_preprocess()
  * Generates the stance theme and adds to fields view
- * 
+ *
  * @param object $vars
  * @param string $hook
  */
@@ -254,7 +255,7 @@ function cmtls_stance_preprocess(&$vars, $hook)
 /**
  * Defines hook_cmtls_stance_info()
  * Use this hook to add stance functionality to nodes
- * 
+ *
  * @return array
  */
 function hook_cmtls_stance_info()

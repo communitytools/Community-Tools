@@ -44,6 +44,7 @@ function cmtls_event_cmtls_app()
 		'cmtls_event' => array(
 			'title' => t('Events'),
 			'callback' => 'cmtls_events_page',
+			'node type title' => t('event'),
 		),
 	);
 }
@@ -70,6 +71,8 @@ function cmtls_event_cmtls_map_config()
 				'select' => 'cmtls-location-white-hover',
 				'temporary' => 'cmtls-location-white',
 			),
+			'add from map' => TRUE,
+			'is mappable' => TRUE,
 		),
 	);
 }
@@ -178,38 +181,13 @@ function cmtls_event_page_taxonomy($group, $app, $taxonomy) {
  * @param unknown_type $form
  * @param unknown_type $form_state
  */
-
-function cmtls_event_form_alter(&$form, &$form_state, $form_id) {
+function cmtls_event_form_alter(&$form, &$form_state, $form_id)
+{
+	// NB! this cant be moved to cmtls_event_form_cmtls_event_node_form_alter because the default date will be lost
 	// prepare event node form for cleanup
 	if($form_id == 'cmtls_event_node_form' && _cmtls_is())
-	//if($form_id == 'cmtls_event_node_form')
 	{
-		drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.core.css');
-		drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.theme.css');
-		drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/ui.datepicker.css');
-
-		$form['name'] = $form['author']['name'];
-		$form['name']['#type'] = 'value';
-		$form['date'] = $form['author']['date'];
-		$form['date']['#type'] = 'value';
-		//$form['body'] = $form['body_field']['body'];
-
-		$form['revision_information'] = NULL;
-		$form['author'] = NULL;
-		//$form['body_field'] = NULL;
-		$form['options'] = NULL;
-		$form['buttons']['preview'] = NULL;
-
-		$group = _cmtls_group_get_current();
-		$app = _cmtls_app_get_current($group);
-
-		if ($form['buttons']['delete'])
-		{
-			$node = $form['#node'];
-
-			$form['buttons']['delete']['#type'] = 'markup';
-			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/' . $group->nid . '/' . $app->nid . '/event/' . $node->nid . '/delete', array('attributes' => array('class' => 'modalframe-processed')));
-		}
+		$form = cmtls_forms_alter($form, &$form_state);
 
 		// new form
 		if (!$form['nid']['#value'])
@@ -218,14 +196,8 @@ function cmtls_event_form_alter(&$form, &$form_state, $form_id) {
 			$form['field_cmtls_event_date'][0]['#default_value']['value2'] = date('Y-m-d 11:00', strtotime('tomorrow'));
 		}
 
-		$form['#after_build'][] = 'cmtls_event_node_form_after_build';
-		$form['#submit'][] = 'cmtls_event_form_submit';
-
-		//printr($form);
-
 	}
-
-	//printr($form);
+	$form['#after_build'][] = 'cmtls_event_form_after_build';
 }
 
 /**
@@ -235,50 +207,12 @@ function cmtls_event_form_alter(&$form, &$form_state, $form_id) {
  * @param unknown_type $form_state
  * @return unknown
  */
-function cmtls_event_node_form_after_build($form, &$form_state) {
-	$node = $form['#node'];
-
-	$current_group = _cmtls_group_get_current();
-	$current_app = _cmtls_app_get_current($current_group);
-
-	cmtls_group_set_og_form_values($form, $form_state);
-
-	$form['comment'] = $form['comment_settings']['comment'];
-	$form['comment']['#type'] = 'value';
-
-
-	$form['parent'] = $form['hierarchy']['parent'];
-	$form['parent']['#type'] = 'value';
-	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
-
-	$form['hierarchy'] = NULL;
-	$form['attachments'] = NULL;
-	$form['sections'] = NULL;
-	$form['comment_settings'] = NULL;
-	$form['og_nodeapi'] = NULL;
-	$form['menu'] = NULL;
-	$form['path'] = NULL;
-	$form['field_cmtls_attender_count'] = NULL;
-
-	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
-	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
-
-	//printr($form); exit;
+function cmtls_event_form_after_build($form, &$form_state)
+{
+	$form['field_cmtls_event_lasts_all_day']['value']['#title'] = t('Event lasts all day');
+	$form['taxonomy']['tags'][1]['#title'] = t('Event keywords');
 
 	return $form;
-}
-
-/**
- * Group node form submit, closes modalframe window
- *
- * @param unknown_type $form
- * @param unknown_type $form_state
- */
-function cmtls_event_form_submit($form, &$form_state) {
-	// Tell the parent window to close the modal frame dialog.
-	modalframe_close_dialog(array(
-		'refresh' => TRUE,
-	));
 }
 
 /**
@@ -298,7 +232,7 @@ function cmtls_event_theme($existing) {
 		),*/
 		// events page
 		'cmtls_events_content' => array (
-			'arguments' => array('app_id' => NULL, 'pager' => NULL),
+			'arguments' => array('app_id' => NULL),
 			'template' => 'cmtls-events-content',
 			'path' => drupal_get_path('module', 'cmtls_event').'/theme',
 		),
@@ -380,8 +314,22 @@ function cmtls_event_cmtls_map_popup_content($feature) {
 
 	$body = implode(' ', $body);
 
-	$output = '<h1><a href="' . base_path() . cmtls_event_path($node) . '">' . $node->title . '</a></h1>';
-	$output .= '<div class="address">'.$node->field_cmtls_address[0]['value'].'</div>';
+	$start_date = date('d.m.Y', strtotime($node->field_cmtls_event_date[0]['value']));
+	$start_time = date('H:i', strtotime($node->field_cmtls_event_date[0]['value']));
+	$end_date = date('d.m.Y', strtotime($node->field_cmtls_event_date[0]['value2']));
+	$end_time = date('H:i', strtotime($node->field_cmtls_event_date[0]['value2']));
+
+	if ($node->field_cmtls_event_lasts_all_day[0]['value'])
+	{
+		$time = ($start_date == $end_date) ? $start_date : $start_date.' - '.$end_date;
+	}
+	else
+	{
+		$time = $start_date.' '.$start_time.($end_date || $end_time ? ' - ' :'').($end_date && $start_date != $end_date ? $end_date.' ' : '').$end_time;
+	}
+
+	$output = '<h1><a href="' . base_path() . cmtls_event_path($node) . '">' . check_plain($node->title) . ' &middot; ' . $time. '</a></h1>';
+	$output .= '<div class="address">'.check_plain($node->field_cmtls_address[0]['value']).'</div>';
 	$output .= '<div class="content">' . $body . '</div>';
 
 	return $output;
@@ -441,7 +389,7 @@ function cmtls_events_page($app_id)
 		cmtls_ajax_response(views_embed_view('cmtls_events', 'default', $app_id));
 	}
 
-	return theme('cmtls_events_content', $app_id, theme('cmtls_pager'));
+	return theme('cmtls_events_content', $app_id);
 }
 
 /**
@@ -510,8 +458,8 @@ function cmtls_event_cmtls_filter_info()
 			'filter fields' => array(
 				'tag' => TRUE,
 				'search' => TRUE,
-				'date from' => TRUE,
-				'date to' => TRUE,
+				'date from' => array('UNIX_TIMESTAMP(node_data_field_cmtls_event_date.field_cmtls_event_date_value) >= %d'),
+				'date to' => array('UNIX_TIMESTAMP(node_data_field_cmtls_event_date.field_cmtls_event_date_value) <= %d'),
 				'sort' => TRUE,
 			), // filter fields
 
@@ -540,5 +488,15 @@ function cmtls_event_cmtls_filter_info()
 			),
 
 		), // node type
+	);
+}
+
+function cmtls_event_cmtls_app_links($node = NULL)
+{
+	return array(
+		'cmtls_event' => array(
+			'add' => 'event/add',
+			'delete' => 'event/'.$node->nid.'/delete',
+		),
 	);
 }

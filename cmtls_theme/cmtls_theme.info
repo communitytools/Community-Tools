@@ -9,6 +9,7 @@ scripts[] = scripts/main.js
 
 regions[cmtls_site_menu] = Community Tools Site Menu
 
+; Community Tools styles
 stylesheets[screen][] = styles/reset.css
 stylesheets[screen][] = styles/typography.css
 stylesheets[screen][] = styles/layout.css
@@ -17,11 +18,8 @@ stylesheets[screen][] = styles/article.css
 stylesheets[screen][] = styles/dashboard.css
 stylesheets[screen][] = styles/map_popup.css
 
-;facebox
-scripts[] = facebox/facebox.js
-stylesheets[screen][] = facebox/facebox.css
-
-;checkboxes
-;scripts[] = scripts/jquery.bind.js
-;scripts[] = scripts/ui.checkbox.js
-;stylesheets[screen][] = styles/checkboxes.css
+; jQuery UI styles
+stylesheets[screen][] = styles/jquery.ui/jquery.ui.core.css
+stylesheets[screen][] = styles/jquery.ui/jquery.ui.theme.css
+stylesheets[screen][] = styles/jquery.ui/jquery.ui.datepicker.css
+stylesheets[screen][] = styles/jquery.ui/jquery.ui.button.css

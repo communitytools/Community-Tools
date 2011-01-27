@@ -163,13 +163,15 @@ while($row = db_fetch_array($result))
 		<div style="clear: both;"></div>
 	</div>
 	
-	<?php /*
+	<?php if($user->uid == 1 || $user->uid == $fields['uid']->raw): ?>
 	<div class="section">
-		<a class="profile-section-toggle-button" href="">Statistika</a> 
+		<a class="profile-section-toggle-button" href=""><?php print t('Notifications'); ?></a>
 		<div class="profile-section-container">
-			lala
+		<div class="notification-description"><?php print t('Send me e-mail notifications on').':'; ?></div>
+		<?php print drupal_get_form('cmtls_member_notification_settings_form', $fields['uid']->raw); ?>
 		</div>
-	</div>*/ ?>
+	</div>
+	<?php endif; ?>
 	
 	<?php if($user->uid == arg(3) && sizeof($activities)): ?>
 	<div class="section">

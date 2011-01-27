@@ -29,11 +29,11 @@
 	
 	<?php if($fields['field_cmtls_geoinfo_openlayers_wkt']->raw && $fields['field_cmtls_geoinfo_openlayers_wkt']->raw != 'GEOMETRYCOLLECTION()'): ?>	
 		<div class="group-address cmtls-map-popup" id="cmtls-map-feature-<?php print $fields['nid']->raw; ?>">
-			<?php print $fields['field_cmtls_address_value']->raw; ?>
+			<?php print check_plain($fields['field_cmtls_address_value']->raw); ?>
 		</div>
 	<?php elseif($fields['field_cmtls_address_value']->content): ?>
 		<div class="group-address" id="cmtls-map-feature-<?php print $fields['nid']->raw; ?>">
-			<?php print $fields['field_cmtls_address_value']->raw; ?>
+			<?php print check_plain($fields['field_cmtls_address_value']->raw); ?>
 		</div>
 	<?php endif; ?>
 </li>

@@ -56,6 +56,7 @@ function cmtls_problem_cmtls_app()
 		'cmtls_problem' => array(
 			'title' => t('Problems'),
 			'callback' => 'cmtls_problems_page',
+			'node type title' => t('problem'),
 		),
 	);
 }
@@ -82,6 +83,8 @@ function cmtls_problem_cmtls_map_config()
 				'select' => 'cmtls-location-red-hover',
 				'temporary' => 'cmtls-location-red',
 			),
+			'add from map' => TRUE,
+			'is mappable' => TRUE,
 		),
 	);
 }
@@ -197,66 +200,51 @@ function cmtls_problem_page($group, $app, $problem)
  * @param unknown_type $form_state
  */
 
-function cmtls_problem_form_alter(&$form, &$form_state, $form_id)
+function cmtls_problem_form_cmtls_problem_node_form_alter(&$form, &$form_state)
 {
-	//return;
-	// prepare problem node form for cleanup
-	if($form_id == 'cmtls_problem_node_form' && _cmtls_is())
-	//if($form_id == 'cmtls_problem_node_form')
+	if(!_cmtls_is()) return;
+	
+	$form = cmtls_forms_alter($form, $form_state);
+	
+	$form['field_cmtls_problem_status'] = NULL;
+	
+	$form['body_field']['body']['#title'] = t('Description');
+	
+	$form['#after_build'][] = 'cmtls_problem_node_form_after_build';
+	$form['#submit'][] = 'cmtls_problem_form_submit';
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+
+function cmtls_problem_form_comment_form_alter(&$form, &$form_state)
+{
+	$node = node_load($form['nid']['#value']);
+
+	if ($node->type == 'cmtls_problem')
 	{
-		$form['name'] = $form['author']['name'];
-		$form['name']['#type'] = 'value';
-		$form['date'] = $form['author']['date'];
-		$form['date']['#type'] = 'value';
-		//$form['body'] = $form['body_field']['body'];
-
-		$form['revision_information'] = NULL;
-		$form['author'] = NULL;
-		//$form['body_field'] = NULL;
-		$form['options'] = NULL;
-		$form['buttons']['preview'] = NULL;
-
-		$group = _cmtls_group_get_current();
-		$app = _cmtls_app_get_current($group);
-
-		$form['field_cmtls_problem_status'] = NULL;
-
-		if($form['buttons']['delete'])
+		if ($node->field_cmtls_problem_status[0]['value'] == 0)
 		{
-			$node = $form['#node'];
-
-			$form['buttons']['delete']['#type'] = 'markup';
-			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$group->nid.'/'.$app->nid.'/problem/'.$node->nid.'/delete', array('attributes' => array('class' => 'modalframe-processed')));
+			$form['problem_status_fixed'] = array(
+				'#type' => 'checkbox',
+				'#default_value' => 0,
+				'#title' => t('This problem has been fixed'),
+			);
+		}
+		else
+		{
+			$form['problem_status_reported'] = array(
+				'#type' => 'checkbox',
+				'#default_value' => 0,
+				'#title' => t('This problem has not been fixed'),
+			);
 		}
 
-		$form['#after_build'][] = 'cmtls_problem_node_form_after_build';
-		$form['#submit'][] = 'cmtls_problem_form_submit';
-	}
-
-	if ($form_id == 'comment_form')
-	{
-		$node = node_load($form['nid']['#value']);
-
-		if ($node->type == 'cmtls_problem') {
-			if ($node->field_cmtls_problem_status[0]['value'] == 0)
-			{
-				$form['problem_status_fixed'] = array(
-					'#type' => 'checkbox',
-					'#default_value' => 0,
-					'#title' => t('This problem has been fixed'),
-				);
-			}
-			else
-			{
-				$form['problem_status_reported'] = array(
-					'#type' => 'checkbox',
-					'#default_value' => 0,
-					'#title' => t('This problem has not been fixed'),
-				);
-			}
-
-			$form['#submit'] = array_merge(array('cmtls_problem_comment_submit'), $form['#submit']);
-		}
+		$form['#submit'] = array_merge(array('cmtls_problem_comment_submit'), $form['#submit']);
 	}
 }
 
@@ -269,33 +257,12 @@ function cmtls_problem_form_alter(&$form, &$form_state, $form_id)
  */
 function cmtls_problem_node_form_after_build($form, &$form_state)
 {
-	//printr($form); exit;
-
-	$node = $form['#node'];
-
-	$current_group = _cmtls_group_get_current();
-	$current_app = _cmtls_app_get_current($current_group);
-
-	cmtls_group_set_og_form_values($form, $form_state);
-
-	$form['comment'] = $form['comment_settings']['comment'];
-	$form['comment']['#type'] = 'value';
-
-	$form['parent'] = $form['hierarchy']['parent'];
-	$form['parent']['#type'] = 'value';
-	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
-
-	$form['hierarchy'] = NULL;
-	$form['sections'] = NULL;
-	$form['attachments'] = NULL;
-	$form['comment_settings'] = NULL;
-	$form['menu'] = NULL;
-	$form['path'] = NULL;
-
-	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
-	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
-
 	$form['field_cmtls_status_uid'] = NULL;
+	
+	foreach ($form['taxonomy'] as $t_id => $taxonomy) if ($taxonomy['#title']) {
+		$form['taxonomy'][$t_id]['#title'] = t('Problem category');
+	}
+
 	return $form;
 }
 
@@ -308,13 +275,9 @@ function cmtls_problem_node_form_after_build($form, &$form_state)
 function cmtls_problem_form_submit($form, &$form_state)
 {
 	global $user;
+	
 	$form_state['values']['field_cmtls_status_uid'][0]['value'] = $user->uid;
 	$form_state['values']['field_cmtls_problem_status'][0]['value'] = 0;
-
-	// Tell the parent window to close the modal frame dialog.
-	modalframe_close_dialog(array(
-		'refresh' => TRUE,
-	));
 }
 
 function cmtls_problem_comment_submit($form, &$form_state)
@@ -435,8 +398,15 @@ function cmtls_problem_cmtls_map_popup_content($feature)
 
 	$body = implode(' ', $body);
 
-	$output = '<h1><a href="'.base_path().cmtls_problem_path($node).'">'.$node->title.'</a></h1>';
-	$output .= '<div class="address">'.$node->field_cmtls_address[0]['value'].'</div>';
+	$tax = check_plain(array_pop($node->taxonomy)->name);
+	$address = check_plain($node->field_cmtls_address[0]['value']);
+
+	$output = '<h1>'.l($node->title, cmtls_problem_path($node)).'</h1>';
+	$output .= '<div class="address">';
+	$output .= $tax;
+	if ($tax && $address) $output .= ' &middot ';
+	$output .= $address;
+	$output .='</div>';
 	$output .= '<div class="content">'.$body.'</div>';
 
 	return $output;
@@ -521,5 +491,15 @@ function cmtls_problem_cmtls_filter_info()
 			),
 
 		), // node type
+	);
+}
+
+function cmtls_problem_cmtls_app_links($node = NULL)
+{
+	return array(
+		'cmtls_problem' => array(
+			'add' => 'problem/add',
+			'delete' => 'problem/'.$node->nid.'/delete',
+		),
 	);
 }

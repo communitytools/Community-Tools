@@ -51,6 +51,7 @@ function cmtls_article_cmtls_app()
 		'cmtls_article' => array(
 			'title' => t('Articles'),
 			'callback' => 'cmtls_articles_page',
+			'node type title' => t('post'),
 		),
 	);
 }
@@ -72,6 +73,8 @@ function cmtls_article_cmtls_map_config()
 				'select' => 'cmtls-location-white-hover',
 				'temporary' => 'cmtls-location-white',
 			),
+			'add from map' => TRUE,
+			'is mappable' => TRUE,
 		),
 	);
 }
@@ -183,7 +186,7 @@ function cmtls_articles_page($app_id)
 		cmtls_ajax_response(views_embed_view('cmtls_articles', 'default', $app_id));
 	}
 
-	return theme('cmtls_articles_content', $app_id, theme('cmtls_pager'));
+	return theme('cmtls_articles_content', $app_id);
 }
 
 /**
@@ -212,7 +215,8 @@ function cmtls_article_page($group, $app, $article)
  * @param string $taxonomy
  * @return string
  */
-function cmtls_article_page_taxonomy($group, $app, $taxonomy) {
+function cmtls_article_page_taxonomy($group, $app, $taxonomy)
+{
 	return views_embed_view('cmtls_articles', 'default', $app->nid, 'all', $taxonomy);
 }
 
@@ -223,84 +227,17 @@ function cmtls_article_page_taxonomy($group, $app, $taxonomy) {
  * @param unknown_type $form_state
  */
 
-function cmtls_article_form_alter(&$form, &$form_state, $form_id)
+function cmtls_article_form_cmtls_article_node_form_alter(&$form, &$form_state)
 {
-	//return;
-	// prepare article node form for cleanup
-	if($form_id == 'cmtls_article_node_form' && _cmtls_is())
-	//if($form_id == 'cmtls_article_node_form')
-	{
-		$form['name'] = $form['author']['name'];
-		$form['name']['#type'] = 'value';
-		$form['date'] = $form['author']['date'];
-		$form['date']['#type'] = 'value';
-		//$form['body'] = $form['body_field']['body'];
+	if(!_cmtls_is()) return;
 
-		$form['revision_information'] = NULL;
-		$form['author'] = NULL;
-		//$form['body_field'] = NULL;
-		$form['options'] = NULL;
-		$form['buttons']['preview'] = NULL;
-
-		$group = _cmtls_group_get_current();
-		$app = _cmtls_app_get_current($group);
-
-		if($form['buttons']['delete'])
-		{
-			$node = $form['#node'];
-
-			$form['buttons']['delete']['#type'] = 'markup';
-			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$group->nid.'/'.$app->nid.'/article/'.$node->nid.'/delete', array('attributes' => array('class' => 'modalframe-processed')));
-		}
-
-		$form['#after_build'][] = 'cmtls_article_node_form_after_build';
-		$form['#submit'][] = 'cmtls_article_form_submit';
-	}
-
-	//printr($form);
-}
-
-/**
- * Clean up and defaults for article node
- *
- * @param unknown_type $form
- * @param unknown_type $form_state
- * @return unknown
- */
-function cmtls_article_node_form_after_build($form, &$form_state)
-{
-	//printr($form); exit;
-
-	$node = $form['#node'];
-
-	$current_group = _cmtls_group_get_current();
-	$current_app = _cmtls_app_get_current($current_group);
-
-	cmtls_group_set_og_form_values($form, $form_state);
-
-	$form['comment'] = $form['comment_settings']['comment'];
-	$form['comment']['#type'] = 'value';
-
-	$form['parent'] = $form['hierarchy']['parent'];
-	$form['parent']['#type'] = 'value';
-	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
-
-	$form['hierarchy'] = NULL;
-	$form['sections'] = NULL;
-	$form['attachments'] = NULL;
-	$form['comment_settings'] = NULL;
-	$form['menu'] = NULL;
-	$form['path'] = NULL;
-
-	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
-	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
-
-	return $form;
+	$form = cmtls_forms_alter($form, $form_state);
 }
 
 /**
  * Group node form submit, closes modalframe window
  *
+ * @deprecated
  * @param unknown_type $form
  * @param unknown_type $form_state
  */
@@ -324,7 +261,7 @@ function cmtls_article_theme($existing)
 	return array(
 		// articles page
 		'cmtls_articles_content' => array (
-			'arguments' => array('app_id' => NULL, 'pager' => NULL),
+			'arguments' => array('app_id' => NULL),
 			'template' => 'cmtls-articles-content',
 			'path' => drupal_get_path('module', 'cmtls_article').'/theme',
 		),
@@ -397,8 +334,8 @@ function cmtls_article_cmtls_map_popup_content($feature)
 
 	$body = implode(' ', $body);
 
-	$output = '<h1><a href="'.base_path().cmtls_article_path($node).'">'.check_plain($node->title).'</a></h1>';
-	$output .= '<div class="address">'.$node->field_cmtls_address[0]['value'].'</div>';
+	$output = '<h1>'.l($node->title, cmtls_article_path($node)).'</h1>';
+	$output .= '<div class="address">'.check_plain($node->field_cmtls_address[0]['value']).'</div>';
 	$output .= '<div class="content">'.$body.'</div>';
 
 	return $output;
@@ -473,5 +410,15 @@ function cmtls_article_cmtls_filter_info()
 				'sort' => 0,
 			),
 		), // node type
+	);
+}
+
+function cmtls_article_cmtls_app_links($node = NULL)
+{
+	return array(
+		'cmtls_article' => array(
+			'add' => 'article/add',
+			'delete' => 'article/'.$node->nid.'/delete',
+		),
 	);
 }

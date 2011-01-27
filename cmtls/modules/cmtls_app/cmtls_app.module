@@ -253,102 +253,69 @@ function cmtls_app_preprocess(&$vars, $hook)
 	);
 }
 
-
-function cmtls_app_form_alter(&$form, &$form_state, $form_id)
+function cmtls_app_form_cmtls_app_node_form_alter(&$form, &$form_state)
 {
-	if($form_id == 'cmtls_app_node_form' && _cmtls_is())
-	//if($form_id == 'cmtls_app_node_form')
-	{
-		$form['name'] = $form['author']['name'];
-		$form['name']['#type'] = 'value';
-		$form['date'] = $form['author']['date'];
-		$form['date']['#type'] = 'value';
-		//$form['body'] = $form['body_field']['body'];
-		
-		$form['options'] = NULL;
-		$form['buttons']['preview'] = NULL;
-		$form['buttons']['delete'] = NULL;
-		$form['revision_information'] = NULL;
-		$form['author'] = NULL;
-		$form['body_field'] = NULL;
-		
-		$form['#after_build'][] = 'cmtls_app_node_form_after_build';
-		$form['#submit'][] = 'cmtls_app_form_submit';
+	if(!_cmtls_is()) return;
+	
+	$form = cmtls_forms_alter($form, $form_state);
+	
+	$form['body_field'] = NULL;
+	
+	$form['#after_build'][] = 'cmtls_app_node_form_after_build';
+	
+	array_pop($form['#submit']);
+	$form['#submit'][] = 'cmtls_app_form_submit';
 
-		$node = $form['#node'];
-		
-		if(!empty($form_state['values']['field_cmtls_app_type'][0]['value']))
-		{
-			$current_config = unserialize($form_state['values']['field_cmtls_app_type'][0]['value']);
-		}
-		elseif(!empty($node->field_cmtls_app_config[0]['value']))
-		{
-			$current_config = unserialize($node->field_cmtls_app_config[0]['value']);
-		}
-		else 
-		{
-			$current_config = array();
-		}
-		
-		if(!empty($form_state['values']['field_cmtls_app_type'][0]['value']))
-		{
-			$app_type = $form_state['values']['field_cmtls_app_type'][0]['value'];
-		}
-		elseif(!empty($node->field_cmtls_app_type[0]['value']))
-		{
-			$app_type = $node->field_cmtls_app_type[0]['value'];
-		}
-		else 
-		{
-			$app_type = NULL;
-		}
-		
-		$form['cmtls_app_config'] = array(
-			'#type' => 'markup',
-			'#title' => t('Configuration'),
-			'#value' => '&nbsp;',
-			'#prefix' => '<div id="cmtls-app-config">',
-			'#suffix' => '</div>',
-		);
-		
-		if($app_type)
-		{
-			// get other app's config hooks
-			if($app_config = module_invoke_all('cmtls_app_general_config', $app_type, $current_config))
-			{
-				$form['cmtls_app_config'] += $app_config;
-			}
-			
-			// get type config
-			if($app_config = module_invoke($app_type, 'cmtls_app_config', $current_config))
-			{
-				$form['cmtls_app_config'] += $app_config;
-			}
-		}
-		
-		//printr($form);
-	}
-	// title
-	/* messes up the title on all pages
-	elseif(strpos($form_id, 'cmtls_') === 0  && _cmtls_is())
+	$node = $form['#node'];
+	
+	if(!empty($form_state['values']['field_cmtls_app_type'][0]['value']))
 	{
-		if($form['#node']->nid)
-		{
-			$title = t('Edit post in');
-		}
-		else 
-		{
-			$title = t('New post in');
-		}
-		
-		$current_group = _cmtls_group_get_current();
-		$current_app = _cmtls_app_get_current($current_group);
-		
-		$title = $title.' "'.check_plain($current_app->title).'"';
-		
-		drupal_set_title($title);
+		$current_config = unserialize($form_state['values']['field_cmtls_app_type'][0]['value']);
 	}
-	*/
+	elseif(!empty($node->field_cmtls_app_config[0]['value']))
+	{
+		$current_config = unserialize($node->field_cmtls_app_config[0]['value']);
+	}
+	else 
+	{
+		$current_config = array();
+	}
+	
+	if(!empty($form_state['values']['field_cmtls_app_type'][0]['value']))
+	{
+		$app_type = $form_state['values']['field_cmtls_app_type'][0]['value'];
+	}
+	elseif(!empty($node->field_cmtls_app_type[0]['value']))
+	{
+		$app_type = $node->field_cmtls_app_type[0]['value'];
+	}
+	else 
+	{
+		$app_type = NULL;
+	}
+	
+	$form['cmtls_app_config'] = array(
+		'#type' => 'markup',
+		'#title' => t('Configuration'),
+		'#value' => '&nbsp;',
+		'#prefix' => '<div id="cmtls-app-config">',
+		'#suffix' => '</div>',
+	);
+	
+	if($app_type)
+	{
+		// get other app's config hooks
+		if($app_config = module_invoke_all('cmtls_app_general_config', $app_type, $current_config))
+		{
+			$form['cmtls_app_config'] += $app_config;
+		}
+		
+		// get type config
+		if($app_config = module_invoke($app_type, 'cmtls_app_config', $current_config))
+		{
+			$form['cmtls_app_config'] += $app_config;
+		}
+	}
 }
 
 /**
@@ -362,24 +329,15 @@ function cmtls_app_node_form_after_build($form, &$form_state)
 {
 	$node = $form['#node'];
 	
+	if(!$node->nid)
+	{
+		drupal_set_title(t('New').' '.t('app'));
+	}
+	
 	$current_group = _cmtls_group_get_current();
 
-	cmtls_group_set_og_form_values(&$form, &$form_state);
-	
-	$form['comment'] = $form['comment_settings']['comment'];
-	$form['comment']['#type'] = 'value';
-	
-	$form['parent'] = $form['hierarchy']['parent'];
-	$form['parent']['#type'] = 'value';
 	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_group->nid;
 	
-	$form['hierarchy'] = NULL;
-	$form['attachments'] = NULL;
-	$form['sections'] = NULL;
-	$form['comment_settings'] = NULL;
-	$form['menu'] = NULL;
-	$form['path'] = NULL;
-
 	foreach ($form['field_cmtls_app_type']['value']['#options'] as $option => &$value)
 	{
 		$form['field_cmtls_app_type']['value'][$option]['#ahah'] = array(
@@ -393,7 +351,6 @@ function cmtls_app_node_form_after_build($form, &$form_state)
 	
 	$form['field_cmtls_app_config']['#type'] = 'hidden';
 	
-	//printr($form_state); exit;
 	$form['#cache'] = FALSE;
 	
 	return $form;

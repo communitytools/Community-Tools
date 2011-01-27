@@ -1,0 +1,408 @@
+<?php
+
+include_once('cmtls_place.features.inc');
+
+/**
+ * Implements hook_cmtls_context()
+ *
+ * The edit button for places
+ *
+ * @return unknown
+ */
+function cmtls_place_cmtls_context()
+{
+	return array(
+		'cmtls_place' => array(
+			'cmtls_place_edit' => array(
+				'title' => t('Edit place'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update', 'node'),
+			),
+		),
+		'script' => drupal_get_path('module', 'cmtls_place').'/js/context_actions.js',
+	);
+}
+
+function cmtls_place_cmtls_dashboard_block_content($group, $app)
+{
+	return views_embed_view('cmtls_places', 'block_2', $app->nid);
+}
+
+/**
+ * Implements hook_init()
+ *
+ */
+function cmtls_place_init()
+{
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+
+	if($current_app->field_cmtls_app_type[0]['value'] == 'cmtls_place')
+	{
+		drupal_add_feed(url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/rss', array('absolute' => TRUE)), $app->title);
+	}
+
+	//drupal_add_js(drupal_get_path('module', 'cmtls_place') .'/js/app.js');
+}
+
+function cmtls_place_cmtls_app()
+{
+	return array(
+		'cmtls_place' => array(
+			'title' => t('Places'),
+			'callback' => 'cmtls_places_page',
+			'node type title' => t('place'),
+		),
+	);
+}
+
+function cmtls_place_cmtls_map_config()
+{
+	return array(
+		'cmtls_place' => array(
+			'map views' => array(
+				CMTLS_MAP_NONE,
+				CMTLS_MAP_VIEW_HIDDEN,
+				CMTLS_MAP_VIEW_HALF_PAGE,
+				CMTLS_MAP_VIEW_FULL_PAGE,
+			),
+			'default map view' => CMTLS_MAP_VIEW_FULL_PAGE,
+			'map view changable' => TRUE,
+			'default map styles' => array(
+				'default' => 'cmtls-location-white',
+				'select' => 'cmtls-location-white-hover',
+				'temporary' => 'cmtls-location-white',
+			),
+			'add from map' => TRUE,
+			'is mappable' => TRUE,
+		),
+	);
+}
+
+function cmtls_place_cmtls_app_config_defaults()
+{
+	return array(
+		'sorting_field' => 'node_created',
+		'sorting_dir' => 'DESC'
+	);
+}
+
+function cmtls_place_cmtls_app_config($config)
+{
+	$settings = array_merge(cmtls_place_cmtls_app_config_defaults(), (array)$config['cmtls_place']);
+
+	//printr($settings);
+
+	$form['cmtls_place']['sorting_field'] = array(
+		'#type' => 'radios',
+		'#title' => t('Sorting field'),
+		'#default_value' => $settings['sorting_field'],
+		'#options' => array(
+			'node_created' => t('Created date'),
+			'node_title' => t('place title'),
+		),
+	);
+
+	$form['cmtls_place']['sorting_dir'] = array(
+		'#type' => 'radios',
+		'#title' => t('Sorting order'),
+		'#default_value' => $settings['sorting_dir'],
+		'#options' => array(
+			'ASC' => t('Ascending'),
+			'DESC' => t('Descending'),
+		),
+	);
+
+	return $form;
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_place_menu()
+{
+	$items = array();
+
+	$items['cmtls/%node/%node/place/%node'] = array(
+		'title' => 'place',
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_place_page',
+		'page arguments' => array(1, 2, 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/place/%node/edit'] = array(
+		'title' => 'place',
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_place', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/place/%node/delete'] = array(
+		'title' => 'Delete place',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 4),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/place/add'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_place'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_place')),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/place/tag/%'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_place_page_taxonomy',
+		'page arguments' => array(1, 2, 5),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 2),
+		'type' => MENU_CALLBACK,
+	);
+
+	return $items;
+}
+
+function cmtls_places_page($app_id)
+{
+	if($_POST['ajax'] == 1)
+	{
+		cmtls_ajax_response(views_embed_view('cmtls_places', 'default', $app_id));
+	}
+
+	return theme('cmtls_places_content', $app_id);
+}
+
+/**
+ * place node form page
+ *
+ * @param node $group
+ * @param node $app
+ * @param node $place
+ * @return unknown
+ */
+function cmtls_place_page($group, $app, $place)
+{
+	if($place->type != 'cmtls_place')
+	{
+		return t('This not a place.');
+	}
+
+	return views_embed_view('cmtls_places', 'default', $app->nid, $place->nid);
+}
+
+/**
+ * places filtered by taxonomy term/tag view
+ *
+ * @param node $group
+ * @param node $app
+ * @param string $taxonomy
+ * @return string
+ */
+function cmtls_place_page_taxonomy($group, $app, $taxonomy) {
+	return views_embed_view('cmtls_places', 'default', $app->nid, 'all', $taxonomy);
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+
+function cmtls_place_form_cmtls_place_node_form_alter(&$form, &$form_state)
+{
+	if(!_cmtls_is()) return;
+	
+	$form = cmtls_forms_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the place view templates
+ *
+ * @param unknown_type $existing
+ * @return unknown
+ */
+function cmtls_place_theme($existing)
+{
+	return array(
+		// places page
+		'cmtls_places_content' => array (
+			'arguments' => array('app_id' => NULL),
+			'template' => 'cmtls-places-content',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		// places view
+		'views_view__cmtls_places__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-places--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'views_view_unformatted__cmtls_places__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-places--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'views_view_fields__cmtls_places__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-places--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		// places dashboard view
+		'views_view__cmtls_places__block_2' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-places--block-2',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'views_view_unformatted__cmtls_places__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-places--block-2',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'views_view_fields__cmtls_places__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-places--block-2',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+	);
+}
+
+/**
+ * Creates the path to place view
+ *
+ * @param unknown_type $place
+ * @param unknown_type $group
+ * @return unknown
+ */
+function cmtls_place_path($place, $group = NULL)
+{
+	if(!$group) $group = _cmtls_group_get_current();
+
+	return 'cmtls/'.$group->nid.'/'.$place->parent.'/place/'.$place->nid;
+}
+
+function cmtls_place_cmtls_map_popup_content($feature)
+{
+	$node = node_load($feature->nid);
+
+	$body = explode(' ', strip_tags(check_markup($node->body)));
+
+	if(sizeof($body) > 25)
+	{
+		$body = array_slice($body, 0, 25);
+		$body[] = '...';
+	}
+
+	$body = implode(' ', $body);
+
+	$output = '<h1>'.l($node->title, cmtls_place_path($node)).'</h1>';
+	$output .= '<div class="address">'.check_plain($node->field_cmtls_address[0]['value']).'</div>';
+	$output .= '<div class="content">'.$body.'</div>';
+
+	return $output;
+}
+
+function cmtls_place_views_query_alter(&$view, &$query)
+{
+	if($view->name == 'cmtls_places')
+	{
+		$config = (array)cmtls_app_get_config(node_load($view->args[0]));
+		$config = $config['cmtls_place'];
+
+		$settings = array_merge(cmtls_place_cmtls_app_config_defaults(), (array)$config);
+
+		$query->orderby = array($settings['sorting_field'].' '.$settings['sorting_dir']);
+	}
+}
+
+/**
+ * Implements hook_cmtls_filter_info()
+ *
+ */
+function cmtls_place_cmtls_filter_info()
+{
+	return array(
+		'cmtls_place' => array(
+			'filter predefined options' => array(
+				array(
+					'title' => t('Latest posts'),
+					'default values' => array(
+						'sort' => 0,
+					),
+				),
+
+				array(
+					'title' => t('Most commented'),
+					'default values' => array(
+						'sort' => 2,
+					),
+				),
+			), // filter predefined options
+
+			'filter fields' => array(
+				'tag' => TRUE,
+				'search' => TRUE,
+				'date from' => TRUE,
+				'date to' => TRUE,
+				'sort' => TRUE,
+			), // filter fields
+
+			'taxonomy dictionary id' => NULL,
+
+			'sort options' => array(
+				array(
+					'field' => 'node_created',
+					'direction' => 'DESC',
+					'title' => t('Time added'),
+				),
+				array(
+					'field' => 'node_title',
+					'direction' => 'ASC',
+					'title' => t('Title'),
+				),
+				array(
+					'field' => 'node_comment_statistics_comment_count',
+					'direction' => 'DESC',
+					'title' => t('Most commented'),
+				),
+			), // sort options
+
+			'default values' => array(
+				'sort' => 0,
+			),
+		), // node type
+	);
+}
+
+function cmtls_place_cmtls_app_links($node = NULL)
+{
+	return array(
+		'cmtls_place' => array(
+			'add' => 'place/add',
+			'delete' => 'place/'.$node->nid.'/delete',
+		),
+	);
+}

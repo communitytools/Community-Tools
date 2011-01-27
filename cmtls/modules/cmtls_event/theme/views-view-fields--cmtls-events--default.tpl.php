@@ -42,7 +42,7 @@ $current_app = _cmtls_app_get_current($current_group);
 <?php if (isset($view->args[1])): ?>
 
 
-		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php print $fields['title']->raw; ?>
+		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php print check_plain($fields['title']->raw); ?>
 
 			<span class="date">
 				&middot;
@@ -61,7 +61,7 @@ $current_app = _cmtls_app_get_current($current_group);
 
 			<?php endif; ?>
 
-			<?php print $fields['field_cmtls_address_value']->raw ? print ' &middot; '. $fields['field_cmtls_address_value']->raw : ''; ?>
+			<?php if($fields['field_cmtls_address_value']->raw) print ' &middot; '.check_plain($fields['field_cmtls_address_value']->raw); ?>
 
 			</span>
 		</h1>
@@ -91,7 +91,7 @@ $current_app = _cmtls_app_get_current($current_group);
 			<?php foreach ((array)$node->field_cmtls_files as $file): ?>
 				<?php if (is_array($file)): ?>
 					<div class="meta-file">
-						<a href="<?php print url($file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
+						<a href="<?php print url($file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
 							<?php print $file['imagecache_icon']; ?>
 						</a>
 					</div>
@@ -135,7 +135,7 @@ $current_app = _cmtls_app_get_current($current_group);
 
 	<div class="text-node-list-item">
 
-		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><a href="<?php print base_path().cmtls_event_path($node); ?>"><?php print $fields['title']->raw; ?>
+		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><a href="<?php print base_path().cmtls_event_path($node); ?>"><?php print check_plain($fields['title']->raw); ?>
 
 			<span class="date">
 				&middot; 
@@ -154,7 +154,7 @@ $current_app = _cmtls_app_get_current($current_group);
 
 			<?php endif; ?>
 
-			<?php print $fields['field_cmtls_address_value']->raw ? print ' &middot; '. $fields['field_cmtls_address_value']->raw : ''; ?>
+			<?php if($fields['field_cmtls_address_value']->raw) print ' &middot; '.check_plain($fields['field_cmtls_address_value']->raw); ?>
 
 			</span>
 		</a></h1>
@@ -167,7 +167,7 @@ $current_app = _cmtls_app_get_current($current_group);
 						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php if ($i < count($node->taxonomy) - 1) print ', '; $i++; ?>
 					<?php endforeach; ?>
 				</div> <!-- meta-tags -->
-				&middot;
+				<?php ($fields['comment_count']->raw || $node->stances->sorted_count[1] > 0) ? print ' &middot; ' : NULL; ?>
 			<?php endif; ?>
 		<?php endif; ?>
 
@@ -184,11 +184,10 @@ $current_app = _cmtls_app_get_current($current_group);
 
 		<?php print node_teaser($fields['body']->content, NULL, 200); ?><?php print node_teaser($fields['body']->content, NULL, 200) < $fields['body']->content ? '..' : NULL; ?>
 
-		 &middot; <a href="<?php print base_path().cmtls_event_path($node); ?>" title="<?php print t('Read more'); ?>"><?php print t('Read more'); ?></a>
+		<?php ($fields['body']->content) ? print ' &middot; ' : NULL; ?>
+
+		 <a href="<?php print base_path().cmtls_event_path($node); ?>" title="<?php print t('Read more'); ?>"><?php print t('Read more'); ?></a>
 
         </div> <!-- /text-node-list-item -->
 
 <?php endif; ?>
-
-
-

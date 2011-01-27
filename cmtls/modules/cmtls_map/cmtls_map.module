@@ -113,6 +113,8 @@ function hook_cmtls_map_config()
 				'select' => 'cmtls-location-white-hover',
 				'temporary' => 'cmtls-location-white',
 			),
+			'add from map' => FALSE,
+			'is mappable' => FALSE,
 		),
 	);
 }
@@ -220,6 +222,7 @@ function cmtls_map_get_config()
 function cmtls_map_init()
 {
 	drupal_add_js(drupal_get_path('module', 'cmtls_map') .'/js/cmtls_map.js');
+	drupal_add_css(drupal_get_path('module', 'cmtls_map').'/css/cmtls_map.css', 'module', 'screen');
 }
 
 function cmtls_map_openlayers_styles()
@@ -411,6 +414,9 @@ function cmtls_map_openlayers_presets()
 		}
 	}
 	
+	$centerpoint = variable_get('cmtls_map_default_centerpoint', '24.734559058178, 59.424735894784');
+	$zoom = variable_get('cmtls_map_default_zoom', '14');
+	
 	$openlayers_presets = new stdClass;
 	$openlayers_presets->disabled = FALSE; // Edit this to true to make a default openlayers_presets disabled initially
 	$openlayers_presets->api_version = 1;
@@ -426,8 +432,8 @@ function cmtls_map_openlayers_presets()
 		'hide_empty_map' => 0,
 		'center' => array(
 			'initial' => array(
-			'centerpoint' => variable_get('cmtls_map_default_centerpoint', '24.734559058178, 59.424735894784'),
-			'zoom' => variable_get('cmtls_map_default_zoom', '14'),
+			'centerpoint' => $centerpoint,
+			'zoom' => $zoom,
 			),
 			'restrict' => array(
 				'restrictextent' => 0,
@@ -435,16 +441,15 @@ function cmtls_map_openlayers_presets()
 			),
 		),
 		'behaviors' => array(
-			'openlayers_behavior_attribution' => array(),
+			//'openlayers_behavior_attribution' => array(),
 			'cmtls_map_behavior_popup' => array(),
-			'openlayers_behavior_keyboarddefaults' => array(),
 			'openlayers_behavior_layerswitcher' => array(
 				'ascending' => 1,
 			),
 			'openlayers_behavior_navigation' => array(
 				'zoomWheelEnabled' => 1,
 			),
-			'openlayers_behavior_panzoombar' => array(),
+			'openlayers_behavior_panzoom' => array(),
 			'openlayers_behavior_zoomtolayer' => array(
 				'zoomtolayer' => current($layer_activated),
 				'point_zoom_level' => '14',
@@ -468,7 +473,89 @@ function cmtls_map_openlayers_presets()
 		'preset_name' => 'cmtls_map',
 	);
 	
+	global $user;
+	
+	$main_group = _cmtls_group_get_main();
+	$current_group = _cmtls_group_get_current();
+	
+	$current_app = _cmtls_app_get_current($current_group);
+	
+	$current_config = module_invoke($current_app->field_cmtls_app_type[0]['value'], 'cmtls_map_config');
+	if($current_config) $current_config = array_pop($current_config);
+	
+	if($current_config['add from map'] && cmtls_group_can_create_content($current_group, $user) || (!$user->uid && $current_group->field_cmtls_group_posting[0]['value'] == 1 && $current_group->nid == $main_group->nid))
+	{
+		$openlayers_presets->data['behaviors']['cmtls_map_behavior_add_object'] = array();
+	}
+	
 	$items['cmtls_map'] = $openlayers_presets;
+	
+	// because the zoomtolayer does not work in node edit form, set the centerpoint and zoom manually
+	if($_GET['lon'] && $_GET['lat'])
+	{
+		$centerpoint = (float)$_GET['lon'].', '.(float)$_GET['lat'];
+		$zoom = 14;
+	}
+	elseif(sizeof($features))
+	{
+		if(sizeof($features) > 1)
+		{
+			foreach ($features as &$feat) if($feat->app_type != 'cmtls_group')
+			{
+				$centerfeature = $feat;
+				break;
+			}
+		}
+		else 
+		{
+			$centerfeature = array_pop($features);
+		}
+		
+		$centerpoint = cmtls_map_parse_wkt($centerfeature->wkt);
+		$centerpoint = $centerpoint['lat'].', '.$centerpoint['lon'];
+		
+		$zoom = 14;
+	}
+	
+	// map for node edit window
+	$openlayers_presets = new stdClass;
+	$openlayers_presets->disabled = FALSE; // Edit this to true to make a default openlayers_presets disabled initially
+	$openlayers_presets->api_version = 1;
+	$openlayers_presets->name = 'cmtls_node_map';
+	$openlayers_presets->title = 'Community Tools: Map (node edit)';
+	$openlayers_presets->description = 'Community Tools: Map for node edit';
+	$openlayers_presets->data = array(
+		'projection' => '900913',
+		'width' => '300px',
+		'height' => '300px',
+		'default_layer' => variable_get('cmtls_map_default_layer', 'osm_mapnik'),
+		'center' => array(
+			'initial' => array(
+				'centerpoint' => $centerpoint,
+				'zoom' => $zoom,
+			),
+		),
+		'displayProjection' => '4326',
+		'maxExtent' => array(
+			0 => -180,
+			1 => -90,
+			2 => 180,
+			3 => 90,
+		),
+		'behaviors' => array(
+			'openlayers_behavior_panzoom' => array(),
+		),
+		'layers' => array(
+			'osm_mapnik' => 'osm_mapnik',
+			'google_satellite' => 'google_satellite',
+			'google_hybrid' => 'google_hybrid',
+			'google_normal' => 'google_normal',
+			'google_physical' => 'google_physical',
+		),
+		'preset_name' => 'cmtls_node_map',
+	);
+	
+	$items['cmtls_node_map'] = $openlayers_presets;
 	
 	return $items;
 }
@@ -571,6 +658,7 @@ function cmtls_map_openlayers_layers()
 	$layers = array();
 
 	$features = _cmtls_map_features('get');
+	//$features = array();
 	
 	//printr($features); exit;
 	
@@ -707,6 +795,17 @@ function cmtls_map_openlayers_behaviors()
 				'parent' => 'openlayers_behavior',
 			),
 		),
+		'cmtls_map_behavior_add_object' => array(
+			'title' => t('Add object'),
+			'description' => t('Adds object.'),
+			'type' => 'layer',
+			'path' => drupal_get_path('module', 'cmtls_map'),
+			'file' => 'cmtls_map.module',
+			'behavior' => array(
+				'class' => 'cmtls_map_behavior_add_object',
+				'parent' => 'openlayers_behavior',
+			),
+		),
 	);
 }
 
@@ -743,6 +842,36 @@ class cmtls_map_behavior_popup extends openlayers_behavior
 	}
 }
 
+/**
+ *  Behavior
+ */
+class cmtls_map_behavior_add_object extends openlayers_behavior
+{
+	/**
+	* Provide initial values for options.
+	*/
+	function options_init()
+	{
+		return array();
+	}
+	
+	/**
+	* Form defintion for per map customizations.
+	*/
+	function options_form($defaults)
+	{
+		return array();
+	}
+	
+	/**
+	* Render.
+	*/
+	function render(&$map)
+	{
+		return $this->options;
+	}
+}
+
 function cmtls_map_parse_wkt($wkt)
 {
 	//"GEOMETRYCOLLECTION(POINT(24.738464355469 59.428708675493))";
@@ -768,4 +897,98 @@ function cmtls_map_parse_wkt($wkt)
 	}
 	
 	return $wkt;
+}
+
+function cmtls_map_menu()
+{
+	$items = array();
+	
+	$items['cmtls/%node/map/choose-app'] = array(
+		'title' => t('Choose application'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('cmtls_map_choose_app_form', 1),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 1),
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+function cmtls_map_choose_app_form(&$form_state, $group)
+{
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+	
+	// get all groups apps
+	$result = db_query('SELECT nodehierarchy.nid FROM {nodehierarchy} nodehierarchy WHERE nodehierarchy.parent = '.(int)$group->nid.' ORDER BY order_by');
+	
+	$apps = array();
+	
+	$apps = array();
+	
+	// app blocks
+	while($row = db_fetch_array($result))
+	{
+		$app = node_load($row['nid']);
+		
+		$config = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_map_config');
+		if($config)
+		{
+			$config = array_pop($config);
+			
+			if($config['is mappable'])
+			{
+				$apps[$app->nid] = $app->title;
+			}
+		}
+	}
+	
+	$form['group_id'] = array(
+		'#type' => 'value',
+		'#value' => (int)$group->nid,
+	);
+	
+	$form['wkt']['lat'] = array(
+		'#type' => 'value',
+		'#value' => (float)$_GET['lat'],
+	);
+	
+	$form['wkt']['lon'] = array(
+		'#type' => 'value',
+		'#value' => (float)$_GET['lon'],
+	);
+	
+	$form['app_id'] = array(
+		'#type' => 'radios',
+		'#title' => t('Choose the applcation'),
+		'#options' => $apps,
+		'#required' => TRUE,
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Choose'),
+	);
+
+	$form['#submit'] = array(
+		'cmtls_map_choose_app_form_submit',
+	);
+
+	return $form;
+}
+
+/**
+ * 
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_map_choose_app_form_submit($form, &$form_state)
+{
+	$app = node_load($form_state['values']['app_id']);
+	
+	$add_links = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_app_links');
+	
+	$form_state['redirect'] = url('cmtls/'.$form_state['values']['group_id'].'/'.$app->nid.'/'.$add_links[$app->field_cmtls_app_type[0]['value']]['add'], array('absolute' => TRUE)) . '?lat='.$form_state['values']['lat'].'&lon='.$form_state['values']['lon'];
 }

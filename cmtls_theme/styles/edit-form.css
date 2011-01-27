@@ -1,128 +1,190 @@
 /* Buttons
 -------------------------------------------------------------- */
 input.form-submit {
-		background: #3c8a2e url(../images/alert-overlay.png) repeat-x;
-		display: inline-block;
-		padding: 8px 14px 8px;
-		color: #fff;
-		text-decoration: none;
-		font-weight: bold;
-		line-height: 1;
-		-moz-border-radius: 5px;
-		-webkit-border-radius: 5px;
-		border-radius: 5px;
-		text-shadow: 0 -1px 1px #222;
-		position: relative;
-		width: auto;
-		cursor: pointer;
-		border: 0;
-	}
-
-	input.form-submit:hover {
-		opacity: 0.85;
-		-moz-opacity: 0.85;
-		filter:alpha(opacity=85);
-	}
-
-	input.form-submit:active {
-		top: 1px;
-	}
-
-.comment-form input.form-submit {
-	background: #999 url(../images/alert-overlay.png) repeat-x;
-	text-shadow: none;
 	font-size: 12px;
 	font-weight: bolder;
 }
 
-		input.form-submit.disabled {
-			background-color: #ccc;
-			text-shadow: 0 -1px 1px #999;
-			cursor: default
-		}
+	/* Form submits, modalframe mostly */
+	.node-form input#edit-submit.form-submit,
+	#user-register input#edit-submit.form-submit,
+	#user-login input#edit-submit.form-submit,
+	#user-profile-form input#edit-submit.form-submit {
+		font-size: 15px;
+		background: url("jquery.ui/images/ui-bg_green.png") repeat-x scroll 50% 50% #4CA20B;
+		color: #fff;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+	}
 
-
-/* Form elements
--------------------------------------------------------------- */
-.form-item {
-	margin-bottom: 20px;
+/*
+.cmtls-button-filter {
+	background: none !important;
+	border: 1px solid transparent !important;
 }
+
+.cmtls-button-filter.ui-state-hover {
+    background: url("jquery.ui/images/ui-bg_highlight-hard_75_ebebeb_1x100.png") repeat-x scroll 50% 50% #EBEBEB !important;
+    border: 1px solid #D3D3D3 !important;
+}
+*/
+
+/* General form elements
+-------------------------------------------------------------- */
+
+.modalframe.ui-widget-content {
+	background: #f2f2f2;
+}
+
+.form-item {
+	margin: 1em 0 !important;
+}
+
 	.form-item h1 {
 		font-size: 24px;
 		font-weight: bold;
 		color: #333;
 	}
 
-	.form-item label {
-		display: inline-block;
-		font-weight: bolder !important;
-	}
-
-	.form-item input.form-text {
+	.form-item input.form-text,
+	.form-item textarea.form-textarea,
+	.form-item select.form-select {
 		border: 1px solid #ccc;
-		padding: 5px;
-		margin-bottom: 3px;
+		border-top: 1px solid #888;
+		border-left: 1px solid #aaa;
+		padding: 4px;
 	}
 
-		.form-item input.form-text:focus {
+		.form-item input.form-text:focus,
+		.form-item textarea.form-textarea:focus,
+		.form-item select.form-select:focus {
 			border: 2px solid #AED9A7;
-			padding: 4px;
+			padding: 3px;
 		}
 
-	#edit-title-wrapper input {
-		font-weight: bold;
+
+			.form-item input.form-text.error:focus,
+			.form-item textarea.form-textarea.error:focus,
+			.form-item select.form-select.error:focus {
+				border: 2px solid red;
+				padding: 4px;
+			}
+
+
+	.form-item select.form-select {
+		padding: 2px;
 	}
 
+		.form-item select.form-select:focus {
+			padding: 1px;
+		}
+
 	.form-item textarea.form-textarea {
-		border: 1px solid #ccc;
-		padding: 5px;
 		height: 150px;
 		margin-bottom: 5px;
 	}
 
-		.form-item textarea.form-textarea:focus {
-			border: 2px solid #AED9A7;
-			padding: 4px;
-		}
-
 	.form-item .description {
 		display: inline-block;
-		color: #999;
-		font-size: 11px !important;
+		color: #9a9a9a;
+		font-size: 0.78em !important;
 	}
 
-	/* reposition Drupal's default ajax gif for our input height */
-	.form-item input.form-autocomplete {
-		background-position: 100% 8px !important;
+
+	.form-item .form-radios,
+	.form-item .form-checkboxes {
+		margin: 0;
 	}
-	
-		.form-item input.form-autocomplete:focus {
-			background-position: 100% 7px !important;
+
+		.form-item .form-radios .form-item,
+		.form-item .form-checkboxes .form-item {
+			display: inline-block;
 		}
-	
-	.form-item input.form-autocomplete.throbbing:focus {
-		background-position: 100% -13px !important;
-	}
-	
-.form-radios .form-item {
-	display: inline-block !important;
+
+fieldset.collapsible legend a {
+	font-weight: bold;
 }
 
-/* File uploads in most tool forms */
 
+
+/* Specific form elements
+-------------------------------------------------------------- */
+
+/* Make post titles more importannt */
+#edit-title-wrapper input {
+	font-weight: bolder;
+	font-size: 19px;
+}
+
+/* Put some labels left */
+#edit-field-cmtls-idea-status-value-wrapper label {
+	display: inline-block;
+}
+
+/* Login */
+
+#user-login input {
+	font-size: 18px;
+}
+
+#user-login #password-remind-link {
+	display: inline-block;
+}
+
+/* reposition Drupal's default ajax gif for our input height */
+.form-item input.form-autocomplete {
+	background-position: 100% 8px !important;
+}
+
+	.form-item input.form-autocomplete:focus {
+		background-position: 100% 7px !important;
+	}
+
+.form-item input.form-autocomplete.throbbing:focus {
+	background-position: 100% -13px !important;
+}
+
+
+/* File uploads in edit forms
+-------------------------------------------------------------- */
 #field-cmtls-files-items {
 	margin-bottom: 15px;
 }
 
-	#field-cmtls-files-items table thead {
-		font-weight: bolder;
+	#field-cmtls-files-items table thead th {
+		font-weight: bold;
 	}
-	
-	#field-cmtls-files-items input.form-submit {
-		background: #999 url(../images/alert-overlay.png) repeat-x;
-		text-shadow: none;
-		font-size: 12px;
-		font-weight: bolder;
+
+	#field-cmtls-files-items table td.content-multiple-drag a.tabledrag-handle {
+		padding: 18px 8px 0 18px;
+	}
+
+	#field-cmtls-files-items .widget-preview .filemime {
+		display: none;
+	}
+
+	#field-cmtls-files-items .widget-edit {
+		max-width: 100%;
+		padding-right: 10px;
+	}
+
+		#field-cmtls-files-items .widget-edit .form-item {
+			margin: 0 !important;
+			display: inline-block;
+		}
+
+			#field-cmtls-files-items .widget-edit .form-item label,
+			#field-cmtls-files-items .widget-edit .form-item input {
+				display: inline-block;
+			}
+
+			#field-cmtls-files-items .widget-edit .form-item input.form-text {
+				width: 15em;
+			}
+
+	#field-cmtls-files-items .content-add-more {
+		margin-top: 15px;
 	}
 
 
@@ -153,46 +215,9 @@ input.form-submit {
 /* Multiple file upload, in gallery
 -------------------------------------------------------------- */
 
-.small-button {
-		display: inline-block;
-		padding: 8px 14px 8px;
-		color: #fff;
-		text-decoration: none;
-		line-height: 1;
-		-moz-border-radius: 5px;
-		-webkit-border-radius: 5px;
-		border-radius: 5px;
-		text-shadow: 0 -1px 1px #222;
-		position: relative;
-		width: auto;
-		cursor: pointer;
-		border: 0;
-                background: #999 url(../images/alert-overlay.png) repeat-x;
-                text-shadow: none;
-                font-size: 12px;
-                font-weight: bolder;
+#upload-buttons {
+	font-size: 12px;
 }
-
-	.small-button:hover {
-		opacity: 0.85;
-		-moz-opacity: 0.85;
-		filter:alpha(opacity=85);
-	}
-
-	.small-button:active {
-		top: 1px;
-	}
-	
-	.small-button.disabled {
-		cursor: default;
-		opacity: 0.5;
-		-moz-opacity: 0.5;
-		filter:alpha(opacity=50);
-	}
-		.small-button.disabled:active {
-			top: 0;
-		}	
-
 
 #add-files {
     margin-right: 10px;
@@ -201,11 +226,11 @@ input.form-submit {
 	#add-files .swfupload {
 		left: 0;
 		position: absolute;
-		top: 0;		
+		top: 0;
 	}
 
 
-/* Modalframe
+/* Modalframe itself
 -------------------------------------------------------------- */
 
 .modalframe .ui-dialog-title {
@@ -274,9 +299,9 @@ input.form-submit {
 	.form-column input.form-text {
 		width: 80%;
 	}
-	
+
 /* Datepicker
--------------------------------------------------------------- */	
+-------------------------------------------------------------- */
 
 .ui-datepicker-div, .ui-datepicker-inline, #ui-datepicker-div {
 	padding: 5px !important;

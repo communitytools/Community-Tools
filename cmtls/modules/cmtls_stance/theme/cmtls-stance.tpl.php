@@ -10,8 +10,8 @@
 	<?php if ($user->uid): ?>
 		<?php print $form; ?>
 	<?php else: ?>
-		<div class="">
-			<?php print t('Please <a !params>log in</a> to submit your stance.', array('!params' => 'href="'.base_path().'cmtls/login" class="modalframe-child"')); ?>
+		<div class="stance">
+			<?php print t('Please <a href="@href" class="@class">log in</a> to submit your stance.', array('@href' => base_path().'cmtls/login', '@class' => 'modalframe-child')); ?>
 		</div>
 	<?php endif; ?>
 

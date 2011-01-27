@@ -24,6 +24,7 @@ function cmtls_dashboard_cmtls_map_config()
 			),
 			'default map view' => CMTLS_MAP_VIEW_HIDDEN,
 			'map view changable' => TRUE,
+			'add from map' => TRUE,
 		),
 	);
 }
@@ -32,50 +33,23 @@ function cmtls_dashboard_page($app_id)
 {
 	$group = _cmtls_group_get_current();
 	
-	$build = '<div class="dashboard-1">';
-	
 	// get all groups apps
 	$result = db_query('SELECT nodehierarchy.nid FROM {nodehierarchy} nodehierarchy WHERE nodehierarchy.parent = '.(int)$group->nid.' ORDER BY order_by');
+	
+	$apps = array();
 	
 	// app blocks
 	while($row = db_fetch_array($result))
 	{
 		$app = node_load($row['nid']);
+		$app->cmtls_dashboard_content = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_dashboard_block_content', $group, $app);
 		
-		$content = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_dashboard_block_content', $group, $app);
-		
-		if($content)
-		{
-			$build .= '<div class="dashboard-item"><div class="content">';
-			$build .= '<div class="title">'.$app->title.'</div>';
-			$build .= l(t('See all'), 'cmtls/'.$group->nid.'/'.$app->nid, array('attributes' => array('class' => 'see-all-link')));
-			$build .= $content;
-			$build .= '</div></div>';
-		}
+		if($app->cmtls_dashboard_content) $apps[] = $app;
 	}
-	$build .= '</div>';
-	
 	// widgets
 	$widgets = module_invoke_all('cmtls_dashboard_widgets', $group);
 	
-	if(sizeof($widgets))
-	{
-		$build .= '<div class="dashboard-2">';
-	
-		foreach($widgets as $widget)
-		{
-			$build .= '<div class="dashboard-item"><div class="content">';
-			$build .= '<div class="title">'.$widget['title'].'</div>';
-			//$build .= l('Vaata koiki', 'cmtls/'.$group->nid.'/'.$app->nid, array('attributes' => array('class' => 'see-all-link')));
-			$build .= $widget['content'];
-			$build .= '</div></div>';
-		}
-		
-		$build .= '</div><!-- dashboard-1 -->';
-	}
-				//	lisas kommentaari artiklile
-	
-	return $build;
+	return theme('cmtls_dashboard_content', $apps, $widgets);
 }
 
 function hook_cmtls_dashboard_block_content($group, $app)
@@ -89,6 +63,18 @@ function hook_cmtls_dashboard_widgets($group)
 		'example_widget' => array(
 			'title' => 'Example title',
 			'content' => views_embed_view('example_view', 'example_display_id', $group->nid),
+		),
+	);
+}
+
+function cmtls_dashboard_theme($existing)
+{
+	return array(
+		// articles page
+		'cmtls_dashboard_content' => array (
+			'arguments' => array('apps' => NULL, 'widgets' => NULL),
+			'template' => 'cmtls-dashboard-content',
+			'path' => drupal_get_path('module', 'cmtls_dashboard').'/theme',
 		),
 	);
 }

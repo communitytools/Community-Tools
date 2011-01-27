@@ -56,6 +56,7 @@ function cmtls_idea_cmtls_app()
 		'cmtls_idea' => array(
 			'title' => t('Ideas'),
 			'callback' => 'cmtls_ideas_page',
+			'node type title' => t('idea'),
 		),
 	);
 }
@@ -82,6 +83,8 @@ function cmtls_idea_cmtls_map_config()
 				'select' => 'cmtls-location-yellow-hover',
 				'temporary' => 'cmtls-location-yellow',
 			),
+			'add from map' => TRUE,
+			'is mappable' => TRUE,
 		),
 	);
 }
@@ -156,8 +159,7 @@ function cmtls_ideas_page($app_id)
 		cmtls_ajax_response(views_embed_view('cmtls_ideas', 'default', $app_id));
 	}
 
-	//return theme('cmtls_pager');
-	return theme('cmtls_ideas_content', $app_id, theme('cmtls_pager'));
+	return theme('cmtls_ideas_content', $app_id);
 }
 
 /**
@@ -197,41 +199,13 @@ function cmtls_idea_page($group, $app, $idea)
  * @param unknown_type $form_state
  */
 
-function cmtls_idea_form_alter(&$form, &$form_state, $form_id)
+function cmtls_idea_form_cmtls_idea_node_form_alter(&$form, &$form_state)
 {
-	//return;
-	// prepare idea node form for cleanup
-	if($form_id == 'cmtls_idea_node_form' && _cmtls_is())
-	//if($form_id == 'cmtls_idea_node_form')
-	{
-		$form['name'] = $form['author']['name'];
-		$form['name']['#type'] = 'value';
-		$form['date'] = $form['author']['date'];
-		$form['date']['#type'] = 'value';
-		//$form['body'] = $form['body_field']['body'];
-
-		$form['revision_information'] = NULL;
-		$form['author'] = NULL;
-		//$form['body_field'] = NULL;
-		$form['options'] = NULL;
-		$form['buttons']['preview'] = NULL;
-
-		$group = _cmtls_group_get_current();
-		$app = _cmtls_app_get_current($group);
-
-		if($form['buttons']['delete'])
-		{
-			$node = $form['#node'];
-
-			$form['buttons']['delete']['#type'] = 'markup';
-			$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/' . $group->nid . '/' . $app->nid . '/idea/' . $node->nid . '/delete', array('attributes' => array('class' => 'modalframe-processed')));
-		}
-
-		$form['#after_build'][] = 'cmtls_idea_node_form_after_build';
-		$form['#submit'][] = 'cmtls_idea_form_submit';
-	}
-
-	//printr($form);
+	if(!_cmtls_is()) return;
+	
+	$form = cmtls_forms_alter($form, $form_state);
+	
+	$form['#after_build'][] = 'cmtls_idea_node_form_after_build';
 }
 
 /**
@@ -245,57 +219,16 @@ function cmtls_idea_node_form_after_build($form, &$form_state)
 {
 	global $user;
 
-	//printr($form); exit;
-
-	$node = $form['#node'];
-
-	$current_group = _cmtls_group_get_current();
-	$current_app = _cmtls_app_get_current($current_group);
-
-	cmtls_group_set_og_form_values($form, $form_state);
-
-	$form['comment'] = $form['comment_settings']['comment'];
-	$form['comment']['#type'] = 'value';
-
-	$form['parent'] = $form['hierarchy']['parent'];
-	$form['parent']['#type'] = 'value';
-	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
-
-	$form['hierarchy'] = NULL;
-	$form['sections'] = NULL;
-	$form['attachments'] = NULL;
-	$form['comment_settings'] = NULL;
-	$form['menu'] = NULL;
-	$form['path'] = NULL;
-
-	$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
-	$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
-
-	/*if (!user_access('administer'))
-	{
-		$form['field_cmtls_idea_status'] = NULL;
-	}*/
-
 	if (!$user->fbuid || $form['nid']['#value'])
 	{
 		$form['field_cmtls_idea_post_on_fb'] = NULL;
 	}
 
-	return $form;
-}
+	foreach ($form['taxonomy']['tags'] as $t_id => $taxonomy) if ($taxonomy['#title']) {
+		$form['taxonomy']['tags'][$t_id]['#title'] = t('Tags');
+	}	
 
-/**
- * Group node form submit, closes modalframe window
- *
- * @param unknown_type $form
- * @param unknown_type $form_state
- */
-function cmtls_idea_form_submit($form, &$form_state)
-{
-	// Tell the parent window to close the modal frame dialog.
-	modalframe_close_dialog(array(
-		'refresh' => TRUE,
-	));
+	return $form;
 }
 
 /**
@@ -310,7 +243,7 @@ function cmtls_idea_theme($existing)
 	return array(
 		// ideas page
 		'cmtls_ideas_content' => array (
-			'arguments' => array('app_id' => NULL, 'pager' => NULL),
+			'arguments' => array('app_id' => NULL),
 			'template' => 'cmtls-ideas-content',
 			'path' => drupal_get_path('module', 'cmtls_idea') . '/theme',
 		),
@@ -384,8 +317,8 @@ function cmtls_idea_cmtls_map_popup_content($feature)
 
 	$body = implode(' ', $body);
 
-	$output = '<h1><a href="' . base_path() . cmtls_idea_path($node) . '">' . $node->title . '</a></h1>';
-	$output .= '<div class="address">'.$node->field_cmtls_address[0]['value'].'</div>';
+	$output = '<h1>'.l($node->title, cmtls_idea_path($node)).'</h1>';
+	$output .= '<div class="address">'.check_plain($node->field_cmtls_address[0]['value']).'</div>';
 	$output .= '<div class="content">'.$body.'</div>';
 
 	return $output;
@@ -428,6 +361,7 @@ function cmtls_idea_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
 
 	if ($op == 'insert' && $user->uid && strpos($node->type, 'cmtls_idea') === 0)
 	{
+		/*
 		if ($node->field_cmtls_idea_post_on_fb[0]['value'] == '1')
 		{
 			$_SESSION['fbconnect_feed'] = array(
@@ -436,6 +370,7 @@ function cmtls_idea_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
 				'nodeurl' => url('node/' . $node->nid, array('absolute' => TRUE)),
 			);
 		}
+		*/
 	}
 }
 
@@ -495,5 +430,15 @@ function cmtls_idea_cmtls_filter_info()
 			),
 
 		), // node type
+	);
+}
+
+function cmtls_idea_cmtls_app_links($node = NULL)
+{
+	return array(
+		'cmtls_idea' => array(
+			'add' => 'idea/add',
+			'delete' => 'idea/'.$node->nid.'/delete',
+		),
 	);
 }

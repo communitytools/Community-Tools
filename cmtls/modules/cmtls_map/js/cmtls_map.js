@@ -161,6 +161,85 @@ Drupal.behaviors.cmtls_map = function(context)
 	}
 };
 
+Drupal.behaviors.cmtls_map_behavior_add_object = function (context)
+{
+	if(context != window.document)
+	{
+		var data = $(context).data('openlayers');
+		
+		if (data && data.map.behaviors['cmtls_map_behavior_add_object'])
+		{
+			var map = data.openlayers;
+			
+			var layer = new OpenLayers.Layer.Vector(
+				Drupal.t('Temporary Features Layer'),
+				{
+					projection: new OpenLayers.Projection('EPSG:4326'),
+					styleMap: new OpenLayers.StyleMap({'default': data.map.styles.temporary}),
+				}
+			);
+			
+			data.openlayers.addLayer(layer);
+			
+			var drawfeature_control = new OpenLayers.Control.DrawFeature(
+				layer,
+				OpenLayers.Handler.Point,
+				{
+					'displayClass': 'olControlDrawFeaturePoint',
+					'title': Drupal.t('Add point'),
+				}
+			);
+			
+			var panel = new OpenLayers.Control.Panel();
+			
+			panel.addControls([new OpenLayers.Control.Navigation(
+				{'title': Drupal.t('Move map')}),
+				drawfeature_control
+			]);
+			
+			panel.defaultControl=panel.controls[0];
+			
+			for (var i = 0; i < panel.controls.length; i++)
+			{
+				$(panel.controls[i].panel_div).text(panel.controls[i].title);
+			}
+			
+			layer.events.register('featureadded', this, addNode);
+			
+			data.openlayers.addControl(panel);
+			panel.activate();
+			panel.redraw();
+			
+		}
+	}
+}
+
+function addNode(args)
+{
+	var coords = args.feature.geometry.getBounds().getCenterLonLat();
+	var layer = args.object;
+
+	coords.transform(
+		layer.map.getProjectionObject(),
+		new OpenLayers.Projection('EPSG:4326')
+	);
+	
+	var $button = $('#add-node-button');
+	
+	if($button.length > 0)
+	{
+		var href = $button.attr('href');
+		
+		$button.attr('href', href + '?lat=' + coords.lat + '&lon=' + coords.lon);
+		$button.click();
+		
+		$button.attr('href', href);
+		
+		args.feature.destroyMarker();
+		args.feature.destroy();
+	}
+}
+
 function pagePopupContent(dir, element)
 {
 	var $this = $(element);

@@ -5,7 +5,7 @@
 		<div class="toolbar">
 			<?php print l('&larr; '.t('Go back'),'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid,array('html'=>true)) ?>
 			<?php if(cmtls_group_can_create_content($cmtls['current_group'], $user)): ?>
-				<?php print l(t('+ Add files'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/album/'.$cmtls['current_album']->nid.'/add', array('attributes' => array('class' => 'button add modalframe-child', 'id' => 'add-images-button'))) ?>
+				<?php print l(t('Add files'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/album/'.$cmtls['current_album']->nid.'/add', array('attributes' => array('class' => 'cmtls-button-add modalframe-child', 'id' => 'add-images-button'))) ?>
 			<?php endif; ?>
 		</div> <!-- toolbar -->
 		

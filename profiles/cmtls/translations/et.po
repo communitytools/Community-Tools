@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2010-12-29 11:41+0200\n"
-"PO-Revision-Date: 2010-12-29 11:41+0200\n"
+"POT-Creation-Date: 2011-01-24 13:01+0200\n"
+"PO-Revision-Date: 2011-01-24 13:01+0200\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -1650,10 +1650,6 @@ msgstr ""
 
 #: /ct-rene/
 msgid "filters"
-msgstr ""
-
-#: /ct-rene/
-msgid "Filter"
 msgstr ""
 
 #: /ct-rene/
@@ -8502,15 +8498,7 @@ msgid "Nov"
 msgstr ""
 
 #: /ct-rene/comment/reply/10
-msgid "Tuesday"
-msgstr ""
-
-#: /ct-rene/comment/reply/10
 msgid "Tue"
-msgstr ""
-
-#: /ct-rene/comment/reply/10
-msgid "Friday"
 msgstr ""
 
 #: /ct-rene/comment/reply/10
@@ -8617,10 +8605,6 @@ msgstr ""
 
 #: /ct-rene/comment/reply/10
 msgid "Dec"
-msgstr ""
-
-#: /ct-rene/comment/reply/10
-msgid "Wednesday"
 msgstr ""
 
 #: /ct-rene/comment/reply/10
@@ -10095,10 +10079,6 @@ msgid "Drush command could not be completed."
 msgstr ""
 
 #: /ct-rene/comment/reply/10
-msgid "Thursday"
-msgstr ""
-
-#: /ct-rene/comment/reply/10
 msgid "Thu"
 msgstr ""
 
@@ -10171,19 +10151,11 @@ msgid "Attender count"
 msgstr ""
 
 #: /ct-rene/cmtls/1/24
-msgid "Tags"
-msgstr ""
-
-#: /ct-rene/cmtls/1/24
 msgid "Files (field_cmtls_files) - data"
 msgstr ""
 
 #: /ct-rene/cmtls/1/24
 msgid "Files (field_cmtls_files) - delta"
-msgstr ""
-
-#: /ct-rene/cmtls/1/24/event/add
-msgid "Add another item"
 msgstr ""
 
 #: /ct-rene/cmtls/1/24/event/add
@@ -10319,10 +10291,6 @@ msgstr ""
 msgid "field_cmtls_problem_status_value"
 msgstr ""
 
-#: /ct-rene/cmtls/1/41/problem/add
-msgid "- None selected -"
-msgstr ""
-
 #: /ct-rene/cmtls/1/41
 msgid "Waiting for answer"
 msgstr ""
@@ -10346,15 +10314,7 @@ msgid ""
 msgstr ""
 
 #: /ct-rene/comment/reply/35
-msgid "Saturday"
-msgstr ""
-
-#: /ct-rene/comment/reply/35
 msgid "Sat"
-msgstr ""
-
-#: /ct-rene/openlayers/geocoder/coordinates
-msgid "Sunday"
 msgstr ""
 
 #: /ct-rene/openlayers/geocoder/coordinates
@@ -10371,10 +10331,6 @@ msgstr ""
 
 #: /ct-rene/cmtls/1/4
 msgid "Denied"
-msgstr ""
-
-#: /ct-rene/openlayers/geocoder/coordinates
-msgid "Monday"
 msgstr ""
 
 #: /ct-rene/cmtls/1/2
@@ -12919,10 +12875,6 @@ msgid "Displays"
 msgstr ""
 
 #: /ct-rene/admin/build/views
-msgid "Sort by"
-msgstr ""
-
-#: /ct-rene/admin/build/views
 msgid "Up"
 msgstr ""
 
@@ -13985,10 +13937,6 @@ msgstr ""
 msgid "Preset %name (ID: @id) was flushed."
 msgstr ""
 
-#: /ct-rene/cmtls/1/member/1/edit
-msgid "Check this box to delete your current picture."
-msgstr ""
-
 #: /ct-rene/user/1
 msgid "History"
 msgstr ""
@@ -14373,6 +14321,3252 @@ msgid ""
 "post comments"
 msgstr ""
 
+#: /ct-rene/comment/reply/50
+msgid "!long-month-name January"
+msgstr ""
+
+#: /ct-rene/admin
+msgid "Google Analytics module"
+msgstr ""
+
+#: /ct-rene/admin
+msgid ""
+"Google Analytics module has not been configured yet. Please configure "
+"its settings from the <a href=\"@url\">Google Analytics settings "
+"page</a>."
+msgstr ""
+
+#: /ct-rene/admin
+msgid "Not configured"
+msgstr ""
+
+#: /ct-rene/admin/settings/performance
+msgid "Google Analytics"
+msgstr ""
+
+#: /ct-rene/admin/settings/performance
+msgid ""
+"Configure the settings used to generate your Google Analytics tracking "
+"code."
+msgstr ""
+
+#: /ct-rene/cmtls/1/4
+msgid "New post in"
+msgstr ""
+
+#: /ct-rene/cmtls/1/43/problem/52/edit
+msgid "googleanalytics"
+msgstr ""
+
+#: /ct-rene/cmtls/1/43/problem/52/edit
+msgid "Edit post in"
+msgstr ""
+
+#: /ct-rene/comment/reply/52
+msgid ""
+"User !username commented on !nodetitle:\n"
+"\n"
+"\"Eriti pikk ja igav kommentaar, kus mitu rida\n"
+"Eriti pikk ja igav kommentaar, kus mitu rida\n"
+"Eriti pikk ja igav kommentaar, kus mitu rida\n"
+"Eriti pikk ja igav kommentaar, kus mitu rida\"\n"
+"\n"
+"!nodelink"
+msgstr ""
+
+#: /ct-rene/comment/reply/52
+msgid ""
+"User !username commented on !nodetitle:\n"
+"\n"
+"\"Ja siis veel üks kommentaar\"\n"
+"\n"
+"!nodelink"
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/add
+msgid "Kestab kogu päeva"
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/67
+msgid "1 o"
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/25
+msgid "@count ot"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "pm"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Custom format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Locale settings"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Default time zone"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Select the default site time zone."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "User-configurable time zones"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid ""
+"When enabled, users can set their own time zone and dates will be "
+"displayed accordingly."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "First day of week"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "The first day of the week for calendar views."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Formatting"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Short date format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "The short format of date display."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Custom short date format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid ""
+"A user-defined short date format. See the <a href=\"@url\">PHP "
+"manual</a> for available options. This format is currently set to "
+"display as <span>%date</span>."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Medium date format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "The medium sized date display."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Custom medium date format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid ""
+"A user-defined medium date format. See the <a href=\"@url\">PHP "
+"manual</a> for available options. This format is currently set to "
+"display as <span>%date</span>."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Long date format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Longer date format used for detailed display."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Custom long date format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid ""
+"A user-defined long date format. See the <a href=\"@url\">PHP "
+"manual</a> for available options. This format is currently set to "
+"display as <span>%date</span>."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Date formats"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "!type date format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid ""
+"Select the default site time zone. If in doubt, choose the timezone "
+"that is closest to your location which has the same rules for daylight "
+"saving time."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Allow users to configure date formats"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Formats"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Custom formats"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Allow users to configure custom date formats."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Add format"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time
+msgid "Allow users to add additional date formats."
+msgstr ""
+
+#: modules/system/system.js
+msgid "Testing clean URLs..."
+msgstr ""
+
+#: modules/system/system.js
+msgid "Your server has been successfully tested to support this feature."
+msgstr ""
+
+#: modules/system/system.js
+msgid ""
+"Your system configuration does not currently support this feature. The "
+"<a href=\"http://drupal.org/node/15365\">handbook page on Clean "
+"URLs</a> has additional troubleshooting information."
+msgstr ""
+
+#: /ct-rene/admin/settings/date_popup
+msgid ""
+"<p>The Date Popup calendar datepicker uses the jQuery UI datepicker. A "
+"version of that is included with the Date Popup module, but you are "
+"strongly encouraged to use the <a "
+"href=\"http://drupal.org/project/jquery_ui\">jQuery UI module</a> "
+"instead. If the jQuery UI module is installed, the Date Popup will use "
+"the datepicker from that module, which is likely to be more current. "
+"If you are having any problems with Popups and you are not already "
+"using jQuery UI, please do that as a first step before reporting "
+"problems.</p>"
+msgstr ""
+
+#: /ct-rene/admin/settings/date_popup
+msgid ""
+"<p>The Date Popup module uses a jQuery timepicker module. There is no "
+"\"official\" jQuery UI timepicker, and not everyone likes the one that "
+"is included here. If you do not want to use the timepicker, you can "
+"turn it off below and users will get a regular textfield instead.</p>"
+msgstr ""
+
+#: /ct-rene/admin/settings/date_popup
+msgid "Use default jQuery timepicker"
+msgstr ""
+
+#: /ct-rene/admin/settings/date_popup
+msgid "Manual time entry, no jQuery timepicker"
+msgstr ""
+
+#: /ct-rene/admin/settings/date_popup
+msgid "Timepicker"
+msgstr ""
+
+#: /ct-rene/admin/settings/date_popup
+msgid "Choose the jQuery timepicker to user."
+msgstr ""
+
+#: /ct-rene/admin/settings/date_popup
+msgid ""
+"<p>The Date Popup calendar includes some css for IE6 that breaks css "
+"validation. Since IE 6 is now superceded by IE 7 and IE 8, the special "
+"css for IE 6 has been removed from the regular css used by the Date "
+"Popup. If you find you need that css after all, you can add it back in "
+"your theme. Look at the way the Garland theme adds special IE-only css "
+"in in its page.tpl.php file. The css you need is:</p>"
+msgstr ""
+
+#: /ct-rene/admin/settings/jquery_update
+msgid "Choose jQuery compression level"
+msgstr ""
+
+#: /ct-rene/admin/settings/jquery_update
+msgid "Production (Minified)"
+msgstr ""
+
+#: /ct-rene/admin/settings/jquery_update
+msgid "Development (Uncompressed Code)"
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid "No available releases found"
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid "Drupal core update status"
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid ""
+"There are updates available for your version of Drupal. To ensure the "
+"proper functioning of your site, you should update as soon as "
+"possible."
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid ""
+"See the <a href=\"@available_updates\">available updates</a> page for "
+"more information."
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid "(version @version available)"
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid "Module and theme update status"
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid ""
+"There are security updates available for one or more of your modules "
+"or themes. To ensure the security of your server, you should update "
+"immediately!"
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid "Not secure!"
+msgstr ""
+
+#: /ct-rene/admin/build/modules
+msgid ""
+"See the <a href=\"@available_updates\">available updates</a> page for "
+"information on installed modules and themes with new versions "
+"released."
+msgstr ""
+
+#: /ct-rene/cmtls/1/43/problem/add
+msgid "update"
+msgstr ""
+
+#: /ct-rene/cmtls/1/43/problem/add
+msgid "Available updates"
+msgstr ""
+
+#: /ct-rene/cmtls/1/43/problem/add
+msgid ""
+"Get a status report about available updates for your installed modules "
+"and themes."
+msgstr ""
+
+#: /ct-rene/cmtls/1/43/problem/add
+msgid "Manual update check"
+msgstr ""
+
+#: /ct-rene/admin
+msgid "No update data available"
+msgstr ""
+
+#: /ct-rene/admin
+msgid ""
+"No information is available about potential new releases for currently "
+"installed modules and themes. To check for updates, you may need to <a "
+"href=\"@run_cron\">run cron</a> or you can <a "
+"href=\"@check_manually\">check manually</a>. Please note that checking "
+"for available updates can take a long time, so please be patient."
+msgstr ""
+
+#: /ct-rene/admin/content/rss-publishing
+msgid "Number of items in each feed"
+msgstr ""
+
+#: /ct-rene/admin/content/rss-publishing
+msgid "Default number of items to include in each feed."
+msgstr ""
+
+#: /ct-rene/admin/content/rss-publishing
+msgid "Feed content"
+msgstr ""
+
+#: /ct-rene/admin/content/rss-publishing
+msgid "Titles only"
+msgstr ""
+
+#: /ct-rene/admin/content/rss-publishing
+msgid "Titles plus teaser"
+msgstr ""
+
+#: /ct-rene/admin/content/rss-publishing
+msgid "Full text"
+msgstr ""
+
+#: /ct-rene/admin/content/rss-publishing
+msgid "Global setting for the default display of content items in each feed."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Table-based multi-column theme with a marine and ash color scheme."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Minimalist tabled theme with light colors."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Tableless, recolorable, multi-column, fluid width theme (default)."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Boxy tabled theme in all grays."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Tableless, recolorable, multi-column, fixed width theme."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Tabled, multi-column theme in blue and orange tones."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Screenshot"
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Select the default theme."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid "Garland"
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid ""
+"Select which themes are available to your users and specify the "
+"default theme. To configure site-wide display settings, click the "
+"\"configure\" task above. Alternatively, to override these settings in "
+"a specific theme, click the \"configure\" link for that theme. Note "
+"that different themes may have different regions available for "
+"displaying content; for consistency in presentation, you may wish to "
+"enable only one theme."
+msgstr ""
+
+#: /ct-rene/admin/build/themes
+msgid ""
+"To change the appearance of your site, a number of <a "
+"href=\"@themes\">contributed themes</a> are available."
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid "Filter aliases"
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid "Alias"
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid "System"
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid "No URL aliases available."
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid "sort descending"
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid "Add alias"
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid ""
+"Drupal provides complete control over URLs through aliasing, which is "
+"often used to make URLs more readable or easy to remember. For "
+"example, the alias 'about' may be mapped onto the post at the system "
+"path 'node/1', creating a more meaningful URL. Each system path can "
+"have multiple aliases."
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid ""
+"The path module allows you to specify aliases for Drupal URLs. Such "
+"aliases improve readability of URLs for your users and may help "
+"internet search engines to index your content more effectively. More "
+"than one alias may be created for a given page."
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid ""
+"<p>Some examples of URL aliases are:</p>\n"
+"<ul>\n"
+"<li>user/login =&gt; login</li>\n"
+"<li>image/tid/16 =&gt; store</li>\n"
+"<li>taxonomy/term/7+19+20+21 =&gt; store/products/whirlygigs</li>\n"
+"<li>node/3 =&gt; contact</li>\n"
+"</ul>\n"
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid ""
+"The path module enables appropriately permissioned users to specify an "
+"optional alias in all node input and editing forms, and provides an "
+"interface to view and edit all URL aliases. The two permissions "
+"related to URL aliasing are <em>administer url aliases</em> and "
+"<em>create url aliases</em>. "
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid ""
+"This module also provides user-defined mass URL aliasing capabilities, "
+"which is useful if you wish to uniformly use URLs different from the "
+"default. For example, you may want to have your URLs presented in a "
+"different language. Access to the Drupal source code on the web server "
+"is required to set up mass URL aliasing. "
+msgstr ""
+
+#: /ct-rene/admin/build/path
+msgid ""
+"For more information, see the online handbook entry for <a "
+"href=\"@path\">Path module</a>."
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Last checked: @time ago"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Check manually"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "warning"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Update available"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Recommended version:"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Download"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Release notes"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Development version:"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Includes: %includes"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "ok"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Also available:"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "error"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Security update required!"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Security update:"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Drupal core"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Disabled modules"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid "Disabled themes"
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid ""
+"Here you can find information about available updates for your "
+"installed modules and themes. Note that each module or theme is part "
+"of a \"project\", which may or may not have the same name, and might "
+"include multiple modules or themes within it."
+msgstr ""
+
+#: /ct-rene/admin/reports/updates
+msgid ""
+"To extend the functionality or to change the look of your site, a "
+"number of contributed <a href=\"@modules\">modules</a> and <a "
+"href=\"@themes\">themes</a> are available."
+msgstr ""
+
+#: /ct-rene/admin/reports/status/run-cron
+msgid "Cron ran successfully."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Logo"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Mission statement"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "User pictures in posts"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "User pictures in comments"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Search box"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Shortcut icon"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Primary links"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Secondary links"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Toggle display"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Enable or disable the display of certain page elements."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Logo image settings"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "If toggled on, the following logo will be displayed."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Use the default logo"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Check here if you want the theme to use the logo supplied with it."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Path to custom logo"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid ""
+"The path to the file you would like to use as your logo file instead "
+"of the default logo."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Upload logo image"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid ""
+"If you don't have direct file access to the server, use this field to "
+"upload your logo."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Shortcut icon settings"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid ""
+"Your shortcut icon, or 'favicon', is displayed in the address bar and "
+"bookmarks of most browsers."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Use the default shortcut icon."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Check here if you want the theme to use the default shortcut icon."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Path to custom icon"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid ""
+"The path to the image file you would like to use as your custom "
+"shortcut icon."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid "Upload icon image"
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid ""
+"If you don't have direct file access to the server, use this field to "
+"upload your shortcut icon."
+msgstr ""
+
+#: /ct-rene/admin/build/themes/settings/cmtls_theme
+msgid ""
+"These options control the display settings for the "
+"<code>%template</code> theme. When your site is displayed using this "
+"theme, these settings will be used. By clicking \"Reset to defaults,\" "
+"you can choose to use the <a href=\"@global\">global settings</a> for "
+"this theme."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Language switcher"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Syndicate"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Author information"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Powered by Drupal"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Who's new"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Who's online"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Fbconnect friend"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Group search"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Group notifications (Views enhanced)"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Group details"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "New groups"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "@view: @display"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"The block %info was assigned to the invalid region %region and has "
+"been disabled."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Save blocks"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Region"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "No blocks in this region"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "Add block"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"This page provides a drag-and-drop interface for assigning a block to "
+"a region, and for controlling the order of blocks within regions. To "
+"change the region or order of a block, grab a drag-and-drop handle "
+"under the <em>Block</em> column and drag the block to a new location "
+"in the list. (Grab a handle by clicking and holding the mouse while "
+"hovering over a handle icon.) Since not all themes implement the same "
+"regions, or display regions in the same way, blocks are positioned on "
+"a per-theme basis. Remember that your changes will not be saved until "
+"you click the <em>Save blocks</em> button at the bottom of the page."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"Click the <em>configure</em> link next to each block to configure its "
+"specific title and visibility settings. Use the <a "
+"href=\"@add-block\">add block page</a> to create a custom block."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"Blocks are boxes of content rendered into an area, or region, of a web "
+"page. The default theme Garland, for example, implements the regions "
+"\"left sidebar\", \"right sidebar\", \"content\", \"header\", and "
+"\"footer\", and a block may appear in any one of these areas. The <a "
+"href=\"@blocks\">blocks administration page</a> provides a "
+"drag-and-drop interface for assigning a block to a region, and for "
+"controlling the order of blocks within regions."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"Although blocks are usually generated automatically by modules (like "
+"the <em>User login</em> block, for example), administrators can also "
+"define custom blocks. Custom blocks have a title, description, and "
+"body. The body of the block can be as long as necessary, and can "
+"contain content supported by any available <a "
+"href=\"@input-format\">input format</a>."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "When working with blocks, remember that:"
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"since not all themes implement the same regions, or display regions in "
+"the same way, blocks are positioned on a per-theme basis."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "disabled blocks, or blocks not in a region, are never shown."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"when throttle module is enabled, throttled blocks (blocks with the "
+"<em>Throttle</em> checkbox selected) are hidden during high server "
+"loads."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "blocks can be configured to be visible only on certain pages."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"blocks can be configured to be visible only when specific conditions "
+"are true."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid "blocks can be configured to be visible only for certain user roles."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"when allowed by an administrator, specific blocks may be enabled or "
+"disabled on a per-user basis using the <em>My account</em> page."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"some dynamic blocks, such as those generated by modules, will be "
+"displayed only on certain pages."
+msgstr ""
+
+#: /ct-rene/admin/build/block
+msgid ""
+"For more information, see the online handbook entry for <a "
+"href=\"@block\">Block module</a>."
+msgstr ""
+
+#: modules/block/block.js
+msgid ""
+"The changes to these blocks will not be saved until the <em>Save "
+"blocks</em> button is clicked."
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer activity"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own activity"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "manage own activity settings"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "collapse format fieldset by default"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "collapsible format selection"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "show format selection for blocks"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "show format selection for comments"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "show format selection for nodes"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "show format tips"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "show more format tips link"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer blocks"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "use PHP for block visibility"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "access cmtls stance"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "access comments"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer comments"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "post comments"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "post comments without approval"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "Use PHP input for field settings (dangerous - grant with care)"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_address"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_app_config"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_app_custom_view"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_app_type"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_cover_image"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_date"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_description"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_event_date"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_event_lasts_all_day"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_files"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_geoinfo"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_group_background"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_group_main"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_group_posting"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_idea_post_on_fb"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_idea_status"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_image_cover"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_problem_status"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_status_uid"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit field_cmtls_upload"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_address"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_app_config"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_app_custom_view"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_app_type"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_cover_image"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_date"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_description"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_event_date"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_event_lasts_all_day"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_files"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_geoinfo"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_group_background"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_group_main"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_group_posting"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_idea_post_on_fb"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_idea_status"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_image_cover"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_problem_status"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_status_uid"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view field_cmtls_upload"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view date repeats"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "invite facebook friends"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer features"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_album content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_album_object content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_app content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_article content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_dashboard content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_event content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_forum content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_group content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_idea content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_member content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_problem content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create cmtls_thread content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_album content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_album_object content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_app content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_article content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_dashboard content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_event content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_forum content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_group content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_idea content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_member content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_problem content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any cmtls_thread content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_album content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_album_object content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_app content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_article content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_dashboard content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_event content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_forum content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_group content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_idea content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_member content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_problem content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own cmtls_thread content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_album content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_album_object content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_app content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_article content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_dashboard content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_event content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_forum content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_group content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_idea content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_member content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_problem content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any cmtls_thread content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_album content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_album_object content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_app content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_article content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_dashboard content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_event content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_forum content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_group content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_idea content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_member content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_problem content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own cmtls_thread content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "manage features"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer filters"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer google analytics"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "opt-in or out of tracking"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "use PHP for tracking visibility"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer imageapi"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer imagecache"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "flush imagecache"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view imagecache avatar_small"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view imagecache content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view imagecache full"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view imagecache original"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view imagecache small"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view imagecache thumbnail"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view imagecache wysiwyg_imageupload_preview"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer languages"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "translate interface"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer menu"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer content types"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer nodes"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create page content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create story content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any page content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete any story content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own page content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete own story content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "delete revisions"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any page content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit any story content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own page content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own story content"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "revert revisions"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view revisions"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer hierarchy"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create child nodes"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit all node parents"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit own node parents"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "reorder children"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view site outline"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "access embedded child view"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "edit embedded child view"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer organic groups"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer openlayers"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer url aliases"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "create url aliases"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer sections"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "assign node theme"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "access administration pages"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "access site reports"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer actions"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer files"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer site configuration"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "select different theme"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer taxonomy"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "upload files"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "view uploaded files"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "access user profiles"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer permissions"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer users"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "change own username"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "access all views"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "administer views"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "use views exporter"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "use wysiwyg image upload"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "Save permissions"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid "@module module"
+msgstr ""
+
+#: /ct-rene/admin/user/permissions
+msgid ""
+"Permissions let you control what users can do on your site. Each user "
+"role (defined on the <a href=\"@role\">user roles page</a>) has its "
+"own set of permissions. For example, you could give users classified "
+"as \"Administrators\" permission to \"administer nodes\" but deny this "
+"power to ordinary, \"authenticated\" users. You can use permissions to "
+"reveal new features to privileged users (those with subscriptions, for "
+"example). Permissions also allow trusted users to share the "
+"administrative burden of running a busy site."
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "role"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "permission"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "status"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "active"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "blocked"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Show only users where"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "is"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Update options"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Unblock the selected users"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Block the selected users"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Delete the selected users"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Add a role to the selected users"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Remove a role from the selected users"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "@time ago"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid "Add user"
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid ""
+"Drupal allows users to register, login, log out, maintain user "
+"profiles, etc. Users of the site may not use their own names to post "
+"content until they have signed up for a user account."
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid ""
+"The user module allows users to register, login, and log out. Users "
+"benefit from being able to sign on because it associates content they "
+"create with their account and allows various permissions to be set for "
+"their roles. The user module supports user roles which establish fine "
+"grained permissions allowing each role to do only what the "
+"administrator wants them to. Each user is assigned to one or more "
+"roles. By default there are two roles <em>anonymous</em> - a user who "
+"has not logged in, and <em>authenticated</em> a user who has signed up "
+"and who has been authorized."
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid ""
+"Users can use their own name or handle and can specify personal "
+"configuration settings through their individual <em>My account</em> "
+"page. Users must authenticate by supplying a local username and "
+"password or through their OpenID, an optional and secure method for "
+"logging into many websites with a single username and password. In "
+"some configurations, users may authenticate using a username and "
+"password from another Drupal site, or through some other site-specific "
+"mechanism."
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid ""
+"A visitor accessing your website is assigned a unique ID, or session "
+"ID, which is stored in a cookie. The cookie does not contain personal "
+"information, but acts as a key to retrieve information from your site. "
+"Users should have cookies enabled in their web browser when using your "
+"site."
+msgstr ""
+
+#: /ct-rene/admin/user/user
+msgid ""
+"For more information, see the online handbook entry for <a "
+"href=\"@user\">User module</a>."
+msgstr ""
+
+#: misc/tableselect.js
+msgid "Select all rows in this table"
+msgstr ""
+
+#: misc/tableselect.js
+msgid "Deselect all rows in this table"
+msgstr ""
+
+#: /ct-rene/user/1/edit
+msgid "Selected"
+msgstr ""
+
+#: /ct-rene/cmtls/1/member/1/edit
+msgid "Only JPEG, PNG and GIF images are allowed."
+msgstr ""
+
+#: /ct-rene/cmtls/1/member/1/edit
+msgid "The selected file %name could not be uploaded."
+msgstr ""
+
+#: /ct-rene/cmtls/1/4/idea/add
+msgid "Access log settings"
+msgstr ""
+
+#: /ct-rene/cmtls/1/24
+msgid "!long-month-name May"
+msgstr ""
+
+#: /index.php
+msgid "Successfully logged into Drupal as !name"
+msgstr ""
+
+#: /index.php
+msgid "(new variable)"
+msgstr ""
+
+#: /index.php
+msgid "!name was set to !value."
+msgstr ""
+
+#: /ct-rene/filefield/ahah/cmtls_article/field_cmtls_files/0
+msgid "The file in the @field field was unable to be uploaded."
+msgstr ""
+
+#: /ct-rene/admin/settings/performance
+msgid "Add object"
+msgstr ""
+
+#: /ct-rene/admin/settings/performance
+msgid "Adds object."
+msgstr ""
+
+#: /ct-rene/admin/settings/performance
+msgid "Choose application"
+msgstr ""
+
+#: sites/all/modules/cmtls/modules/cmtls_map/js/cmtls_map.js
+msgid "Temporary Features Layer"
+msgstr ""
+
+#: sites/all/modules/cmtls/modules/cmtls_map/js/cmtls_map.js
+msgid "Add Point"
+msgstr ""
+
+#: /ct-rene/admin/build/features/cleanup/clear
+msgid "Community Tools: Place"
+msgstr ""
+
+#: /ct-rene/admin/build/features/cleanup/clear
+msgid "Edit place"
+msgstr ""
+
+#: /ct-rene/admin/build/features/cmtls
+msgid ""
+"Reverted all <strong>!component</strong> components for "
+"<strong>!module</strong>."
+msgstr ""
+
+#: /ct-rene/cmtls/1/map/choose-app?wkt[lat]=62.134419554432&wkt[lon]=-36.306752349579
+msgid "Choose the applcation"
+msgstr ""
+
+#: /ct-rene/cmtls/1/map/choose-app?wkt[lat]=62.134419554432&wkt[lon]=-36.306752349579
+msgid "Choose"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Blank"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Relative"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"A default value to use for this field. If you select 'Relative', add "
+"details below."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Default value for To date"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Same as From date"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Customize Default Value"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "strtotime"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"The custom value for a Relative default should be something that "
+"describes a time by reference to the current day using strtotime, like "
+"'+90 days' (90 days from the day the field is created) or '+1 "
+"Saturday' (the next Saturday). See !strtotime for more details."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Custom value for From date"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Custom value for To date"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"Set the order and format for the date parts in the input form. The "
+"format will be adapted to remove values not in the granularity for "
+"this field."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Years back and forward"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"Number of years to go back and forward in the year selection list, "
+"default is -3:+3."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Time increment"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Increment the minute and second fields by this amount."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Customize Date Parts"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Within"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Position of date part labels"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"The location of date part labels, like 'Year', 'Month', or 'Day'. "
+"'Above' will display them as titles above each date part. 'Within' "
+"will insert the label as the first option in the select list and in "
+"blank textfields. 'None' will not label any of the date parts. The "
+"exact text in the label is controlled by themes like "
+"'date_part_label_year' and 'date_part_label_month'."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"Display a matching second date field as a 'To date'. If marked "
+"'Optional' field will be presented but not required. If marked "
+"'Required' the 'To date' will be required if the 'From date' is "
+"required or filled in."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"Changing the %name setting after data has been created could result in "
+"the loss of data!"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "To Date"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Granularity"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Set the date elements to be stored (at least a year is required)."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Default Display"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid ""
+"Select a default format type to be used for the date display. Visit "
+"the <a href=\"@date-time-page\">Date and time date format page</a> to "
+"add and edit format types."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Select the timezone handling method to be used for this date field."
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Time zone handling"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Site's time zone"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "Date's time zone"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "User's time zone"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-event/fields/field_cmtls_event_date
+msgid "No time zone conversion"
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/add
+msgid "Formatting guidelines"
+msgstr ""
+
+#: /ct-rene/admin/content/node-type/cmtls-member/display
+msgid ""
+"There are no fields configured for this content type. You can add new "
+"fields on the <a href=\"@link\">Manage fields</a> page."
+msgstr ""
+
+#: /ct-rene/cmtls/1/43/problem/add
+msgid "asdf"
+msgstr ""
+
+#: /ct-rene/cmtls/1/app/config
+msgid "place title"
+msgstr ""
+
+#: /ct-rene/cmtls/1/91
+msgid "Add place"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid ""
+"By default the your site will point to a hosted version of\n"
+"    the OpenLayers library, at <code>@ol_api_url.</code>"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid ""
+"Alternately, you can <a href=\"!ol_url\">download OpenLayers</a>,\n"
+"    add it to your Drupal installation, and use a relative path like\n"
+"    <code>@suggested_path</code>"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid "OpenLayers Source"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid "OpenLayers Default Preset"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid ""
+"This is the default preset that will be used\n"
+"      in cases where one is not defined.  It will also be used as the "
+"default when creating new presets."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid "Add OpenLayers map preset."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid "API Keys"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid "Layers"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid "Create OpenLayers map presets."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid ""
+"Configure where Drupal finds \n"
+"        the OpenLayers javascript library. Using a local or <a "
+"href=\"@olb\">compacted \n"
+"        version</a> of OpenLayers can reduce filesize, but remember to "
+"set the Image Path and \n"
+"        CSS Path options in every preset, because OpenLayers is not "
+"able to find these resources \n"
+"        automatically. See the included documentation in /doc for \n"
+"        more details."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers
+msgid ""
+"The OpenLayers module is the base module for the \n"
+"        OpenLayers suite of modules, and provides the main API."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Yahoo Maps Satellite"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Yahoo satellite imagery tiles."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Yahoo Maps Street"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Yahoo streets tiles."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Yahoo Maps Hybrid"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Yahoo hybrid of streets and satellite tiles."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Virtual Earth Street"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Virtual Earth (Bing) street tiles."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Virtual Earth Satellite"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Virtual Earth (Bing) satellite tiles."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Virtual Earth Hybrid"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Virtual Earth (Bing) hybrid of streets and satellite tiles."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "OSM Tiles@Home"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Alternative, community-rendered OpenStreetMap"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "OSM Cycling Map"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "OpenStreetMap with highlighted bike lanes"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "OSM Overlay"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid ""
+"Semi-transparent hybrid overlay. Projected into \n"
+"    WSG84 for use on non spherical-mercator maps."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "Default OpenLayers WMS"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid "MetaCarta basemap of province and water boundaries"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers
+msgid ""
+"Layers are stored versions of javascript OpenLayers layer \n"
+"        objects. They point at a data source, like OpenStreetMap, "
+"Google Maps, \n"
+"        or Drupal itself, and sometimes define the zoom levels for "
+"which they apply."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets
+msgid ""
+"Presets are combinations of the layers, styles, and behaviors \n"
+"        which constitute maps. They also contain basic configuration "
+"like the \n"
+"        width and centerpoint of the map - everything except for a "
+"mechanism \n"
+"        to put a map on a page. For that, use the Views OpenLayers Map "
+"style."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "General information"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"This is the machine readable identifier.\n"
+"      This should be all lowercase characters, numbers, or underscores "
+"(_)."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"This is the descriptive title of the preset and will show up most "
+"often in the interface."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Preset Description"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"This is full description of the preset and is mostly used on the "
+"preset overview list page."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"The map's width. \"auto\" will make the map fill\n"
+"      the space it is given; otherwise, enter a value in pixels, like "
+"400px."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"The map's height. Enter a value in pixels,\n"
+"      like 400px."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Image Path"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"The path to a directory for OpenLayers to look for UI\n"
+"      graphics. If blank, default graphics are used.  Use either a "
+"Drupal path\n"
+"      (and the appropriate base path will be prepended), an absolute "
+"path\n"
+"      (such as !ab_example), or a full URL."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "CSS Path"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Path for where OpenLayers should look for its theme\n"
+"      CSS file. The default hosted OpenLayers URL is\n"
+"      http://openlayers.org/api/theme/default/style.css.  Use either a "
+"Drupal path\n"
+"      (and the appropriate base path will be prepended), an absolute "
+"path\n"
+"      (such as !ab_example), or a full URL."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Proxy Host"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"A proxy (typically on the same domain as this site)\n"
+"      which enables requests to cross-domain AJAX resources (including "
+"remote\n"
+"      KML).  Use either a Drupal path (and the appropriate base path "
+"will\n"
+"      be prepended), an absolute path (such as !ab_example), or a full "
+"URL."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Hide empty map"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Show views empty text or hide the map if there are \n"
+"    no map overlays with features. Otherwise an empty map is "
+"displayed."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Center & Bounds"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Where the map will center itself initially. Shift-drag on the map to "
+"set the Restricted Extent."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Initial Map View"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Centerpoint"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Coordinates that are the intial focus of the map"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Zoom Level"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Initial Zoom Level when the map intially displays"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Restrict Extent"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Setting the restricted extent of a map prevents users\n"
+"      from panning the map outside a specified area. This can be set\n"
+"      interactively by holding the shift key and dragging a box over "
+"the map\n"
+"      above. Setting the extent does not restrict how far users can "
+"zoom out,\n"
+"      so setting restricted zoom levels (via individual layer "
+"settings) is\n"
+"      recommended."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Restricted Extent"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Prevents users from panning outside of a specific bounding box"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Behaviors"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Configure interactive map behaviors."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Dependency not found:"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Select layer to apply popups to."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Select layer to apply tooltips to."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Initially activated"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Select to be in fullscreen by default."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Show layers in ascending order"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Higher layers shown toward the bottom"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Round corners"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"If true the Rico library is used for rounding the corners of the layer "
+"switcher div."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Round corners color"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"The color of the rounded corners, only applies if roundedCorner is "
+"true."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Enable Zoom Wheel"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Enable zooming via the mouse scroll wheel. This can \n"
+"          interfere with page scrolling."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Available Features"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Select what features are available to draw."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Number of features"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"The number of features that are allowed to be \n"
+"          drawn. Leave blank or at 0 for unlimited."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Element ID"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"The DOM element ID that will be passed the value of the features.  "
+"This will probably be a textfield or textarea."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Select layers to cluster."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Distance"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Pixel distance between features that should be considered a single "
+"cluster"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Threshold"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Optional threshold below which original features will be added to the "
+"layer instead of clusters"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Geocoder query"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Query submitted to the geocoder. You can use replacement patterns "
+"below."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Query replacement patterns"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Layers & Styles"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Layer settings.  The Layer options will change based on the projection "
+"chosen."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Projection"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "geographical projection"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Select the EPSG code of the !link_proj for your map.\n"
+"    The list next to each projection is the layers that support this "
+"projection."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Map Projection"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"The !link_proj of this map: all layers will either be requested or "
+"reprojected to this format."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Display Projection"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"All interaction with the map - drawing, panning, \n"
+"      centering, and more - occurs in the display projection. The vast "
+"majority \n"
+"      of maps use 4326 (latitude/longitude) for this value."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Default style for features in a vector."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Select style"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Style for features in a vector that are selected."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Temporary Style"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid ""
+"Default style for any temporary features in a vector.\n"
+"      This will also be used for rollovers for things like Tooltips."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Base layers"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Overlay layers"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "Activated"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/presets/add
+msgid "In Switcher"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles
+msgid ""
+"OpenLayer styles are stored versions of \n"
+"        <a href=\"@ols\">javascript StyleMap objects</a>, but are much "
+"easier to \n"
+"        configure through an interface. Styles will typically define "
+"the icon, \n"
+"        fill color, border, and radius of points or polygons, so they "
+"are used \n"
+"        on overlays more often than base layers, which are not "
+"affected by vector \n"
+"        styles."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "The URL of an icon for points in a layer."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"The radius of a vector point or the size of\n"
+"        an icon. Note that, when using icons, this value should be "
+"half the\n"
+"        width of the icon image."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"This is the color used for \n"
+"        filling in Polygons. It is also used in the center of marks "
+"for \n"
+"        points: the interior color of circles or other shapes. It is "
+"\n"
+"        not used if an externalGraphic is applied to a point.  This "
+"should be\n"
+"        a hexadecimal value like #FFFFFF."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"This is color of the line on features. On \n"
+"        polygons and point marks, it is used as an outline to the "
+"feature. \n"
+"        On lines, this is the representation of the feature.  This "
+"should be\n"
+"        a hexadecimal value like #FFFFFF."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"This is width of the line on features. On \n"
+"        polygons and point marks, it is used as an outline to \n"
+"        the feature. On lines, this is the representation of the \n"
+"        feature.  This is a value in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"This is the opacity used for filling in Polygons. \n"
+"        It is also used in the center of marks for points: the "
+"interior \n"
+"        color of circles or other shapes. It is not used if an \n"
+"        externalGraphic is applied to a point.  This should be a "
+"value\n"
+"        between 0 and 1."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"This is opacity of the line on features. \n"
+"        On polygons and point marks, it is used as an outline to the "
+"\n"
+"        feature. On lines, this is the representation of the "
+"feature.\n"
+"        This should be a value between 0 and 1."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Options are butt, round, square. This property \n"
+"        is similar to the SVG stroke-linecap property. It determines "
+"\n"
+"        what the end of lines should look like. See the SVG link for "
+"\n"
+"        image examples."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Butt"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Round"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Square"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Options are dot, dash, dashdot, longdash, longdashdot, solid."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Dot"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Dash"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Dash-dot"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Long-dash"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Long-dash-dot"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Solid"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Cursor used when mouse is over the feature. Default \n"
+"        is an empty string, which inherits from parent elements.  "
+"See\n"
+"        <a href=\"!url\">CSS cursor styles</a>."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"This properties define the width of an externalGraphic. \n"
+"        This is an alternative to the pointRadius symbolizer property "
+"\n"
+"        to be used when your graphic has different sizes in the X and "
+"\n"
+"        Y direction.  This should be in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"This properties define the height of an externalGraphic. \n"
+"        This is an alternative to the pointRadius symbolizer property "
+"\n"
+"        to be used when your graphic has different sizes in the X and "
+"\n"
+"        Y direction.  This should be in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Opacity of an external graphic.  This should be a \n"
+"        value between 0 and 1. Grahics that are already "
+"semitransparent,\n"
+"        like alpha PNGs, should have this set to 1, or rendering "
+"problems in \n"
+"        Internet Explorer will ensue."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Where the X value of the \"center\" of an \n"
+"      externalGraphic should be.  This should be in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Where the Y value of the \"center\" of an \n"
+"      externalGraphic should be.  This should be in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Name of a type of symbol to be used  for a point mark. \n"
+"      You can use the names \"star\", \"cross\", \"x\", \"square\", "
+"\"triangle\", \n"
+"      and \"circle\". See <a href=\"!url\">Graphic Name Examples</a>."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Z index of the feature. This determines drawing order: \n"
+"         elements with higher Z indexes are drawn on top of those "
+"with\n"
+"         lower Z indexes."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"The URL of an icon to display in addition to the main \n"
+"        feature. Use backgroundGraphicZIndex and graphicZIndex to set "
+"its \n"
+"        drawing order relative to main feature."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Width of a backgroundGraphic, in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Height of a backgroundGraphic, in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Where the X value of the \"center\" of a \n"
+"        backgroundGraphic should be.  This should be in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Where the Y value of the \"center\" of a \n"
+"        backgroundGraphic should be.  This should be in pixels."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Z index of backgroundGraphic. This determines drawing \n"
+"         order: elements with higher Z indexes are drawn on top of "
+"those \n"
+"         with lower Z indexes."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"The rotation angle in degrees clockwise for \n"
+"        a point symbolizer."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Can be set to \"none\" to hide features \n"
+"        from rendering."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "None (off)"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "A label to show for features. Typically used with ${attribute} syntax."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Label alignment."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Center, middle"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Center, top"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Center, bottom"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Left, middle"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Left, top"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Left, bottom"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Right, middle"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Right, top"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Right, bottom"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Label X offset. Positive numbers move label right."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Label Y offset. Positive numbers move label up."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Label font color."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Label font size."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Label font family."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Label font weight."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Basic Information"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"The basic information for the style, used to refer to and describe the "
+"style."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid "Style Properties and Plugins"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"Style properties are properties as \n"
+"      defined by the OpenLayers library.  Plugins are dynamically\n"
+"      process the layer at render time; plugins may override the\n"
+"      values that you have set for style properies."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/styles/add
+msgid ""
+"The name, title, and description you give a style is for Drupal's \n"
+"        interal storage. The rest of the properties are documented on "
+"openlayers.org"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "Google API Key"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "<a href=\"@google\">Obtain an API key from Google for your domain</a>"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid ""
+"This will set the language used\n"
+"          for the interface (like attribution) as well as tiles,\n"
+"          as supported by Google.  By default, Google Map API will\n"
+"          determine the language automatically.  Only use this is "
+"you\n"
+"          want to force a specific language.  Please see\n"
+"          <a href=\"!url\">this list of languages</a>."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "Yahoo API Key"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "VirtualEarth API Key"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "<a href=\"@microsoft\">Get a Virtual Earth API Key</a>"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "CloudMade API Key"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "<a href=\"@cloudmade\">Get a CloudMade account and API Key</a>"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid "CloudMade Javascript Location"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid ""
+"The Drupal path or full URL to the location of the <a "
+"href=\"@url\">Cloudmade OpenLayers Javascript library</a>"
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/settings
+msgid ""
+"Commercial layer providers like Google will require API keys \n"
+"        to ensure that users are't abusing the service and to enforce "
+"limits. Not all \n"
+"        of these keys are required, of course, only those that are "
+"used on a site."
+msgstr ""
+
+#: /ct-rene/admin/build/openlayers/layers/add
+msgid "Select a layer type to create a new layer."
+msgstr ""
+
+#: /ct-rene/cmtls/login
+msgid "Have you forgotten your password?"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time/formats
+msgid "Add format type"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time/formats
+msgid "The human-readable name for this format type."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time/formats
+msgid ""
+"The machine-readable name of this format type. <br>This name must "
+"contain only lowercase letters, numbers, and underscores and must be "
+"unique."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time/formats/custom
+msgid "No custom formats configured. Please <a href=\"@link\">add</a> some."
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time/formats/add
+msgid "Format string"
+msgstr ""
+
+#: /ct-rene/admin/settings/date-time/formats/add
+msgid ""
+"A user-defined date format. See the <a href=\"@url\">PHP manual</a> "
+"for available options. This format is currently set to display as "
+"<span>%date</span>."
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/87/edit
+msgid "Event lasts all dsay"
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/87/edit
+msgid "Event lasts allasdfasdf dsay"
+msgstr ""
+
+#: /ct-rene/user/password
+msgid "Username or e-mail address"
+msgstr ""
+
+#: /ct-rene/user/password
+msgid "E-mail new password"
+msgstr ""
+
+#: /ct-rene/cmtls/register
+msgid "You must enter an e-mail address."
+msgstr ""
+
+#: /ct-rene/cmtls/register
+msgid "You must enter a username."
+msgstr ""
+
+#: /ct-rene/cmtls/register
+msgid "The e-mail address %mail is not valid."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "edit %title"
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Field settings"
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"The category the new field should be part of. Categories are used to "
+"group fields logically. An example category is \"Personal "
+"information\"."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"The title of the new field. The title will be shown to the user. An "
+"example title is \"Favorite color\"."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Form name"
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"The name of the field. The form name is not shown to the user but used "
+"internally in the HTML code and URLs.\n"
+"Unless you know what you are doing, it is highly recommended that you "
+"prefix the form name with <code>profile_</code> to avoid name clashes "
+"with other fields. Spaces or any other special characters except dash "
+"(-) and underscore (_) are not allowed. An example name is "
+"\"profile_favorite_color\" or perhaps just \"profile_color\"."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Explanation"
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"An optional explanation to go with the new field. The explanation will "
+"be shown to the user."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"Hidden profile field, only accessible by administrators, modules and "
+"themes."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Private field, content only available to privileged users."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"Public field, content shown on profile page but not used on member "
+"list pages."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Public field, content shown on profile page and on member list pages."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"To enable browsing this field by value, enter a title for the "
+"resulting page. The word <code>%value</code> will be substituted with "
+"the corresponding value. An example page title is \"People whose "
+"favorite color is %value\". This is only applicable for a public "
+"field."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"The weights define the order in which the form fields are shown. "
+"Lighter fields \"float up\" towards the top of the category."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Form will auto-complete while user is typing."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid ""
+"For security, auto-complete will be disabled if the user does not have "
+"access to user profiles."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "The user must enter a value."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Visible in user registration form."
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "Save field"
+msgstr ""
+
+#: /ct-rene/admin/user/profile/edit/5
+msgid "The field has been updated."
+msgstr ""
+
+#: /ct-rene/cmtls/register
+msgid "Account details for !username at !site"
+msgstr ""
+
+#: /ct-rene/cmtls/register
+msgid ""
+"!username,\n"
+"\n"
+"Thank you for registering at !site. You may now log in to !login_uri "
+"using the following username and password:\n"
+"\n"
+"username: !username\n"
+"password: !password\n"
+"\n"
+"You may also log in by clicking on this link or copying and pasting it "
+"in your browser:\n"
+"\n"
+"!login_url\n"
+"\n"
+"This is a one-time login, so it can be used only once.\n"
+"\n"
+"After logging in, you will be redirected to !edit_uri so you can "
+"change your password.\n"
+"\n"
+"\n"
+"--  !site team"
+msgstr ""
+
+#: /ct-rene/cmtls/register
+msgid ""
+"Your password and further instructions have been sent to your e-mail "
+"address."
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/add
+msgid "Send instant notifications on new nodes"
+msgstr ""
+
+#: /ct-rene/cmtls/1/24/event/add
+msgid "Send instant notifications on new comments"
+msgstr ""
+
+#: /ct-rene/admin/build/menu
+msgid "List menus"
+msgstr ""
+
+#: /ct-rene/admin/build/menu
+msgid "Add menu"
+msgstr ""
+
+#: /ct-rene/admin/build/menu
+msgid ""
+"Menus are a collection of links (menu items) used to navigate a "
+"website. The menus currently available on your site are displayed "
+"below. Select a menu from this list to manage its menu items."
+msgstr ""
+
+#: /ct-rene/admin/build/menu
+msgid ""
+"The menu module provides an interface to control and customize "
+"Drupal's powerful menu system. Menus are a hierarchical collection of "
+"links, or menu items, used to navigate a website, and are positioned "
+"and displayed using Drupal's flexible block system. By default, three "
+"menus are created during installation: <em>Navigation</em>, "
+"<em>Primary links</em>, and <em>Secondary links</em>. The "
+"<em>Navigation</em> menu contains most links necessary for working "
+"with and navigating your site, and is often displayed in either the "
+"left or right sidebar. Most Drupal themes also provide support for "
+"<em>Primary links</em> and <em>Secondary links</em>, by displaying "
+"them in either the header or footer of each page. By default, "
+"<em>Primary links</em> and <em>Secondary links</em> contain no menu "
+"items but may be configured to contain custom menu items specific to "
+"your site."
+msgstr ""
+
+#: /ct-rene/admin/build/menu
+msgid ""
+"The <a href=\"@menu\">menus page</a> displays all menus currently "
+"available on your site. Select a menu from this list to add or edit a "
+"menu item, or to rearrange items within the menu. Create new menus "
+"using the <a href=\"@add-menu\">add menu page</a> (the block "
+"containing a new menu must also be enabled on the <a "
+"href=\"@blocks\">blocks administration page</a>)."
+msgstr ""
+
+#: /ct-rene/admin/build/menu
+msgid ""
+"For more information, see the online handbook entry for <a "
+"href=\"@menu\">Menu module</a>."
+msgstr ""
+
+#: /ct-rene/cmtls/1/4
+msgid "article"
+msgstr ""
+
+#: /ct-rene/cmtls/1/member/1
+msgid "Notification settings"
+msgstr ""
+
+#: /ct-rene/cmtls/1/member/1
+msgid "Send notifications about new comments in my discussions"
+msgstr ""
+
+#: /ct-rene/cmtls/1/member/1
+msgid "Send me notifications from:"
+msgstr ""
+
+#: /ct-rene/cmtls/1/member/1
+msgid "New replys to my posts or comments, instantly"
+msgstr ""
+
 #:  sites/all/modules/modalframe/js/parent.js; sites/all/modules/modalframe/js/parent.js
 msgid "Close"
 msgstr "Sulge"
@@ -14537,7 +17731,7 @@ msgstr "Nimetus"
 msgid "Description"
 msgstr "Kirjeldus"
 
-#:  modules/cmtls_app/cmtls_app.module:17,  modules/cmtls_forum/cmtls_forum.module:17;41,  modules/cmtls_group/cmtls_group.module:17
+#:  modules/cmtls_app/cmtls_app.module:17,  modules/cmtls_forum/cmtls_forum.module:17; 41,  modules/cmtls_group/cmtls_group.module:17; sites/all/modules/features/features.js
 msgid "Edit"
 msgstr "Muuda"
 
@@ -14799,7 +17993,7 @@ msgstr "Lae üles"
 
 #:  modules/cmtls_gallery/cmtls_gallery.features.content.inc:452
 msgid "Use as album's cover image"
-msgstr "Kasuta kaanepildina"
+msgstr "Kasuta albumi kaanepildina"
 
 #:  modules/cmtls_gallery/cmtls_gallery.features.inc:57
 msgid "Community Tools: Album"
@@ -15049,11 +18243,11 @@ msgstr "Community Tools: Grupi liige"
 msgid "Members"
 msgstr "Liikmed"
 
-#:  modules/cmtls_auth/cmtls_auth.module:150,  modules/cmtls_upload/js/cmtls_upload.js:0
+#:  modules/cmtls_auth/cmtls_auth.module:150,  modules/cmtls_upload/js/cmtls_upload.js:0; sites/all/modules/cmtls/modules/cmtls_upload/js/cmtls_upload.js
 msgid "Continue"
 msgstr "Jätka"
 
-#:  cmtls.module:263,  modules/cmtls_comment/cmtls_comment.module:57,  modules/cmtls_group/cmtls_group.module:257;272,  modules/cmtls_member/cmtls_member.module:236;251;268;286
+#:  cmtls.module:263,  modules/cmtls_comment/cmtls_comment.module:57,  modules/cmtls_group/cmtls_group.module:257; 272,  modules/cmtls_member/cmtls_member.module:236; 251; 268; 286; sites/all/modules/wysiwyg_imageupload/plugins/imgupload/imgupload.js
 msgid "Cancel"
 msgstr "Katkesta"
 
@@ -15171,19 +18365,19 @@ msgstr "Ülemise taseme node'i ID"
 msgid "Session id of the upload"
 msgstr "Sessiooni ID"
 
-#:  modules/cmtls_upload/js/cmtls_upload.js:0
+#:  modules/cmtls_upload/js/cmtls_upload.js:0; sites/all/modules/cmtls/modules/cmtls_upload/js/cmtls_upload.js
 msgid "%count files in queue. %totalsize %unit in total"
 msgstr "Järjekorras on %count faili. Kokku %totalsize %unit"
 
-#:  modules/cmtls_upload/js/cmtls_upload.js:0
+#:  modules/cmtls_upload/js/cmtls_upload.js:0; sites/all/modules/cmtls/modules/cmtls_upload/js/cmtls_upload.js
 msgid "Add files"
 msgstr "Lisa faile"
 
-#:  modules/cmtls_upload/js/cmtls_upload.js:0
+#:  modules/cmtls_upload/js/cmtls_upload.js:0; sites/all/modules/cmtls/modules/cmtls_upload/js/cmtls_upload.js
 msgid "Start upload"
 msgstr "Lae üles"
 
-#:  modules/cmtls_upload/js/cmtls_upload.js:0
+#:  modules/cmtls_upload/js/cmtls_upload.js:0; sites/all/modules/cmtls/modules/cmtls_upload/js/cmtls_upload.js
 msgid "Cancel all uploads"
 msgstr "Katkesta üleslaadimised"
 
@@ -15210,6 +18404,10 @@ msgstr "Privaatne grupp"
 #: /ct-rene/
 msgid "Fixed entry"
 msgstr "Lahendatud"
+
+#: /ct-rene/
+msgid "Filter"
+msgstr "Filter"
 
 #:  og.module:1010
 msgid "Moderated"
@@ -15515,7 +18713,7 @@ msgstr "@count dokumenti"
 msgid "1 photo"
 msgstr "1 foto"
 
-#:  modules/cmtls_upload/js/cmtls_upload.js:0
+#:  modules/cmtls_upload/js/cmtls_upload.js:0; sites/all/modules/cmtls/modules/cmtls_upload/js/cmtls_upload.js
 msgid ""
 "Error uploading file <strong>%file</strong>. Seems that the uploader "
 "doesn't have permissions to access your server (error code 401: "
@@ -15524,7 +18722,7 @@ msgstr ""
 "Faili <strong>%file</strong> üleslaadimisel tekkis viga. Tundub, et "
 "failide kirjutamiseks puuduvad õigused (vea kood 401: Unauthorized)"
 
-#:  modules/cmtls_upload/js/cmtls_upload.js:0
+#:  modules/cmtls_upload/js/cmtls_upload.js:0; sites/all/modules/cmtls/modules/cmtls_upload/js/cmtls_upload.js
 msgid ""
 "Error uploading file <strong>%file</strong>. Seems that the uploader "
 "doesn't have permissions to access your server (error code 403: "
@@ -15568,6 +18766,14 @@ msgstr "@field_name Lõpp"
 #:  /ct-rene/cmtls/1/24/event/add
 msgid "Format: @date"
 msgstr "Vorming: @date"
+
+#: /ct-rene/comment/reply/10
+msgid "Tuesday"
+msgstr "Teisipäev"
+
+#: /ct-rene/comment/reply/10
+msgid "Friday"
+msgstr "Reede"
 
 #:  /ct-rene/comment/reply/10
 msgid "1 week"
@@ -15638,11 +18844,15 @@ msgstr "Privaatse grupi sisu näevad ainult selle liikmed."
 
 #:  /ct-rene/cmtls/add
 msgid "Maximum Filesize: %size"
-msgstr "Suurim lubautud faili suurus: %size"
+msgstr "Suurim lubatud faili suurus: %size"
 
 #:  /ct-rene/cmtls/add
 msgid "Allowed Extensions: %ext"
 msgstr "Lubatud faililaiendid: %ext"
+
+#: /ct-rene/comment/reply/10
+msgid "Wednesday"
+msgstr "Neljapäev"
 
 #:  page.tpl.php:25
 msgid "Map"
@@ -15668,7 +18878,7 @@ msgstr "!name täitmine on kohustuslik."
 msgid "Loading ..."
 msgstr "Laadin ..."
 
-#:  modules/cmtls_comment/js/app.js:0
+#:  modules/cmtls_comment/js/app.js:0; sites/all/modules/cmtls/modules/cmtls_comment/js/app.js
 msgid "Saving ..."
 msgstr "Salvestan ..."
 
@@ -15752,6 +18962,10 @@ msgstr ""
 msgid "Share"
 msgstr "Jaga"
 
+#: /ct-rene/comment/reply/10
+msgid "Thursday"
+msgstr "Kolmapäev"
+
 #:  modules/cmtls_article/theme/views-view-fields--cmtls-articles--default.tpl.php:45,  modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:33
 msgid "Show on map"
 msgstr "Näita kaardil"
@@ -15815,6 +19029,10 @@ msgstr "Kasutaja Id"
 msgid "Event lasts all day"
 msgstr "Kestab kogu päeva"
 
+#: /ct-rene/cmtls/1/24
+msgid "Tags"
+msgstr "Võtmesõnad"
+
 #:  modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:137
 msgid "attending"
 msgstr "osalen"
@@ -15830,6 +19048,10 @@ msgid ""
 msgstr ""
 "Komadega eraldatud nimekiri võtmesõnadest. Näiteks: sport, avalikud "
 "teenused, \"noad, kahvlid, lusikad\""
+
+#: /ct-rene/cmtls/1/24/event/add
+msgid "Add another item"
+msgstr "Lisa veel üks"
 
 #: /ct-rene/admin?destination=admin
 msgid ""
@@ -15879,6 +19101,10 @@ msgstr "Idee"
 msgid "+ Add problem"
 msgstr "+ Lisa probleem"
 
+#: /ct-rene/cmtls/1/41/problem/add
+msgid "- None selected -"
+msgstr "- Palun vali -"
+
 #: /ct-rene/cmtls/1/41/delete
 msgid "Delete children"
 msgstr "Kustuta sisalduvad elemendid."
@@ -15888,6 +19114,10 @@ msgid "This node has @count child. Check this box to delete it as well."
 msgstr ""
 "Leiti @count sisalduvat elementi. Märgista märkeruut ka nende "
 "kustutamiseks."
+
+#: /ct-rene/comment/reply/35
+msgid "Saturday"
+msgstr "Laupäev"
 
 #:  modules/cmtls_article/theme/cmtls-articles-content.tpl.php:39,  modules/cmtls_filter/theme/cmtls-filter.tpl.php:31
 msgid "or"
@@ -15918,6 +19148,14 @@ msgstr "probleem"
 #:  modules/cmtls_problem/cmtls_problem.module:119
 msgid "Delete problem"
 msgstr "Probleemi kustutamine"
+
+#: /ct-rene/openlayers/geocoder/coordinates
+msgid "Sunday"
+msgstr "Laupäev"
+
+#: /ct-rene/openlayers/geocoder/coordinates
+msgid "Monday"
+msgstr "Esmaspäev"
 
 #:  modules/cmtls_filter/cmtls_filter.module:89
 msgid "Date from"
@@ -16041,6 +19279,10 @@ msgstr ""
 "Hetkel on kasutusel Facebooki pilt. Kui sa laed siin üles mõne muu "
 "pildi, ei kasutata enam edaspidi Facebooki oma."
 
+#: /ct-rene/admin/build/views
+msgid "Sort by"
+msgstr "Sorteeri"
+
 #: /ct-rene/cmtls/1/15/album/16
 msgid "@count photos"
 msgstr "@count pilti"
@@ -16048,6 +19290,10 @@ msgstr "@count pilti"
 #: /ct-rene/cmtls/1/member/1/edit
 msgid "Delete picture"
 msgstr "Kustuta pilt"
+
+#: /ct-rene/cmtls/1/member/1/edit
+msgid "Check this box to delete your current picture."
+msgstr "Oma praeguse pildi kustutamiseks märgista kastike."
 
 #:  modules/cmtls_problem/cmtls_problem.module:254
 msgid "This problem has not been fixed"
@@ -16059,7 +19305,7 @@ msgstr "Probleem on lahendatud"
 
 #: /ct-rene/cmtls/1/43
 msgid "New report"
-msgstr "Uus probleem"
+msgstr "Lahendamata"
 
 #: /ct-rene/cmtls/login/facebook
 msgid "Username field is required"
@@ -16085,7 +19331,165 @@ msgstr "@count osalejat"
 msgid ""
 "Please <a href=\"@href\" class=\"@class\">log in</a> to submit your "
 "stance."
-msgstr ""
-"Seisukoha avaldamiseks <a href=\"@href\" class=\"@class\">logi palun "
-"sisse</a>. "
+msgstr "Vastamiseks <a href=\"@href\" class=\"@class\">logi palun sisse</a>. "
+
+#: /ct-rene/
+msgid "Latest posts"
+msgstr "Viimased postitused"
+
+#: /ct-rene/
+msgid "Most commented"
+msgstr "Enim kommenteeritud"
+
+#: /ct-rene/
+msgid "Time added"
+msgstr "Loomise aeg"
+
+#: /ct-rene/cmtls/1/2/article/50
+msgid "Created between"
+msgstr "Loodud vahemikus"
+
+#: /ct-rene/cmtls/1/2/article/50
+msgid "Keyword or phrase"
+msgstr "Võtmesõna või fraas"
+
+#: /ct-rene/cmtls/1/43
+msgid "Read more"
+msgstr "Loe lähemalt"
+
+#: /ct-rene/cmtls/1/43
+msgid "Repoted"
+msgstr "Teavitatud"
+
+#: /ct-rene/cmtls/1/43/problem/61
+msgid "reported"
+msgstr "teatas"
+
+#: /ct-rene/cmtls/1/24
+msgid "Whole day"
+msgstr "Kogu päev"
+
+#: /ct-rene/cmtls/1/24/event/67
+msgid "Next 7 days"
+msgstr "Järgmised 7 päeva"
+
+#: /ct-rene/cmtls/1/24/event/67
+msgid "Next 30 days"
+msgstr "Järgmised 30 päeva"
+
+#: /ct-rene/cmtls/1/24/event/67
+msgid "Not fixed"
+msgstr "Lahendamata"
+
+#: /ct-rene/cmtls/1/4/idea/46
+msgid "View whole list"
+msgstr "Vaata kogu nimekirja"
+
+#: /ct-rene/cmtls/1/4/idea/add
+msgid "Geolocation"
+msgstr "Geopunkt"
+
+#: /ct-rene/cmtls/1/24
+msgid "Add event"
+msgstr "Lisa sündmus"
+
+#: /ct-rene/cmtls/1/43
+msgid "Add problem"
+msgstr "Lisa probleem"
+
+#: /ct-rene/cmtls/1/11/forum/12
+msgid "Start a thread"
+msgstr "Algata lõim"
+
+#: /ct-rene/cmtls/1/15
+msgid "Add folder"
+msgstr "Lisa kaust"
+
+#: sites/all/modules/cmtls/modules/cmtls_map/js/cmtls_map.js
+msgid "Move map"
+msgstr "Liiguta kaarti"
+
+#: /ct-rene/admin/build/views
+msgid "Places"
+msgstr "Kohad"
+
+#: /ct-rene/cmtls/login
+msgid "Forgot your password?"
+msgstr "Unustasid parooli?"
+
+#: /ct-rene/cmtls/1/43/problem/add
+msgid "Problem category"
+msgstr "Probleemi kategooria"
+
+#: /ct-rene/cmtls/1/24
+msgid "Today"
+msgstr "Täna"
+
+#: /ct-rene/cmtls/1/24
+msgid "Tomorrow"
+msgstr "Homme"
+
+#: /ct-rene/cmtls/1/24/event/add
+msgid "Event keywords"
+msgstr "Sündmuse võtmesõnad"
+
+#: /ct-rene/cmtls/1/24/event/add
+msgid "New"
+msgstr "Uus"
+
+#: /ct-rene/cmtls/1/4
+msgid "topic"
+msgstr "teema"
+
+#: /ct-rene/cmtls/1/4
+msgid "folder"
+msgstr "kaust"
+
+#: /ct-rene/cmtls/1/4
+msgid "place"
+msgstr "koht"
+
+#: /ct-rene/cmtls/1/15/album/16/add
+msgid "Upload files"
+msgstr "Lae üles"
+
+#: /ct-rene/cmtls/1/2/article/add
+msgid "post"
+msgstr "postitus"
+
+#: /ct-rene/cmtls/1/11/forum/12/add
+msgid "thread"
+msgstr "lõim"
+
+#: /ct-rene/cmtls/add
+msgid "group"
+msgstr "grupp"
+
+#: sites/all/modules/cmtls/modules/cmtls_map/js/cmtls_map.js
+msgid "Add point"
+msgstr "Lisa punkt"
+
+#: /ct-rene/cmtls/1/member/1
+msgid "Instantly"
+msgstr "Kohe"
+
+#: /ct-rene/cmtls/1/member/1
+msgid "Daily"
+msgstr "Kord päevas"
+
+#: /ct-rene/cmtls/1/member/1
+msgid "Notifications"
+msgstr "Teavitused"
+
+#: /ct-rene/cmtls/1/member/1
+msgid "Send me e-mail notifications on"
+msgstr "Teavita mind e-kirja teel"
+
+#: /ct-rene/cmtls/1/member/1
+msgid "New posts in my groups"
+msgstr "Kui tekib uut sisu minu gruppides"
+
+#: /ct-rene/cmtls/1/member/1
+msgid "New replies to my posts or comments, instantly"
+msgstr "Kui vastatakse minu postitustele või kommentaaridele, koheselt\r\n"
 

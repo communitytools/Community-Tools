@@ -34,7 +34,7 @@ $current_app = _cmtls_app_get_current($current_group);
 
 	<div class="node-head">
 
-		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php print $fields['title']->raw; ?></h1>
+		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php check_plain(print $fields['title']->raw); ?></h1>
 
 		<div class="meta-author">
 			<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 16, TRUE); ?>
@@ -62,7 +62,7 @@ $current_app = _cmtls_app_get_current($current_group);
 		<?php endif; ?>
 		</div> <!-- meta-geo -->
 
-		<div class="meta-address"><?php print $fields['field_cmtls_address_value']->raw; ?></div>
+		<div class="meta-address"><?php print check_plain($fields['field_cmtls_address_value']->raw); ?></div>
 
 	</div> <!-- node-head -->
 
@@ -74,7 +74,7 @@ $current_app = _cmtls_app_get_current($current_group);
 			<?php foreach ((array)$node->field_cmtls_files as $file): ?>
 				<?php if (is_array($file)): ?>
 					<div class="meta-file">
-						<a href="<?php print url($file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
+						<a href="<?php print url($file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
 							<?php print $file['imagecache_icon']; ?>
 						</a>
 					</div>
@@ -111,7 +111,7 @@ $current_app = _cmtls_app_get_current($current_group);
 
 	<div class="text-node-list-item">
 
-		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><a href="<?php print base_path().cmtls_problem_path($node); ?>"><?php print $fields['title']->raw; ?></a></h1>
+		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php print l($fields['title']->raw, cmtls_problem_path($node, $cmtls['current_group'])); ?></h1>
 
 		<?php if (is_array($node->taxonomy)): ?>
 			<?php if (count($node->taxonomy) > 0): ?>

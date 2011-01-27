@@ -4,7 +4,7 @@ include_once('cmtls_member.features.inc');
 
 /**
  * Implements hook_init()
- * 
+ *
  * Adds context menu styles and scripts
  *
  */
@@ -36,7 +36,7 @@ function cmtls_member_cmtls_app()
 function cmtls_member_menu()
 {
 	$items = array();
-	
+
 	$items['cmtls/%node/member/%'] = array(
 		'title' => 'Member',
 		'page callback' => 'cmtls_member_page',
@@ -45,7 +45,7 @@ function cmtls_member_menu()
 		'access arguments' => array('view', 1),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/members'] = array(
 		'title' => 'Member',
 		'page callback' => 'cmtls_members_page',
@@ -54,7 +54,7 @@ function cmtls_member_menu()
 		'access arguments' => array('view', 1),
 		'type' => MENU_CALLBACK,
 	);
-	
+
 	$items['cmtls/%node/member/%user/edit'] = array(
 		'title' => 'Edit',
 		'page callback' => 'drupal_get_form',
@@ -65,7 +65,7 @@ function cmtls_member_menu()
 		'file' => 'user.pages.inc',
 		'file path' => drupal_get_path('module', 'user'),
 	);
-	
+
 	$items['cmtls/%node/member/%user/delete'] = array(
 		'title' => 'Delete',
 		'page callback' => 'drupal_get_form',
@@ -75,13 +75,6 @@ function cmtls_member_menu()
 		'type' => MENU_CALLBACK,
 		'file' => 'user.pages.inc',
 		'file path' => drupal_get_path('module', 'user'),
-	);
-	
-	$items['cmtls/login/redirect'] = array(
-		'title' => 'redirect',
-		'page callback' => 'cmtls_member_login_redirect',
-	    'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
 	);
 	
 	$items['cmtls/%node/member/%user/create_admin'] = array(
@@ -94,7 +87,7 @@ function cmtls_member_menu()
 		'file path' => drupal_get_path('module', 'og'),
 		'file' => 'og.pages.inc',
 	);
-	
+
 	$items['cmtls/%node/member/%user/remove_admin'] = array(
 		'title' => 'Create group administrator',
 		'type' => MENU_CALLBACK,
@@ -105,7 +98,7 @@ function cmtls_member_menu()
 		'file path' => drupal_get_path('module', 'og'),
 		'file' => 'og.pages.inc',
 	);
-	
+
 	return $items;
 }
 
@@ -125,7 +118,8 @@ function cmtls_member_user($op, &$edit, &$account, $category = NULL){
 			$main_group = _cmtls_group_get_main();
 
 			modalframe_close_dialog(array(
-				'redirect' => base_path().'cmtls/'.$main_group->nid.'/member/'.$account->uid,
+				'refresh' => TRUE,
+				//'redirect' => base_path().'cmtls/'.$main_group->nid.'/member/'.$account->uid,
 			));
 
 			break;
@@ -142,17 +136,17 @@ function cmtls_member_user($op, &$edit, &$account, $category = NULL){
 function cmtls_member_page($group, $uid)
 {
 	global $user;
-	
+
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
-	
+
 	// set map settings, currently there is no map for members pages
 	cmtls_map_set_config(array(
 		'cmtls_member' => array(
 			'default map view' => CMTLS_MAP_NONE,
 		),
 	));
-	
+
 	return views_embed_view('cmtls_member', 'default', $group->nid, $uid);
 }
 
@@ -166,17 +160,17 @@ function cmtls_member_page($group, $uid)
 function cmtls_members_page($group)
 {
 	global $user;
-	
+
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
-	
+
 	// set map settings, currently there is no map for members pages
 	cmtls_map_set_config(array(
 		'cmtls_member' => array(
 			'default map view' => CMTLS_MAP_NONE,
 		),
 	));
-	
+
 	return views_embed_view('cmtls_members', 'default', $group->nid);
 }
 
@@ -199,7 +193,7 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 		case 'user_profile_form':
 			// Send the Modal Frame javascript for child windows to the page.
 			modalframe_child_js();
-	
+
 			$weight = 1;
 			foreach($form['account'] as $key => $field)
 			{
@@ -210,7 +204,7 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 					$form[$key] = $field;
 				}
 			}
-			
+
 			foreach($form['picture'] as $key => $field)
 			{
 				if(strpos($key, '#') !== 0)
@@ -220,7 +214,7 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 					$form[$key] = $field;
 				}
 			}
-			
+
 			foreach($form['Community Tools: Member'] as $key => $field)
 			{
 				if(strpos($key, '#') !== 0)
@@ -230,27 +224,33 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 					$form[$key] = $field;
 				}
 			}
-	
+
 			// Lift the name element
 			$form['profile_cmtls_member_name']['#weight'] = 0;
 			// Sink the locale selection element
 			$form['locale']['#weight'] = 25;
-	
+
 			$form['Community Tools: Member'] = NULL;
 			$form['picture'] = NULL;
 			$form['account'] = NULL;
 			$form['theme_select'] = NULL;
 			$form['locale'] = NULL;
-	
+
+			$form['profile_cmtls_member_address']['#title'] = t('Address');
+			$form['profile_cmtls_member_phone']['#title'] = t('Phone');
+			$form['profile_cmtls_member_skype']['#title'] = t('Skype');
+			$form['profile_cmtls_member_description']['#title'] = t('Description');
+			$form['profile_cmtls_member_url']['#title'] = t('Homepage');
+
 			$form['#submit'][] = 'cmtls_member_form_submit';
-			
+
 			if($form['actions']['cancel'])
 			{
 				$form['actions']['cancel'] = array(
 					'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
 				);
 			}
-	
+
 			break;
 
 		/*
@@ -259,12 +259,12 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 		case 'user_confirm_delete':
 			// Send the Modal Frame javascript for child windows to the page.
 			modalframe_child_js();
-			
+
 			$form['#submit'][] = 'cmtls_member_delete_submit';
 			$form['actions']['cancel'] = array(
 				'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
 			);
-	
+
 			break;
 
 		/*
@@ -273,16 +273,16 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 		case 'og_create_admin_confirm':
 			// Send the Modal Frame javascript for child windows to the page.
 			modalframe_child_js();
-			
+
 			$form['#submit'][] = 'cmtls_member_create_admin_submit';
-			
+
 			if($form['actions']['cancel'])
 			{
 				$form['actions']['cancel'] = array(
 					'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
 				);
 			}
-	
+
 			break;
 
 		/*
@@ -291,16 +291,16 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 		case 'og_remove_admin_confirm':
 			// Send the Modal Frame javascript for child windows to the page.
 			modalframe_child_js();
-			
+
 			$form['#submit'][] = 'cmtls_member_remove_admin_submit';
-			
+
 			if($form['actions']['cancel'])
 			{
 				$form['actions']['cancel'] = array(
 					'#value' => '<a href="javascript:void(0);" onclick="Drupal.modalFrameChild.triggerParentEvent(\'childClose\', false); return false;">'.t('Cancel').'</a>',
 				);
 			}
-	
+
 			break;
 	}
 }
@@ -309,7 +309,7 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 function user_login_save_previous_login($form, &$form_state)
 {
 	$account = user_load(array('name' => $form_state['values']['name'], 'pass' => trim($form_state['values']['pass']), 'status' => 1));
-	
+
 	if($account->uid)
 	{
 		db_query("UPDATE {users} SET previous_login = %d WHERE uid = %d", $account->login, $account->uid);
@@ -344,9 +344,9 @@ function cmtls_member_remove_admin_submit($form, &$form_state)
 function cmtls_member_delete_submit($form, &$form_state)
 {
 	global $user;
-	
+
 	$main_group = _cmtls_group_get_main();
-	
+
 	modalframe_close_dialog(array(
 		'redirect' => base_path().'cmtls/'.$main_group->nid,
 	));
@@ -406,15 +406,15 @@ function cmtls_member_theme($existing)
 function _cmtls_member_name($fields, $link_to_member = FALSE, $shorten = FALSE)
 {
 	//printr($fields);
-	
+
 	if(!$fields['value']->raw)
 	{
 		$name = $fields['name']->raw;
 	}
-	else 
+	else
 	{
 		$name = $fields['value']->raw;
-		
+
 		if($shorten)
 		{
 			$name = explode(' ', $name);
@@ -423,20 +423,22 @@ function _cmtls_member_name($fields, $link_to_member = FALSE, $shorten = FALSE)
 				$last_fragment = array_pop($name);
 				$name = implode(' ', $name).' '.$last_fragment[0].'.';
 			}
-			else 
+			else
 			{
 				$name = $fields['value']->raw;
 			}
-			
+
 		}
 	}
 	
+	$name = check_plain($name);
+
 	if($link_to_member && $fields['uid']->raw)
 	{
 		$current_group = _cmtls_group_get_current();
 		$name = l($name, 'cmtls/'.$current_group->nid.'/member/'.$fields['uid']->raw);
 	}
-	
+
 	return $name;
 }
 
@@ -445,12 +447,6 @@ function _cmtls_member_name_by_uid($uid) {
 	profile_load_profile($user);
 
 	$name = $user->name;
-
-	/*$name = db_result(db_query("SELECT value FROM {profile_values} WHERE uid = %d LIMIT 1", $uid));
-
-	if (!$name) {
-		$name = db_result(db_query("SELECT name FROM {users} WHERE uid = %d", $uid));
-	}*/
 
 	$current_group = _cmtls_group_get_current();
 	$name = l($name, 'cmtls/' . $current_group->nid . '/member/' . $uid);
@@ -465,12 +461,12 @@ function _cmtls_member_avatar($uid = NULL, $width = 100, $link_to_member = FALSE
 		global $user;
 		$account = $user;
 	}
-	
+
 	if(is_numeric($uid))
 	{
 		$account = user_load($uid);
 	}
-	else 
+	else
 	{
 		$account = $uid;
 	}
@@ -479,16 +475,16 @@ function _cmtls_member_avatar($uid = NULL, $width = 100, $link_to_member = FALSE
 	{
 		$output = '<img class="avatar" src="'.imagecache_create_url('avatar_small',$account->fb_avatar).'" width="'.$width.'" height="'.$width.'" alt="">';
 	}
-	else 
+	else
 	{
 		$output = '<img class="avatar" src="'.($account->picture ? file_create_url($account->picture) : _cmtls_get_default_avatar_url()).'" width="'.$width.'" height="'.$width.'" alt="">';
 	}
-	
+
 	if ($link_to_member) {
 		$current_group = _cmtls_group_get_current();
 		$output = '<a class="avatar" href="'.base_path().'cmtls/'.$current_group->nid.'/member/'.$account->uid.'">'.$output.'</a>';
 	}
-	return $output;	
+	return $output;
 }
 
 function _cmtls_member_avatar_url($fields)
@@ -504,9 +500,9 @@ function _cmtls_member_avatar_url($fields)
 function _cmtls_get_default_avatar_url()
 {
 	$path = drupal_get_path('theme', 'cmtls_theme').'/images/default-avatar.jpg';
-	
+
 	$url = base_path().$path;
-	
+
 	return $url;
 }
 
@@ -522,9 +518,9 @@ function cmtls_member_preprocess(&$vars, $hook)
 	if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
 
 	global $user;
-	
+
 	profile_load_profile($user);
-	
+
 	$vars['user'] = $user;
 }
 
@@ -537,10 +533,10 @@ function cmtls_member_token_values($type, $object = NULL, $options = array())
 	switch ($type)
 	{
 		case 'user':
-			
+
 			$account = $object;
 			profile_load_profile($account);
-			
+
 			$values['cmtls-member-avatar-url'] = _cmtls_member_avatar($account, 16);
 			$values['cmtls-member-name'] = _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid)));
 			$values['cmtls-member-name-link'] = _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid)), TRUE);
@@ -551,7 +547,7 @@ function cmtls_member_token_values($type, $object = NULL, $options = array())
 			$values['cmtls-member-address'] = $account->profile_cmtls_member_address;
 			$values['cmtls-member-url'] = $account->profile_cmtls_member_url;
 			$values['cmtls-member-description'] = $account->profile_cmtls_member_description;
-		
+
 		break;
 	}
 	return $values;
@@ -563,7 +559,7 @@ function cmtls_member_token_values($type, $object = NULL, $options = array())
 function cmtls_member_token_list($type = 'all')
 {
 	$tokens = array();
-	
+
 	if ($type == 'user' || $type == 'all')
 	{
 		$tokens['user']['cmtls-member-avatar-url'] = 'cmtls picture';
@@ -577,24 +573,8 @@ function cmtls_member_token_list($type = 'all')
 		$tokens['user']['cmtls-member-url'] = 'cmtls homepage';
 		$tokens['user']['cmtls-member-description'] = 'cmtls description';
 	}
-		
-	return $tokens;
-}
 
-function cmtls_member_login_redirect()
-{
-	global $user;
-	
-	// Send the Modal Frame javascript for child windows to the page.
-	modalframe_child_js();
-	
-	$main_group = _cmtls_group_get_main();
-	
-	modalframe_close_dialog(array(
-		'redirect' => base_path().'cmtls/'.$main_group->nid.'/member/'.$user->uid,
-	));
-	
-	return '';
+	return $tokens;
 }
 
 /**
@@ -606,23 +586,146 @@ function cmtls_member_login_redirect()
 function cmtls_member_own_delete_permission($account)
 {
 	global $user;
-	
+
 	if($user->uid && $account->uid && ($user->uid == $account->uid || $user->uid == 1))
 	{
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
-/*
-function cmtls_member_cmtls_dashboard_widgets($group, $app)
+function cmtls_member_notification_settings_form(&$form_state, $account = NULL)
 {
-	return array(
-		'cmtls_member_latest_widget' => array(
-			'title' => 'Viimased liitujad',
-			'content' => 'muhhahahahahasds',
-		),
+	if(!$account) $account = $GLOBALS['user'];
+	if(!is_object($account))
+		if($account == $GLOBALS['user']->uid) $account = $GLOBALS['user'];
+		else $account = user_load($account);
+	
+	$form['uid'] = array(
+		'#type' => 'value',
+		'#value' => $account->uid,
 	);
+	
+	if(variable_get('cmtls_comment_notifications', '1'))
+	{
+		$form['comment_notifications'] = array(
+			'#type' => 'checkbox',
+			'#title' => t('New replies to my posts or comments, instantly'),
+			'#default_value' => (isset($account->cmtls['notifications']['comments']) ? $account->cmtls['notifications']['comments'] : 1),
+		);
+	}
+	
+	if(variable_get('cmtls_instant_notification', 1) || variable_get('cmtls_daily_digest', '1'))
+	//if(variable_get('cmtls_instant_notification', 0) || variable_get('cmtls_daily_digest', '1'))
+	{
+		$form['group_notifications'] = array(
+			'#type' => 'checkbox',
+			'#title' => t('New posts in my groups').':',
+			'#default_value' => (isset($account->cmtls['notifications']['group']) ? $account->cmtls['notifications']['group'] : 1),
+		);
+		
+		$form['groups'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Groups'),
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
+			'#tree' => TRUE,
+		);
+		
+		$groups = array();
+		
+		$sql = 'SELECT nid FROM {og_uid} WHERE uid = %d';
+		$groups_result = db_query($sql, $account->uid);
+		
+		while ($group = db_fetch_object($groups_result))
+		{
+			$group = node_load($group->nid);
+			
+			$form['groups'][$group->nid] = array(
+				'#type' => 'fieldset',
+				'#title' => $group->title,
+				'#collapsible' => TRUE,
+				'#collapsed' => TRUE,
+				'#tree' => TRUE,
+			);
+			
+			$app_options = array();
+				
+			$sql = 'SELECT nid FROM {nodehierarchy} WHERE parent = %d ORDER BY order_by';
+			$apps_result = db_query($sql, $group->nid);
+			
+			while ($app = db_fetch_object($apps_result))
+			{
+				$app = node_load($app->nid);
+				
+				$form['groups'][$group->nid][$app->nid] = array(
+					'#type' => 'fieldset',
+					'#title' => $app->title,
+					'#collapsible' => FALSE,
+					'#collapsed' => FALSE,
+					'#tree' => TRUE,
+				);
+				
+				if(variable_get('cmtls_instant_notification', 1))
+				//if(variable_get('cmtls_instant_notification', 0))
+				{
+					$form['groups'][$group->nid][$app->nid]['instant'] = array(
+						'#type' => 'checkbox',
+						'#title' => t('Instantly'),
+						'#default_value' => (isset($account->cmtls['notifications']['apps']['instant'][$app->nid]) ? $account->cmtls['notifications']['apps']['instant'][$app->nid] : 0),
+					);
+				}
+				
+				if(variable_get('cmtls_daily_digest', '1'))
+				{
+					$form['groups'][$group->nid][$app->nid]['daily'] = array(
+						'#type' => 'checkbox',
+						'#title' => t('Daily'),
+						'#default_value' => (isset($account->cmtls['notifications']['apps']['daily'][$app->nid]) ? $account->cmtls['notifications']['apps']['daily'][$app->nid] : 1),
+					);
+				}
+			}
+		}
+	}
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save'),
+	);
+
+	$form['#submit'] = array(
+		'cmtls_member_notification_settings_form_submit',
+	);
+	
+	return $form;
 }
-*/
+
+function cmtls_member_notification_settings_form_submit($form, &$form_state)
+{
+	$account = user_load($form_state['values']['uid']);
+	
+	$settings = array('notifications' =>
+		array(
+			'comments' => $form_state['values']['comment_notifications'],
+			'group' => $form_state['values']['group_notifications'],
+		)
+	);
+	
+	foreach ($form_state['values']['groups'] as $group_id => $app)
+	{
+		foreach ($app as $app_id => $app_settings)
+		{
+			$settings['notifications']['apps']['daily'][$app_id] = $app_settings['daily'];
+			$settings['notifications']['apps']['instant'][$app_id] = $app_settings['instant'];
+		}
+	}
+	
+	$account = user_save($account, array('cmtls' => $settings));
+	
+	/*
+	printr($account);
+	printr($settings);
+	printr($form_state); exit;
+	*/
+}

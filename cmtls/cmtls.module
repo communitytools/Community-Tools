@@ -22,6 +22,7 @@ function cmtls_init()
 	drupal_add_js(drupal_get_path('module', 'cmtls') .'/js/jquery.contextMenu.js');
 	drupal_add_js(drupal_get_path('module', 'cmtls') .'/js/app.js');
 	drupal_add_css(drupal_get_path('module', 'cmtls').'/css/cmtls.css');
+	drupal_add_js(drupal_get_path('module', 'cmtls') .'/js/jquery.livequery.min.js');
 	
 	// Send the Modal Frame javascript for parent windows to the page.
 	modalframe_parent_js();
@@ -572,17 +573,6 @@ function cmtls_block($op = 'list', $delta = 0, $edit = array())
 	}
 }
 
-function cmtls_fbconnect_config_alter(&$config)
-{
-	// the fbconnect and wysiwyg_imageupload do not get along so this removes fbconnect footer additions from edit and add forms
-	if(arg(0) == 'wysiwyg_imageupload' && arg(1) == 'upload')
-	{
-		unset($config['api_key']);
-		unset($config['secret_api_key']);
-	}
-	
-}
-
 function cmtls_cron()
 {
 	if(!variable_get('cmtls_daily_digest', '1')) return;
@@ -599,7 +589,7 @@ function cmtls_cron()
 	//$daily_interval = strtotime('today');
 	//$daily_interval = strtotime('2010-10-01');
 	
-	printr($daily_interval);
+	//printr($daily_interval);
 	
 	$mail_contents = array(
 		'new_groups' => array(),
@@ -612,14 +602,17 @@ function cmtls_cron()
 	
 	$users_sent = 0;
 	
-	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, (SELECT group_concat(sub_og_uid.nid) FROM {og_uid} AS sub_og_uid WHERE sub_og_uid.uid = users.uid) AS groups FROM {users} AS users LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2";
+	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, users.data, (SELECT group_concat(sub_og_uid.nid) FROM {og_uid} AS sub_og_uid WHERE sub_og_uid.uid = users.uid) AS groups FROM {users} AS users LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2";
 	$result = db_query($sql);
 	while ($user = db_fetch_object($result))
 	{
 		$user->groups = explode(',', $user->groups);
+		$user->data = unserialize($user->data);
 		
 		$users[$user->uid] = $user;
 	}
+	
+	//printr($users); exit;
 	
 	// get all the groups
 	$groups = array();
@@ -706,7 +699,7 @@ function cmtls_cron()
 	{
 		$site_name = variable_get('site_name', 'CT');
 		
-		foreach($users as $user_id => &$user)
+		foreach($users as $user_id => &$user) if(!isset($user->data['cmtls']['notifications']['group']) || $user->data['cmtls']['notifications']['group'])
 		{
 			// if any users groups has new content
 			$user_new_content_group_ids = array_intersect($user->groups, $new_content_group_ids);
@@ -715,6 +708,9 @@ function cmtls_cron()
 			{
 				$body = '';
 				
+				$content_body = '';
+				$comments_body = '';
+					
 				foreach ($user_new_content_group_ids as &$group_id)
 				{
 					$user_new_content_app_ids = array_intersect(array_keys($groups[$group_id]->apps), $new_content_app_ids);
@@ -722,31 +718,36 @@ function cmtls_cron()
 					$i = 0;
 					foreach ($user_new_content_app_ids as &$app_id)
 					{
-						if(!empty($mail_contents['new_content'][$app_id]))
+						if(!empty($mail_contents['new_content'][$app_id]) && (!isset($user->data['cmtls']['notifications']['apps']['daily'][$app_id]) || $user->data['cmtls']['notifications']['apps']['daily'][$app_id]))
 						{
+							$content_body .= implode("\n", $mail_contents['new_content'][$app_id])."\n";
 							$i++;
-							
-							if($i == 1) $body .= t('New content in !groupname', array('!groupname' => $groups[$group_id]->title))."\n";
-							$body .= implode("\n", $mail_contents['new_content'][$app_id])."\n";
 						}
 					}
 						
-					if($i > 0) $body .= "\n";
-						
+					if($i > 0)
+					{
+						$content_body = t('New content in !groupname', array('!groupname' => $groups[$group_id]->title))."\n".$content_body."\n";
+					}
+					
 					$i = 0;
 					foreach ($user_new_content_app_ids as &$app_id)
 					{
-						if(!empty($mail_contents['commented_content'][$app_id]))
+						if(!empty($mail_contents['commented_content'][$app_id]) && (!isset($user->data['cmtls']['notifications']['apps']['daily'][$app_id]) || $user->data['cmtls']['notifications']['apps']['daily'][$app_id]))
 						{
 							$i++;
 							
-							if($i == 1) $body .= t('New comments has been posted in !groupname', array('!groupname' => $groups[$group_id]->title))."\n";
-							$body .= implode("\n", $mail_contents['commented_content'][$app_id])."\n";
+							$comments_body .= implode("\n", $mail_contents['commented_content'][$app_id])."\n";
 						}
 					}
 					
-					if($i > 0) $body .= "\n";
+					if($i > 0)
+					{
+						$comments_body = t('New comments have been posted in !groupname', array('!groupname' => $groups[$group_id]->title))."\n".$comments_body."\n";
+					}
 				}
+				
+				$body = $content_body.$comments_body;
 				
 				if(!empty($mail_contents['new_groups']))
 				{
@@ -755,23 +756,24 @@ function cmtls_cron()
 					$body .= url('cmtls/list', array('absolute' => TRUE));
 				}
 				
-				$message = array(
-					'subject' => t('!sitename daily summary', array('!sitename' => $site_name)),
-					'body' =>
-						t('Hello !username', array('!username' => $user->name)).','."\n\n".
-						t('Here\'s a summary of !sitename daily changes', array('!sitename' => $site_name)).':'."\n\n".
-						$body.
-						"\n"."\n".'---'."\n".
-						'Community Tools'."\n"
-					,
-				);
-				
-				//printr($message);
-				drupal_mail('cmtls', 'cmtls_mail', $user->mail, language_default(), $message);
-				//drupal_mail('cmtls', 'cmtls_mail', 'user@example.com', language_default(), $message);
-				//exit;
-				
-				$users_sent++;
+				if($body)
+				{
+					$message = array(
+						'subject' => t('!sitename daily summary', array('!sitename' => $site_name)),
+						'body' =>
+							t('Hello !username', array('!username' => $user->name)).','."\n\n".
+							t('Here\'s a summary of !sitename daily changes', array('!sitename' => $site_name)).':'."\n\n".
+							$body.
+							"\n"."\n".'---'."\n".
+							'Community Tools'."\n"
+						,
+					);
+					
+					drupal_mail('cmtls', 'cmtls_mail', $user->mail, language_default(), $message);
+					//exit;
+					
+					$users_sent++;
+				}
 			}
 		}
 	}
@@ -792,7 +794,7 @@ function cmtls_theme($existing)
 	return array(
 		// pager
 		'cmtls_pager' => array(
-			'arguments' => array(),
+			'arguments' => array('href' => NULL),
 			'template' => 'cmtls-pager',
 			'path' => drupal_get_path('module', 'cmtls').'/theme',
 		),
@@ -825,11 +827,38 @@ function cmtls_ajax_response($content)
  */
 function cmtls_preprocess(&$vars, $hook)
 {
+	static $pager;
+	
 	if ($hook != 'cmtls_sm_share' && strpos($hook, 'views_view_fields') === 0 && isset($vars['view']) && isset($vars['fields']) && isset($vars['fields']['nid']))
 	{
-		global $base_url;
-		
-		$vars['sm_share_buttons'] = theme('cmtls_sm_share', $base_url.'/'.cmtls_path_to_node($vars['fields']['nid']->raw));
+		$vars['sm_share_buttons'] = theme('cmtls_sm_share', $GLOBALS['base_url'].'/'.cmtls_path_to_node($vars['fields']['nid']->raw));
+	}
+	
+	if ($hook != 'cmtls_pager' && $hook != 'cmtls_sm_share')
+	{
+		if($pager)
+		{
+			$vars['pager'] = $pager;
+		}
+		else 
+		{
+			$params = $_GET;
+			unset($params['q']);
+			
+			if(!$params['page']) $params['page'] = 1;
+			
+			$pager_links = array();
+			
+			foreach ($params as $key => &$value)
+			{
+				$pager_links[] = check_plain($key).'='.check_plain($value);
+			}
+			
+			$pager = $vars['pager'] = theme(
+				'cmtls_pager',
+				'?'.implode('&', $pager_links)
+			);
+		}
 	}
 }
 
@@ -877,6 +906,7 @@ $new_array = drupal_array_insert($arr1, 'three', $arr2);
 print_r($new_array);
 */
 
+
 function cmtls_page_title($node = NULL)
 {
 	if(!$node)
@@ -885,4 +915,310 @@ function cmtls_page_title($node = NULL)
 	}
 	
 	return $node->title;
+}
+
+
+function cmtls_forms_alter($form, $form_state)
+{
+	$group = _cmtls_group_get_current();
+	$app = _cmtls_app_get_current($group);
+
+	$form['name'] = $form['author']['name'];
+	$form['name']['#type'] = 'value';
+	$form['date'] = $form['author']['date'];
+	$form['date']['#type'] = 'value';
+
+	$form['revision_information'] = NULL;
+	$form['author'] = NULL;
+	$form['options'] = NULL;
+	$form['buttons']['preview'] = NULL;
+
+	$form['geolocation'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Geolocation'),
+		'#tree' => TRUE,
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,    
+	);
+	
+	if ($form['#node'] && $form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] && ($form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] != 'GEOMETRYCOLLECTION()'))
+	{
+		$form['geolocation']['#collapsible'] = FALSE;
+	}
+
+	if($form['buttons']['delete'])
+	{
+		$node = $form['#node'];
+		
+		$links = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_app_links', $node);
+
+		$form['buttons']['delete']['#type'] = 'markup';
+		$form['buttons']['delete']['#value'] = l(t('Delete'), 'cmtls/'.$group->nid.'/'.$app->nid.'/'.$links[$app->field_cmtls_app_type[0]['value']]['delete'], array('attributes' => array('class' => 'modalframe-processed')));
+	}
+
+	$form['#after_build'][] = 'cmtls_forms_after_build';
+	$form['#submit'][] = 'cmtls_forms_submit';
+	
+	return $form;
+}
+
+/**
+ * general after build
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @return unknown
+ */
+function cmtls_forms_after_build($form, &$form_state)
+{
+	if(!$form['#node']->nid)
+	{
+		$app_info = module_invoke($form['#node']->type, 'cmtls_app');
+		
+		if($app_info)
+		{
+			$app_info = array_pop($app_info);
+			
+			drupal_set_title(t('New').' '.($app_info['node type title'] ? $app_info['node type title'] : 'post'));
+		}
+	}
+	
+	//printr($form); exit;
+
+	$node = $form['#node'];
+
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+
+	// OG settings
+	$form['og_groups'] = $form['og_nodeapi']['visible']['og_groups'];
+	$form['og_groups']['#options'] = $form['og_groups']['#type']=='select' ? form_options_flatten($form['og_groups']['#options']) : $form['og_groups']['#options'];
+	$form['og_groups']['#type'] = 'value';
+	$form['og_groups']['#value'] = $form_state['values']['og_groups'] = isset($node->og_groups) ? $node->og_groups : array($current_group->nid => $current_group->nid);
+
+	$form['og_public'] = $form['og_nodeapi']['visible']['og_public'];
+	$form['og_public']['#type'] = 'value';
+	$form['og_public']['#value'] = $form_state['values']['og_public'] = isset($node->og_public) ? $node->og_public : ($current_group->og_private ? 0 : 1);
+
+	// comment settings
+	$form['comment'] = $form['comment_settings']['comment'];
+	$form['comment']['#type'] = 'value';
+
+	// nodehierarchy settings
+	$form['parent'] = $form['hierarchy']['parent'];
+	$form['parent']['#type'] = 'value';
+	$form['parent']['#value'] = $form_state['values']['parent'] = $node->parent ? $node->parent : $current_app->nid;
+
+	// NULL fields that user should not see
+	$form['og_nodeapi'] = NULL;
+	$form['hierarchy'] = NULL;
+	$form['sections'] = NULL;
+	$form['attachments'] = NULL;
+	$form['comment_settings'] = NULL;
+	$form['menu'] = NULL;
+	$form['path'] = NULL;
+	
+	// geoinfo settings
+	if($form['field_cmtls_geoinfo'] && $_GET['lat'] && $_GET['lon'] && !$form['field_cmtls_geoinfo']['#default_value'][0]['openlayers_wkt'])
+	{
+		$wkt = 'GEOMETRYCOLLECTION(POINT('.(float)$_GET['lon'].' '.(float)$_GET['lat'].'))';
+		
+		$form['field_cmtls_geoinfo']['#default_value'][0]['openlayers_wkt'] =
+		$form['field_cmtls_geoinfo']['#value'][0]['openlayers_wkt'] =
+		$form['field_cmtls_geoinfo']['openlayers_wkt']['#default_value'] =
+		$form['field_cmtls_geoinfo']['openlayers_wkt']['#value'] =
+		$wkt;
+	}
+	
+	if($form['field_cmtls_geoinfo'])
+	{
+		$form['field_cmtls_geoinfo']['#prefix'] = '<div class="ol-map-input-widget">';
+		$form['field_cmtls_geoinfo']['#suffix'] = '</div>';
+		
+		$form['geolocation']['field_cmtls_geoinfo'] = $form['field_cmtls_geoinfo'];
+		unset($form['field_cmtls_geoinfo']);
+	}
+	else 
+	{
+		$form['geolocation'] = NULL;
+	}
+
+	return $form;
+}
+
+function cmtls_forms_submit($form, &$form_state)
+{
+	// Tell the parent window to close the modal frame dialog.
+	modalframe_close_dialog(array(
+		'refresh' => TRUE,
+	));
+}
+
+function cmtls_views_pre_render(&$view)
+{
+	if($view->pager && $view->pager['items_per_page'] && $view->total_rows)
+	{
+		$total_pages = ceil($view->total_rows / $view->pager['items_per_page']);
+		
+		$vars = array(
+			'cmtls' => array(
+				'pager' => array(
+					'totalPages' => $total_pages,
+					'itemsPerPage' => $view->pager['items_per_page'],
+					'currentPage' => $view->pager['current_page'],
+					'totalItems' => $view->total_rows,
+				),
+			),
+		);
+		
+		drupal_add_js($vars, 'setting');
+	}
+}
+
+/**
+ * Implementation of hook_action_info().
+ */
+function cmtls_action_info()
+{
+	return array(
+		'cmtls_notify_action' => array(
+			'description' => t('Send instant notifications on new nodes'),
+			'type' => 'node',
+			'configurable' => FALSE,
+			'hooks' => array(
+				'nodeapi' => array('insert', ),
+			),
+		),
+		'cmtls_notify_comment_action' => array(
+			'description' => t('Send instant notifications on new comments'),
+			'type' => 'comment',
+			'configurable' => FALSE,
+			'hooks' => array(
+				'comment' => array('insert', 'view', ),
+			),
+		),
+	);
+}
+
+/**
+ * Implementation of a Drupal action.
+ */
+function cmtls_notify_action($node, $context = array())
+{
+	if(!$node->og_groups) return;
+	
+	$group = array_pop($node->og_groups);
+	
+	if(!$group) return;
+	
+	$group = node_load($group);
+	
+	if(!$group && !$group->nid) return;
+	
+	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, users.data FROM {users} AS users LEFT JOIN {og_uid} AS og_uid ON users.uid = og_uid.uid LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2 AND og_uid.nid = %d AND users.uid != %d AND users.status = 1 AND users.data LIKE '%s' AND users.data LIKE '%s'";
+	$result = db_query($sql, $group->nid, $node->uid, '%"group";i:1;%', '%i:'.$node->parent.';i:1;%');
+	
+	$users = array();
+	
+	$body = '"'.$node->title.'" '.url(cmtls_path_to_node($node, $group), array('absolute' => TRUE));
+	
+	$site_name = variable_get('site_name', 'CT');
+	
+	while ($user = db_fetch_object($result))
+	{
+		$user->data = unserialize($user->data);
+		if($user->data['cmtls']['notifications']['group'] && $user->data['cmtls']['notifications']['apps']['instant'][$node->parent])
+		{
+			$message = array(
+				'subject' => t('!sitename new post', array('!sitename' => $site_name)),
+				'body' =>
+					t('Hello !username', array('!username' => $user->name)).','."\n\n".
+					t('There\'s a post at !sitename', array('!sitename' => $site_name)).':'."\n\n".
+					$body.
+					"\n"."\n".'---'."\n".
+					'Community Tools'."\n"
+				,
+			);
+			
+			//printr($message);
+			drupal_mail('cmtls', 'cmtls_mail', $user->mail, language_default(), $message);
+		}
+	}
+}
+
+/**
+ * Implementation of a Drupal action.
+ */
+function cmtls_notify_comment_action($comment, $context = array())
+{
+	global $user;
+	
+	/*
+	printr($comment);
+	printr($context);
+	exit;
+	*/
+	
+	if(!variable_get('cmtls_comment_notifications', '1')) return;
+	
+	$node = node_load($comment->nid);
+	
+	if($node->nid)
+	{
+    	$current_group = _cmtls_group_get_current();
+    	
+		$site_name = variable_get('site_name', 'CT');
+    	
+    	// notify node author
+		if($user->uid != $node->uid)
+		{
+			$author = user_load($node->uid);
+			
+			if(!isset($author->cmtls['notifications']['group']) || $author->cmtls['notifications']['comments'])
+			{
+		    	profile_load_profile($author);
+		    	
+				$message = array(
+					'subject' => $site_name.' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
+					'body' =>
+						t('User !username commented on !nodetitle:'."\n\n".'"'.check_plain($comment->comment).'"'."\n\n".'!nodelink',
+							array(
+								'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
+								'!nodetitle' => $node->title,
+								'!nodelink' => url(cmtls_path_to_node($node, $current_group), array('absolute' => TRUE)),
+							)
+						)."\n",
+				);
+				
+				drupal_mail('cmtls', 'cmtls_mail', $author->mail, language_default(), $message);
+			}
+		}
+		
+		// notify other commenters and node author
+		// todo: select query users to avoid user_load()
+		$result = db_query('SELECT DISTINCT uid FROM {comments} WHERE nid = %d AND uid NOT IN (0, %d, %d)', $node->nid, $user->uid, $node->uid);
+		while ($commenter_uid = db_fetch_array($result))
+	    {
+	    	$commenter = user_load($commenter_uid);
+	    	
+			if(!isset($commenter->cmtls['notifications']['group']) || $commenter->cmtls['notifications']['comments'])
+			{
+		    	profile_load_profile($commenter);
+		    	
+				$message = array(
+					'subject' => $site_name.' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
+					'body' =>
+						t('User !username commented on !nodetitle:'."\n\n".'"'.check_plain($comment->comment).'"'."\n\n".'!nodelink',
+							array(
+								'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
+								'!nodetitle' => $node->title,
+								'!nodelink' => url(cmtls_path_to_node($node, $current_group), array('absolute' => TRUE)),
+							)
+						)."\n",
+				);
+				
+				drupal_mail('cmtls', 'cmtls_mail', $commenter->mail, language_default(), $message);
+			}
+	    }
+	}
 }

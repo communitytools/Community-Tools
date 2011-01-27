@@ -30,11 +30,6 @@ function cmtls_comment_form_alter(&$form, &$form_state, $form_id)
 		$form['subject'] = NULL;
 		$form['fbconnect_feed'] = NULL;
 		
-		if(variable_get('cmtls_comment_notifications', '1'))
-		{
-			$form['#submit'][] = 'cmtls_comment_submit_notification';
-		}
-		
 		if($_POST['ajax'] == 1)
 		{
 			$form['#submit'][] = 'cmtls_comment_submit_ajax_response';
@@ -63,63 +58,6 @@ function cmtls_comment_form_alter(&$form, &$form_state, $form_id)
 	    $form_state['redirect']  = NULL;
 	}
 }
-
-function cmtls_comment_submit_notification($form, &$form_state)
-{
-	global $user;
-	
-	$node = node_load($form['nid']['#value']);
-	
-	if($node->nid)
-	{
-    	$current_group = _cmtls_group_get_current();
-    	
-		// notify node author
-		if($user->uid != $node->uid)
-		{
-			$author = user_load($node->uid);
-	    	profile_load_profile($author);
-	    	
-			$message = array(
-				'subject' => variable_get('site_name', 'CT').' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
-				'body' =>
-					t('User !username commented on !nodetitle:'."\n\n".'"'.$form['comment']['#value'].'"'."\n\n".'!nodelink',
-						array(
-							'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
-							'!nodetitle' => $node->title,
-							'!nodelink' => url(cmtls_path_to_node($node->nid, $current_group), array('absolute' => TRUE)),
-						)
-					)."\n",
-			);
-			
-			drupal_mail('cmtls', 'cmtls_mail', $author->mail, user_preferred_language($author), $message);
-		}
-		
-		// notify other commenters and node author
-		$result = db_query('SELECT DISTINCT uid FROM {comments} WHERE nid = %d AND uid NOT IN (0, %d, %d)', $node->nid, $user->uid, $node->uid);
-		while ($commenter_uid = db_fetch_array($result))
-	    {
-	    	$commenter = user_load($commenter_uid);
-	    	profile_load_profile($commenter);
-	    	
-			$message = array(
-				'subject' => variable_get('site_name', 'CT').' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
-				'body' =>
-					t('User !username commented on !nodetitle:'."\n\n".'"'.$form['comment']['#value'].'"'."\n\n".'!nodelink',
-						array(
-							'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
-							'!nodetitle' => $node->title,
-							'!nodelink' => url(cmtls_path_to_node($node->nid, $current_group), array('absolute' => TRUE)),
-						)
-					)."\n",
-			);
-			
-			drupal_mail('cmtls', 'cmtls_mail', $commenter->mail, user_preferred_language($commenter), $message);
-	    }
-	}
-	
-}
-
 
 /**
  * Implements hook_theme()

@@ -146,7 +146,7 @@ function cmtls_article_content_default_fields() {
       'polygon' => 0,
     ),
     'widget' => array(
-      'openlayers_cck_preset_map' => 'cmtls_map',
+      'openlayers_cck_preset_map' => 'cmtls_node_map',
       'openlayers_cck_show_empty_map' => 0,
       'openlayers_cck_zoom_to_layer' => 0,
       'openlayers_cck_zoom_to_layer_level' => '10',
