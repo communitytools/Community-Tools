@@ -20,14 +20,22 @@
  */
 ?>
 
-<div class="author">
-	<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 16, TRUE); ?> <?php print _cmtls_member_name($fields, TRUE); ?>
-</div>
+<div class="dashboard-item">
+	
+	<div class="meta-author">
+		<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 16, TRUE); ?> <?php print _cmtls_member_name($fields, TRUE); ?>
+	</div>
 
-<?php print t('commented on') ?>
+	<?php print t('commented on') ?>
+	
+	<?php print l($fields['title']->raw, cmtls_path_to_node($fields['nid']->raw, $view->args[0])); ?>
+	
+	<span class="dashboard-meta">&middot; <?php print $fields['timestamp']->content; ?></span>
+	
+</div><!-- dashboard-item -->
 
-<?php print l($fields['title']->raw, cmtls_path_to_node($fields['nid']->raw, $view->args[0])); ?>
 
-<div class="date">
-	<?php print $fields['timestamp']->content; ?>
-</div>
+
+
+
+

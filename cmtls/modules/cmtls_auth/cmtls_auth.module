@@ -10,16 +10,6 @@ function cmtls_auth_menu()
 	$items = array();
 
 	/*
-	 * Admin pages
-	 */
- 	$items['admin/settings/cmtls-authentication'] = array(
-		'title' => 'Community Tools Authentication',
-		'page callback' => 'cmtls_auth_settings_page',
-		'access arguments' => array('administer cmtls'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-	
-	/*
 	 * Public pages
 	 */
 	$items['cmtls/login'] = array(
@@ -39,17 +29,6 @@ function cmtls_auth_menu()
 		'file' => 'user.pages.inc',
 		'file path' => drupal_get_path('module', 'user'),
 	);
-	/*
-	$items['cmtls/password'] = array(
-		'title' => 'Request new password',
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('user_pass'),
-		'access callback' => 'user_is_anonymous',
-		'type' => MENU_CALLBACK,
-		'file' => 'user.pages.inc',
-		'file path' => drupal_get_path('module', 'user'),
-	);
-	*/
 
 	return $items;
 }
@@ -84,39 +63,39 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 	switch($form_id){
 
 		case 'user_pass':
-			
+
 			modalframe_child_js();
-			
+
 			$form['#submit'][] = 'cmtls_auth_user_pass_submit';
-			
+
 			break;
 		/*
 		 * User login form
 		 */
 		case 'user_login':
 			$GLOBALS['conf']['cache'] = FALSE;
-			
+
 			modalframe_child_js();
 
 			// Remove required flag from username and password fields
 			$form['name']['#required'] = FALSE;
 			$form['pass']['#required'] = FALSE;
-			
+
 			$form['name']['#description'] = NULL;
 			$form['pass']['#description'] = NULL;
-			
-			
+
+
 			$form['#validate'] = array();
 			$form['#submit'] = array('cmtls_auth_user_login_submit');
 
 			$form['#after_build'][] = 'cmtls_auth_add_auth_modules';
-			
+
 			$form['password_remind'] = array(
 				'#type' => 'markup',
 				'#prefix' => '<div id="password-remind-link">',
 				'#value' => l(t('Forgot your password?'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.'), 'class' => 'modalframe-processed'))),
 				'#suffix' => '</div>',
-				'#weight' => 30,
+				'#weight' => 25,
 			);
 			
 			break;
@@ -126,13 +105,14 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 		 */
 		case 'user_register':
 			$GLOBALS['conf']['cache'] = FALSE;
-			
+
 			modalframe_child_js();
 
 			// Less is more
 			$form['name'] = $form['account']['name'];
 			$form['mail'] = $form['account']['mail'];
 			$form['profile_cmtls_member_name'] = $form['Community Tools: Member']['profile_cmtls_member_name'];
+			$form['profile_cmtls_member_name']['#title'] = t('Full name');
 
 			$form['profile_cmtls_member_name']['#weight'] = 1;
 			$form['name']['#weight'] = 2;
@@ -141,12 +121,21 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 			unset($form['account'], $form['Community Tools: Member']);
 
 			$module = cmtls_auth_authentication_module();
-			
+
+			if($module)
+			{
+				$form['captcha'] = NULL;
+			}
+			else
+			{
+				$form['captcha']['#description'] = NULL;
+			}
+
 			if(!$module) $form['#after_build'][] = 'cmtls_auth_add_auth_modules';
-			
+
 			// Use custom handler for user registration
 			$form['#submit'][] = 'cmtls_auth_user_register_submit';
-			
+
 			break;
 
 		/*
@@ -154,7 +143,7 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 		 */
 		case 'cmtls_auth_connect':
 			$GLOBALS['conf']['cache'] = FALSE;
-			
+
 			// Add registration type switch
 			$form['registration_type'] = array(
 				'#type' => 'radios',
@@ -166,11 +155,11 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 				'#default_value'=>'new_user',
 				'#weight' => 0,
 			);
-			
+
 			// Remove required flag from name and pass fields to allow optional posting
 			$form['name']['#required'] = 0;
 			$form['pass']['#required'] = 0;
-			
+
 			// Wrap authentication fields for improved usability
 			$form['authentication-wrapper'] = array(
 				'#type' => 'markup',
@@ -188,13 +177,13 @@ function cmtls_auth_form_alter(&$form, $form_state, $form_id){
 			);
 
 			unset($form['name'], $form['pass']);
-			
+
 			$form['submit']['#value'] = t('Continue');
 
 			// Set form callbacks
 			$form['#validate'] = array('cmtls_auth_connect_validate');
 			$form['#submit'] = array('cmtls_auth_connect_submit');
-			
+
 			// Add some javascript for improved usability
 			drupal_add_js(drupal_get_path('module', 'cmtls_auth') . '/js/module.js');
 
@@ -233,12 +222,11 @@ function cmtls_auth_user_register_submit($form, &$form_state){
 	}
 
 	$form_state['user'] = $account;
-    
-	$form_state['redirect'] = '';
 
-	user_external_login($account);
+	$form_state['redirect'] = 'cmtls';
 	
-	modalframe_child_js();
+	user_external_login($account);
+
 	modalframe_close_dialog(array(
 		'refresh' => TRUE,
 	));
@@ -249,12 +237,10 @@ function cmtls_auth_user_register_submit($form, &$form_state){
  * Login form's after build callback.
  * Rearranges login form into two columns when external authentication modules are detected
  */
-function cmtls_auth_add_auth_modules($form, &$form_state){
+function cmtls_auth_add_auth_modules($form, &$form_state)
+{
 	// If somebody tries to apply the formatter on form element rather than form, just return
 	if($form['#type'] != 'form'){ return $form; }
-
-	// Unset OpenID specific stuff
-	unset($form['openid_identifier'], $form['openid.return_to']);
 
 	// Create temporary containers
 	$_form = array();
@@ -277,7 +263,7 @@ function cmtls_auth_add_auth_modules($form, &$form_state){
 			$_form[$key] = $element;
 		}
 	}
-	
+
 	// If we've got something in external authentication, create new form layout
 	if(!empty($_form_external_authentication)){
 		$_form['external_authentication'] = array_merge(array(
@@ -285,13 +271,13 @@ function cmtls_auth_add_auth_modules($form, &$form_state){
 			'#suffix' => '</div>',
 			'#weight' => 2,
 		), $_form_external_authentication);
-		
+
 		$_form['internal_authentication'] = array_merge(array(
 			'#prefix' => '<div id="internal-authentication" class="form-column">',
 			'#suffix' => '</div>',
 			'#weight' => 1,
 		), $_form_internal_authentication);
-		
+
 		$form = $_form;
 	}
 
@@ -312,18 +298,18 @@ function cmtls_auth_connect_validate($form, &$form_state){
 			if(empty($form_state['values']['name'])){
 				form_set_error('name', t("Username field is required"));
 			}
-			
+
 			if(empty($form_state['values']['pass'])){
 				form_set_error('pass', t("Password field is required"));
 			}
-			
+
 			// Validate user based on passed credentials
 			$user = user_load(array('name' => $form_state['values']['name'], 'pass' => $form_state['values']['pass']));
 
 			if(!$user){
 				form_set_error('name', t("Sorry, unrecognized username or password."));
 			}
-			
+
 			break;
 	}
 }
@@ -333,7 +319,7 @@ function cmtls_auth_connect_validate($form, &$form_state){
  */
 function cmtls_auth_connect_submit($form, &$form_state){
 	$direction = $form_state['values']['registration_type'];
-	
+
 	switch($direction){
 		// If we're dealing with a new user, redirect user directly to registration form
 		case 'new_user':
@@ -342,7 +328,7 @@ function cmtls_auth_connect_submit($form, &$form_state){
 		// If user already has account, connect them
 		case 'existing_user':
 			$module = cmtls_auth_authentication_module();
-			
+
 			// TODO: What about users who wish to connect Facebook and OpenID accounts for some reason?
 			$account = user_load(array('name' => $form_state['values']['name'], 'pass' => $form_state['values']['pass']));
 
@@ -392,7 +378,7 @@ function cmtls_auth_connect_submit($form, &$form_state){
 function cmtls_auth_user_login($euid, $module){
 	// Send the Modal Frame javascript for child windows to the page
 	modalframe_child_js();
-	
+
 	// Set authentication module
 	cmtls_auth_authentication_module($module);
 
@@ -424,7 +410,7 @@ function cmtls_auth_user_login($euid, $module){
 	}else{
 		$display = drupal_get_form('cmtls_auth_connect');
 	}
-	
+
 	return $display;
 }
 
@@ -437,13 +423,13 @@ function cmtls_auth_authentication_module($module = NULL){
 	if($module){
 		$_SESSION['cmtls']['auth'] = array('module' => $module);
 	}
-	
+
 	return $_SESSION['cmtls']['auth']['module'];
 }
 
 
 /**
- * 
+ *
  */
 function cmtls_auth_get_authmaps($authname = NULL) {
 	$result = db_query("SELECT uid, authname, module FROM {authmap} WHERE authname = '%s' LIMIT 0, 1", $authname);
@@ -482,13 +468,16 @@ function cmtls_auth_user_exists($params){
  * @param $last_name string Last name of new user
  * @return string Unique user name
  */
-function cmtls_auth_recommend_user_name($name = ''){
+function cmtls_auth_recommend_user_name($name = NULL)
+{
+	if(!$name) return;
+	
 	// Parse user's real name into bits
 	$name_bits = preg_split('/[\.,-\s]+/i', strtolower($name));
 
 	$existing_names = array();
 	$query = db_query("SELECT `name` FROM {users} WHERE `name` REGEXP '%s'", strtolower(implode('|', $name_bits)));
-	
+
 	while($row = db_result($query)){
 		$existing_names[] = $row;
 	}
@@ -497,25 +486,25 @@ function cmtls_auth_recommend_user_name($name = ''){
 	$name = array();
 	$name_string = '';
 	$found_unique_name = FALSE;
-	
+
 	for($i=0; $i<count($name_bits); $i++){
 		$name[] = $name_bits[$i];
 		$name_string = implode('.', $name_bits);
-		
+
 		if(!in_array($name_string, $existing_names)){ $found_unique_name = TRUE; break; }
 	}
-	
+
 	if(!$found_unique_name){
 		$name_last_index = count($name);
 		for($i=1; $i<999; $i++){
 			$name[$name_last_index] = str_pad($i, 3, '0', STR_PAD_LEFT);
-			
+
 			$name_string = implode('.', $name);
-			
+
 			if(!in_array($name_string, $existing_names)){ $found_unique_name = TRUE; break; }
 		}
 	}
-	
+
 	if($found_unique_name){
 		return $name_string;
 	}else{
@@ -526,6 +515,6 @@ function cmtls_auth_recommend_user_name($name = ''){
 function cmtls_auth_user_pass_submit($form, &$form_state)
 {
 	$form_state['redirect'] = NULL;
-	
+
 	return;
 }

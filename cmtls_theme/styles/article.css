@@ -127,22 +127,22 @@
 	margin-bottom: 15px;
 }
 
-.meta-files .meta-file {
+.meta-file {
     background: none repeat scroll 0 0 #f2f2f2;
     border: 1px solid #E2E2E2;
     height: 52px;
     width: 52px;
     padding: 4px;
     display: inline-block;
-    margin-right: 5px;
+    margin: 0 5px 8px 0;
 }
 
-	.meta-files .meta-file a,
-	.meta-files .meta-file a:hover {
+	.meta-file a,
+	.meta-file a:hover {
 		border: none;
 	}
 
-		.meta-files .meta-file a img {
+		.meta-file a img {
 			height: 52px;
 			width: 52px;
 		}
@@ -302,19 +302,96 @@ a.comments-button {
 
 /* Content Toolbar - includes content add button and filter button
 ------------------------------------------------------------------------------ */
-
-.toolbar {
+.content-toolbar {
 	display: block;
-	margin-bottom: 5px;
-	font-size: 12px;
+	margin: -25px -25px 10px -25px;
+	padding: 25px 25px 15px 25px;
+	background: #F6F6F6;
+	background: -moz-linear-gradient(center top , #ffffff, #EFEFEF);
+	background: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#EFEFEF));
+	border-bottom: 1px solid #ECECEC;
 }
+
+	.content-toolbar .toolbar-description {
+		float: left;
+		color: #777;
+		font-size: 13px;
+	}
+
+	.content-toolbar .cmtls-button {
+		font-size: 11px;
+	}
+
+	.content-toolbar h1 {
+		display: inline-block;
+		margin: 0 10px 0 0;
+		vertical-align: middle;
+		color: #777;
+		font-size: 22px;
+		text-shadow: 0 1px 0 #FFFFFF;
+	}
+
+	.content-toolbar ul {
+		display: inline-block;
+		margin: 0;
+	}
+
+		.content-toolbar ul li {
+			list-style-type: none;
+		}
+
+	.content-toolbar .toolbar-buttons {
+		font-size: 11px;
+		display: inline-block;
+		float: right;
+	}
+
+	.content-toolbar ul.toolbar-tabs {
+		margin: 0 0 -16px 0;
+		padding: 0;
+		font-size: 12px;
+		font-weight: bolder;
+		display: block;
+	}
+
+		.content-toolbar ul.toolbar-tabs li {
+			display: inline-block;
+			padding: 3px 10px 3px 10px;
+		}
+
+			.content-toolbar ul.toolbar-tabs li.selected {
+				border-left: 1px solid #ECECEC;
+				border-top: 1px solid #ECECEC;
+				border-right: 1px solid #ECECEC;
+				-moz-border-radius: 3px 3px 0 0;
+				-webkit-border-radius: 3px 3px 0 0;
+				border-radius: 3px 3px 0 0;
+				background: #fff;
+			}
+
+				.content-toolbar ul.toolbar-tabs li a,
+				/* Drupal somehow always adds active class to this link, so we need to override it */
+				.content-toolbar ul.toolbar-tabs li a.active {
+					color: #777;
+				}
+
+				.content-toolbar ul.toolbar-tabs li a:hover {
+					color: #2786C2;
+				}
+
+
+				.content-toolbar ul.toolbar-tabs li.selected a:hover {
+					color: #777;
+				}
+
 
 /* Content filter
 ------------------------------------------------------------------------------ */
 .content-filter {
 	padding: 20px;
+	margin-top: 10px;
 	background: #f6f6f6;
-	border: 1px solid #EDEDED;
+	border: 1px solid #E3E3E3;
 	font-size: 12px;
 	text-align: center;
 	-moz-border-radius: 4px;
@@ -389,23 +466,25 @@ a.comments-button {
 	}
 
 
-/* Text Node
+/* Text Nodejavascript:void(0);
 ------------------------------------------------------------------------------ */
 .text-node {
-	padding: 10px 0;
-	margin: 5px 0 0 0;
-	float: left;
-	width: 100%;
 	position: relative;
-	border-top: 1px solid #E7E7E7;
+	border-bottom: 1px solid #E7E7E7;
+	margin: 8px -25px 0 -25px;
+	padding: 10px 25px;
 }
 
-	#text-container .text-node:first-child {
-		border-top: none;
+	#text-container .text-node:last-child {
+		border-bottom: none;
 	}
 
 	.text-node h1 a {
 		color: #333;
+	}
+
+	.text-node h1 a:hover {
+		color: #2786C2;
 	}
 
 	.text-node .text-node-list-item {
@@ -421,20 +500,43 @@ a.comments-button {
 			display: inline-block;
 		}
 
-/* Event Item
+/* Content grouping
 -------------------------------------------------------------- */
-.event-group-header {
-	padding: 15px 0 0;
-	margin: 0 0 -5px;
-	font-size: 14px;
+.content-group-header {
+	padding: 15px 0 0 0;
+	margin: 0 0 -8px -25px;
+	font-size: 11px;
 	font-weight: bold;
 	clear: both;
 	color: #555;
+	text-transform: uppercase;
 }
 
-		.text-node .content .event-header {
-			font-size: 12px;
-		}
+	.content-group-header span {
+		background: #EBEBEB;
+		padding: 5px 10px 3px 25px;
+		-moz-border-radius: 0 3px 0 0;
+		-webkit-border-radius: 0 3px 0 0;
+		border-radius: 0 3px 0 0;
+	}
+
+	.content-group-header a {
+		color: #555;
+	}
+
+	.content-group-header a:hover {
+		color: #2786C2;
+	}
+
+
+
+/* Event Item
+-------------------------------------------------------------- */
+
+/* TODO: This line is maybe not needed, search from code... */
+.text-node .content .event-header {
+	font-size: 12px;
+}
 
 
 h1 span.date {
@@ -444,13 +546,49 @@ h1 span.date {
 
 /* Problem Item
 ------------------------------------------------------------------------------ */
+.meta-problem-status {
+	display: inline-block;
+	color: #777;
+	padding-left: 16px;
+}
 
-.meta-status.open {
-	background: #CB9B99;
+.meta-problem-status.open {
+	background: url(../images/problem-status-bullets.png) no-repeat 0 4px ;
 }
-.meta-status.closed {
-	background: #8BCB9E;
+.meta-problem-status.closed {
+	background: url(../images/problem-status-bullets.png) no-repeat 0 -16px;
 }
+
+/* Group overview
+-------------------------------------------------------------- */
+.group-overview {}
+
+.group-overview .group-tool {
+	border-top: 1px solid #E7E7E7;
+	padding: 10px 0;
+}
+
+	.group-overview .group-tool:first-child {
+		border-top: none;
+	}
+
+	.group-overview .group-tool .group-name {
+		width: 175px;
+		float: left;
+		margin-right: 20px;
+		font-weight: bold;
+	}
+
+	.group-overview .group-tool .group-posts {
+		width: 200px;
+		float: left;
+		margin-right: 20px;
+	}
+
+	.group-overview .group-tool .group-comments {
+		float: left;
+	}
+
 
 /* Rich Text
 -------------------------------------------------------------- */

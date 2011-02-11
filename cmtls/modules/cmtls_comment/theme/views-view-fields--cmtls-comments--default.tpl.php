@@ -22,7 +22,7 @@
 $node = node_load($view->args[0]);
 
 ?>
-<div class="comment<?php print $node->uid == $fields['uid']->raw ? ' authors-comment' : NULL; ?>">
+<div class="comment<?php print $node->uid == $fields['uid']->raw ? ' authors-comment' : NULL; ?><?php print $node->stances->all[$fields['uid']->raw] ? ' cmtls-stance-'.$node->stances->all[$fields['uid']->raw]->stance : NULL ?>">
 
 	<div class="avatar">
 		<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 40); ?>

@@ -1,7 +1,5 @@
 <?php if ($rows): ?>
-    <div class="gallery-container">
-	<?php print $rows; ?>
-    </div>
+    <?php print $rows; ?>
 <?php elseif ($empty): ?>
 	<?php print $empty; ?>
 <?php endif; ?>

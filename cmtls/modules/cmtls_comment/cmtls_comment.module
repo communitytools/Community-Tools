@@ -28,7 +28,6 @@ function cmtls_comment_form_alter(&$form, &$form_state, $form_id)
 		$form['comment_filter'] = NULL;
 		$form['preview'] = NULL;
 		$form['subject'] = NULL;
-		$form['fbconnect_feed'] = NULL;
 		
 		if($_POST['ajax'] == 1)
 		{
@@ -244,13 +243,13 @@ function cmtls_comment_init()
 
 function cmtls_comment_ajax_response($node)
 {
-	print drupal_json(array('content' => views_embed_view('cmtls_comments', 'default', $node->nid)));
-	exit;
+	cmtls_ajax_response(views_embed_view('cmtls_comments', 'default', $node->nid));
 }
 
 function cmtls_comment_submit_ajax_response($form, &$form_state)
 {
-	cmtls_comment_ajax_response(node_load($form['nid']['#value']));
+	//printr($form_state); exit;
+	cmtls_ajax_response(views_embed_view('cmtls_comments', 'default', $form['nid']['#value']), $form_state['#cmtls_comment_options'] ? $form_state['#cmtls_comment_options'] : NULL);
 }
 
 /**

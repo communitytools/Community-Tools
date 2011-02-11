@@ -30,7 +30,7 @@ $i = 0;
 ?>
 <div class="node-head">
 
-		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><a href="<?php print base_path().cmtls_article_path($node); ?>"><?php print $fields['title']->raw; ?></a></h1>
+	<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><a href="<?php print base_path().cmtls_article_path($node); ?>"><?php print $fields['title']->raw; ?></a></h1>
 
 	<div class="meta-author">
 		<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 16, TRUE); ?> <?php print _cmtls_member_name($fields, TRUE); ?>

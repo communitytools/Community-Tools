@@ -74,16 +74,16 @@ function cmtls_event_strongarm() {
   $strongarm->name = 'content_extra_weights_cmtls_event';
   $strongarm->value = array(
     'title' => '-5',
-    'body_field' => '-1',
-    'revision_information' => '2',
-    'author' => '3',
-    'options' => '4',
-    'comment_settings' => '5',
-    'menu' => '0',
-    'taxonomy' => '-2',
-    'path' => '6',
-    'attachments' => '7',
-    'og_nodeapi' => '1',
+    'body_field' => '0',
+    'revision_information' => '3',
+    'author' => '4',
+    'options' => '5',
+    'comment_settings' => '6',
+    'menu' => '1',
+    'taxonomy' => '-1',
+    'path' => '7',
+    'attachments' => '8',
+    'og_nodeapi' => '2',
   );
 
   $export['content_extra_weights_cmtls_event'] = $strongarm;

@@ -1,1 +1,5 @@
-#edit-fb-integration{display:inline-block;width:169px;height:21px;margin:0;padding:0;background:url(../images/login.gif) center center no-repeat;overflow:hidden;text-indent:180px}
+#edit-fb-integration{display:inline-block;width:83px;height:22px;margin:0;padding:0;background:url(../images/fb_connect.png) center center no-repeat;overflow:hidden;text-indent:180px}
+
+.fb_reset {
+    display: none;
+}

@@ -29,11 +29,13 @@
 <div class="modalframe-page-wrapper">
   <div class="modalframe-page-container clear-block">
     <div class="modalframe-page-content">
-<?php if ($show_messages && $messages): print $messages; endif; ?>
-<?php print $help; ?>
-<div class="clear-block">
-  <?php print $content; ?>
-</div>
+      <?php if(arg(1) == 'login') print t('Log in or <a href="@href" class="@class">sign up</a> to become a member.', array('@href' => base_path().'cmtls/register', '@class' => 'modalframe-processed')); ?>
+      <?php if(arg(1) == 'register') print t('Register or <a href="@href" class="@class">log in</a> if you already have an account.', array('@href' => base_path().'cmtls/login', '@class' => 'modalframe-processed')); ?>
+      <?php if ($show_messages && $messages): print $messages; endif; ?>
+      <?php print $help; ?>
+      <div class="clear-block">
+        <?php print $content; ?>
+      </div>
     </div>
   </div>
 </div>

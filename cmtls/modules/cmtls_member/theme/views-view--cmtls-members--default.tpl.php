@@ -30,13 +30,6 @@
  */
 
 ?>
-
-<div class="cmtls-members-container">
-	<div class="address-book">
-		<?php if ($rows): ?>
-			<?php print $rows; ?>
-		<?php elseif ($empty): ?>
-			<?php print $empty; ?>
-		<?php endif; ?>
-	</div>
-</div> <!-- .cmtls-members-container -->
+<?php if ($rows): ?>
+	<?php print $rows; ?>
+<?php endif; ?>

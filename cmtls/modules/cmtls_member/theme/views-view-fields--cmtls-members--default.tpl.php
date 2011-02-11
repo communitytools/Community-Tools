@@ -20,24 +20,23 @@
  */
 ?>
 
-<div class="profile-left">
-	<div class="profile<?php echo (og_is_group_admin($cmtls['current_group'], $user->uid == $fields['uid']->raw ? $user : user_load($fields['uid']->raw)) ? '-admin' : ''); ?>">
-		<div class="avatar">
-			<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 55, TRUE); ?>
-		</div>
-		<ul>
-			<li><strong><?php print l(_cmtls_member_name($fields), 'cmtls/'.$cmtls['current_group']->nid.'/member/'.$fields['uid']->raw); ?></strong></li>
-			<?php if(og_is_group_admin($cmtls['current_group'], $user->uid == $fields['uid']->raw ? $user : user_load($fields['uid']->raw))): ?><li class="admin-title"><?php print t('Group administrator') ?></li><?php endif; ?>
-			<?php if($user->uid): ?>
-			<li><?php print $fields['mail']->content ;?></li>
-			<?php if($fields['value_2']->raw): ?><li><div class="line-description"><?php print t('Address') ?>:</div> <?php print check_plain($fields['value_2']->raw) ;?></li><?php endif; ?>
-			<?php if($fields['value_5']->raw): ?><li><div class="line-description"><?php print t('Phone') ?>:</div> <a href="callto:<?php print check_plain($fields['value_5']->raw) ;?>"><?php print check_plain($fields['value_5']->raw) ;?></a></li><?php endif; ?>
-			<?php if($fields['value_1']->raw): ?><li><div class="line-description"><?php print t('Skype') ?>:</div> <a href="skype:<?php print check_plain($fields['value_1']->raw) ;?>"><?php print check_plain($fields['value_1']->raw) ;?></a></li><?php endif; ?>
-			<?php /*
-			<li><div class="line-description"><?php print t('Description') ?>:</div> <?php print check_plain($fields['value_3']->raw) ;?></li>
-			<li><div class="line-description"><?php print t('Homepage') ?>:</div> <?php print $fields['value_4']->content ;?></li>*/ ?>
-			<?php endif; ?>
-		</ul>
+<div class="profile">
+	<div class="avatar">
+		<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 55, TRUE); ?>
 	</div>
+	<ul>
+		<li class="member-name"><?php print l(_cmtls_member_name($fields), 'cmtls/'.$cmtls['current_group']->nid.'/member/'.$fields['uid']->raw); ?></li>
+		<?php if(og_is_group_admin($cmtls['current_group'], $user->uid == $fields['uid']->raw ? $user : user_load($fields['uid']->raw))): ?><li class="admin-title"><?php print t('Group administrator') ?></li><?php endif; ?>
+		<?php if($user->uid): ?>
+		<?php /*
+		<li><?php print $fields['mail']->content ;?></li>
+		<?php if($fields['value_2']->raw): ?><li><div class="line-description"><?php print t('Address') ?>:</div> <?php print check_plain($fields['value_2']->raw) ;?></li><?php endif; ?>
+		<?php if($fields['value_5']->raw): ?><li><div class="line-description"><?php print t('Phone') ?>:</div> <a href="callto:<?php print check_plain($fields['value_5']->raw) ;?>"><?php print check_plain($fields['value_5']->raw) ;?></a></li><?php endif; ?>
+		<?php if($fields['value_1']->raw): ?><li><div class="line-description"><?php print t('Skype') ?>:</div> <a href="skype:<?php print check_plain($fields['value_1']->raw) ;?>"><?php print check_plain($fields['value_1']->raw) ;?></a></li><?php endif; ?>
+		<li><div class="line-description"><?php print t('Description') ?>:</div> <?php print check_plain($fields['value_3']->raw) ;?></li>
+		<li><div class="line-description"><?php print t('Homepage') ?>:</div> <?php print $fields['value_4']->content ;?></li>
+		*/ ?>
+		<?php endif; ?>
+	</ul>
 </div>
 	

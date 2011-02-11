@@ -9,35 +9,15 @@ function cmtls_event_install()
 	cmtls_module_install('cmtls_event');
 }
 
-function cmtls_event_schema() {
-	$schema['cmtls_member_stance'] = array(
-		'fields' => array(
-			'uid' => array(
-				'type' => 'int',
-				'not null' => TRUE,
-				'default' => 0,
-				'length' => 11,
-				'description' => t('Id of the user'),
-			),
-			'parent' => array(
-				'type' => 'char',
-				'not null' => TRUE,
-				'default' => '',
-				'length' => 11,
-				'description' => t('Id of the parent node'),
-			),
-			'stance' => array(
-				'type' => 'int',
-				'not null' => TRUE,
-				'default' => '',
-				'length' => 11,
-				'description' => t('Users stance on the matter'),
-			),
-		),
-		'unique keys' => array(
-			'sid'     => array('uid', 'parent')
-		),
+function cmtls_event_update_6003(&$sandbox)
+{
+	features_revert(array('cmtls_event' => array('node', 'content')));
+	
+	// Add simple note
+	$ret[] = array(
+		'success' => TRUE,
+		'query' => 'Reverted Event feature',
 	);
 
-	return $schema;
+	return $ret;
 }

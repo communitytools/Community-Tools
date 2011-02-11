@@ -25,8 +25,11 @@ function cmtls_group_cmtls_context()
 
 function cmtls_group_init()
 {
-	drupal_add_js(array('cmtls' => array('mainGroup' => _cmtls_node_json_prepare(_cmtls_group_get_main()))), 'setting');
-	drupal_add_js(array('cmtls' => array('currentGroup' => _cmtls_node_json_prepare(_cmtls_group_get_current()))), 'setting');
+	if(_cmtls_is())
+	{
+		drupal_add_js(array('cmtls' => array('mainGroup' => _cmtls_node_json_prepare(_cmtls_group_get_main()))), 'setting');
+		drupal_add_js(array('cmtls' => array('currentGroup' => _cmtls_node_json_prepare(_cmtls_group_get_current()))), 'setting');
+	}
 }
 
 /**
@@ -144,6 +147,16 @@ function cmtls_group_menu()
 		'access arguments' => array(1),
 		'type' => MENU_CALLBACK,
 	);
+	
+	$items['cmtls/%node/overview'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(1),
+		'page callback' => 'cmtls_group_overview',
+		'page arguments' => array(1, 'group'),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 1),
+		'type' => MENU_CALLBACK,
+	);
 
 	return $items;
 }
@@ -234,22 +247,34 @@ function cmtls_groups_page()
  */
 function cmtls_group_preprocess(&$vars, $hook)
 {
-	$main_group = _cmtls_group_get_main();
-	$current_group = _cmtls_group_get_current();
-
-	$group_properties = array(
-		'background_image' => ($current_group->field_cmtls_group_background[0]['filepath'] ? file_create_url($current_group->field_cmtls_group_background[0]['filepath']) : file_create_url($main_group->field_cmtls_group_background[0]['filepath'])),
-	);
-
-	//printr($current_group); exit;
-
-	if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
-
-	$vars['cmtls'] += array(
-		'main_group' => $main_group,
-		'current_group' => $current_group,
-		'current_group_properties' => $group_properties,
-	);
+	static $cache;
+	
+	if(_cmtls_is())
+	{
+		if($cache)
+		{
+			$vars['cmtls'] = $cache;
+		}
+		else 
+		{
+			$main_group = _cmtls_group_get_main();
+			$current_group = _cmtls_group_get_current();
+		
+			$group_properties = array(
+				'background_image' => ($current_group->field_cmtls_group_background[0]['filepath'] ? file_create_url($current_group->field_cmtls_group_background[0]['filepath']) : ($main_group->field_cmtls_group_background[0]['filepath'] ? file_create_url($main_group->field_cmtls_group_background[0]['filepath']) : NULL)),
+			);
+		
+			//printr($current_group); exit;
+		
+			if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
+		
+			$cache = $vars['cmtls'] += array(
+				'main_group' => $main_group,
+				'current_group' => $current_group,
+				'current_group_properties' => $group_properties,
+			);
+		}
+	}
 }
 
 /**
@@ -480,6 +505,12 @@ function cmtls_group_node_form_after_build($form, &$form_state)
 function cmtls_group_theme($existing)
 {
 	return array(
+		// group overview
+		'cmtls_group_overview' => array (
+			'arguments' => array('group' => NULL, 'apps' => NULL, 'page' => NULL, 'members' => NULL, ),
+			'template' => 'cmtls-group-overview',
+			'path' => drupal_get_path('module', 'cmtls_group').'/theme',
+		),
 		// groups view (the drop down menu, if logged in then only your groups else all public groups)
 		'views_view__cmtls_groups__default' => array (
 			'arguments' => array('view' => NULL),
@@ -761,12 +792,18 @@ function cmtls_group_openlayers_map_preprocess_alter(&$map = array())
 		unset($layers['cmtls_group']);
 		$map['layers'] = $layers;
 
-		$openlayers_behavior_cluster = $map['behaviors']['openlayers_behavior_cluster']['clusterlayer'];
-		unset($openlayers_behavior_cluster['cmtls_group']);
-		$map['behaviors']['openlayers_behavior_cluster']['clusterlayer'] = $openlayers_behavior_cluster;
+		if($map['behaviors']['openlayers_behavior_cluster'])
+		{
+			$openlayers_behavior_cluster = $map['behaviors']['openlayers_behavior_cluster']['clusterlayer'];
+			unset($openlayers_behavior_cluster['cmtls_group']);
+			$map['behaviors']['openlayers_behavior_cluster']['clusterlayer'] = $openlayers_behavior_cluster;
+		}
 
-		reset($layers_activated);
-		$map['behaviors']['openlayers_behavior_zoomtolayer']['zoomtolayer'] = current($layers_activated);
+		if($map['behaviors']['openlayers_behavior_zoomtolayer'])
+		{
+			reset($layers_activated);
+			$map['behaviors']['openlayers_behavior_zoomtolayer']['zoomtolayer'] = current($layers_activated);
+		}
 	}
 }
 
@@ -817,4 +854,67 @@ function cmtls_group_leave_access($group, $account)
 function cmtls_group_rss_page($group)
 {
 
+}
+
+function cmtls_group_overview($group, $page = 'group')
+{
+	if($page == 'members' && $_POST['ajax'] == 1)
+	{
+		cmtls_ajax_response(views_embed_view('cmtls_members', 'default', $group->nid, $_GET['letter']));
+	}
+	
+	// Send the Modal Frame javascript for parent windows to the page.
+	modalframe_parent_js();
+
+	// set map settings, currently there is no map for members pages
+	cmtls_map_set_config(array(
+		'cmtls_group' => array(
+			'default map view' => CMTLS_MAP_NONE,
+		),
+	));
+	
+	if($group->type != 'cmtls_group') return t('This is not a group');
+	
+	$sql = 'SELECT count(uid) AS members FROM {og_uid} AS og_uid WHERE nid = %d AND og_uid.uid <> 1';
+	$result = db_query($sql, $group->nid);
+	
+	$group->members = db_fetch_array($result);
+	$group->members = $group->members['members'];
+	
+	$group->comments = 0;
+	$group->posts = 0;
+	
+	$sql = "SELECT node.nid FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_app' ORDER BY order_by ASC";
+	$result = db_query($sql, $group->nid);
+	
+	$apps = array();
+	
+	while ($nid = db_fetch_array($result))
+	{
+		$nid = $nid['nid'];
+		
+		$app = node_load($nid);
+		
+		$app_overview = module_invoke($app->field_cmtls_app_type[0]['value'], 'cmtls_group_overview', $app);
+		
+		if($app_overview)
+		{
+			$return = array(
+				'total comments' => 0,
+				'total posts' => 0,
+				'posts column' => NULL,
+				'comments column' => NULL,
+			);	
+			
+			$apps[] = array(
+				'nid' => $app->nid,
+				'title' => $app->title,
+			) + $app_overview;
+			
+			$group->comments += $app_overview['total comments'];
+			$group->posts += $app_overview['total posts'];
+		}
+	}
+	
+	return theme('cmtls_group_overview', $group, $apps, $page, theme('cmtls_members_content', $group));
 }

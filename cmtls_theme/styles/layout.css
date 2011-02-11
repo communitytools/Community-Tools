@@ -3,7 +3,6 @@
 -------------------------------------------------------------- */
 
 body {
-	/*background-image: url(../images/bg.jpg);*/
 	background-attachment: fixed;
 	height: 100%;
 	width: 100%;
@@ -24,7 +23,6 @@ body {
 	position: fixed;
 	width: 100%;
 	height: 100px;
-	background-image: url(../images/bg.jpg);
 	z-index: 50;
 }
 
@@ -54,7 +52,7 @@ body {
 		position: fixed;
 		top: 0;
 		right: 40px;
-		width: 90px;
+		width: auto;
 		-moz-border-radius: 5px;
 		-webkit-border-radius: 5px;
 		border-radius: 5px;
@@ -140,9 +138,9 @@ body {
 			bottom: 0;
 			left: 120px;
 			height: 33px;
-			width: 60%;
 			z-index: 56;
 			font-weight: bold;
+			width: 100%
 		}
 
 		@-moz-document url-prefix() { #header .header-container #cmtls-site-menu { height: 35px; } }
@@ -263,7 +261,7 @@ body {
 				margin-bottom: -1px
 			}
 
-		#header .header-container .community-name a.ct-logo-small {
+		#header .header-container .community-name a.logo {
 			position: absolute;
 			top: 25px;
 			left: -23px;
@@ -278,7 +276,7 @@ body {
 			margin-right: 15px;
 		}
 
-			#header .header-container .community-name a.ct-logo-small:hover {
+			#header .header-container .community-name a.logo:hover {
 				border: none;
 			}
 
@@ -725,7 +723,7 @@ body {
 			}
 
 		#tools ul li.selected a {
-			background: #3c8a2e url(../images/tools-selector-active.png) no-repeat 99px 0;
+			background: url(../images/tools-selector-active.png) no-repeat -19px 0;
 			width: 101px;
 			padding: 5px 20px 5px 10px;
 			border-bottom: none;
@@ -914,6 +912,7 @@ body {
 /* Content
 -------------------------------------------------------------- */
 #content {
+
 }
 
 	.text-map {
@@ -925,6 +924,9 @@ body {
 		padding: 25px;
 		background: #fff;
 		min-height: 90%;
+		box-shadow: 4px 0 10px #666;
+		-webkit-box-shadow: 5px 0 10px #666;
+		-moz-box-shadow: 5px 0 10px #666;
 	}
 
 		.text-map #text-container {
@@ -937,7 +939,7 @@ body {
 		padding: 25px;
 		left: 120px;
 		top: 100px;
-		box-shadow: 5px 0 10px #666;
+		box-shadow: 4px 0 10px #666;
 		-webkit-box-shadow: 5px 0 10px #666;
 		-moz-box-shadow: 5px 0 10px #666;
 		background: #fff;
@@ -948,14 +950,14 @@ body {
 	.map-only {
 		position: absolute;
 		display: block;
-		width: 11px;
-		left: 120px;
+		width: 10px;
+		left: 110px;
 		top: 100px;
-		box-shadow: 5px 0 10px #666;
-		-webkit-box-shadow: 5px 0 10px #666;
-		-moz-box-shadow: 5px 0 10px #666;
 		background: #fff;
 		min-height: 90%;
+		box-shadow: 5px 0 5px #666;
+		-webkit-box-shadow: 5px 0 5px #666;
+		-moz-box-shadow: 5px 0 5px #666;
 	}
 
 		.map-only #text-container {
@@ -1084,20 +1086,8 @@ body {
 /* Gallery
 -------------------------------------------------------------- */
 .gallery {
+	padding-top: 20px;
 }
-
-	.gallery .header {
-		margin-bottom: 15px;
-	}
-
-		.gallery .header h1 {
-			font-size: 18px;
-			font-weight: bold;
-			color: #333;
-		}
-
-		.gallery .header .gallery-meta {
-		}
 
 	.gallery .gallery-item {
 		position: relative;
@@ -1266,219 +1256,95 @@ body {
 }
 
 
-/* Address Book
+
+/* Group members list
 -------------------------------------------------------------- */
-.address-book {
+.cmtls-members-container {}
+
+.cmtls-members-container .members-filter {
+	font-size: 14px;
+	margin-bottom: 15px;
+	color: #ccc;
 }
 
-.address-book .profile-left {
+.cmtls-members-container .profile {
+	width: 220px;
+	height: 55px;
+	margin: 0 10px 10px 0;
+	padding: 10px 10px 10px 10px;
+	box-shadow: 2px 2px 7px #e2e2e2;
+	-webkit-box-shadow: 2px 2px 7px #e2e2e2;
+	-moz-box-shadow: 2px 2px 7px #e2e2e2;
 	float: left;
+	clear: none; /* Drupal override */
 }
 
-	.address-book .profile,
-	.address-book .profile-admin {
-		width: 250px;
-		height: 130px;
-		margin: 0 10px 10px 0;
-		padding: 10px 10px 10px 10px;
-		box-shadow: 2px 2px 10px #e2e2e2;
-		-webkit-box-shadow: 2px 2px 10px #e2e2e2;
-		-moz-box-shadow: 2px 2px 10px #e2e2e2;
+	.cmtls-members-container .profile img.avatar {
+		float: left;
 	}
 
-	.address-book .profile,
-	.address-book .profile-admin {
-		border: 1px solid #e2e2e2;
+	.cmtls-members-container .profile ul {
+		overflow: hidden;
 	}
 
-		.address-book .profile-admin ul li.admin-title {
-			color: #3C8A2E;
-			font-weight: bold;
-		}
-
-		.address-book .profile img.avatar,
-		.address-book .profile-admin img.avatar {
-			float: left;
-			border: 1px dotted #ccc;
-		}
-
-		.address-book .profile ul,
-		.address-book .profile-admin ul {
-			height: 125px;
+		.cmtls-members-container .profile ul li {
+			margin-left: 10px;
+			font-size: 12px;
+			list-style-type: none;
+			padding: 3px 0 0 0;
+			white-space: nowrap;
 			overflow: hidden;
-			width: 190px;
 		}
 
-			.address-book .profile ul li,
-			.address-book .profile-admin ul li {
-				margin-left: 10px;
-				width: 180px;
-				font-size: 12px;
-				list-style-type: none;
-				padding: 3px 0 0 0;
-				border-bottom: 1px dotted #ccc;
-			}
-
-			.address-book .profile ul li .line-description,
-			.address-book .profile-admin ul li .line-description {
-				opacity: 0.5;
-				-moz-opacity: 0.5;
-				filter:alpha(opacity=50);
-				display: inline;
-				font-weight: bold;
-			}
+		.cmtls-members-container .profile ul li.member-name {
+			font-size: 14px;
+		}
 
 
 /* Profile
 -------------------------------------------------------------- */
-.profile {
-
+.cmtls-member-profile-container {
+	vertical-align: top;
 }
 
-	.profile .section {
-		position: relative;
-		background: #f0efec;
-		border: 1px dotted #ccc;
-		-moz-border-radius-bottomright: 5px;
-		-webkit-border-bottom-right-radius: 5px;
-		border-bottom-right-radius: 5px;
-		-moz-border-radius-topright: 5px;
-		-webkit-border-top-right-radius: 5px;
-		border-top-right-radius: 5px;
+.cmtls-member-profile-container h2 {
+	margin-top: 25px;
+}
+
+.cmtls-member-profile-container .content-toolbar .avatar {
+	margin: 0 20px 10px 0;
+	float: left;
+}
+
+	.cmtls-member-profile-container .content-toolbar .avatar img {
+		margin: 0;
+		border: 4px solid #fff;
+		-webkit-box-shadow: 0px 1px 3px #ccc;
+		-moz-box-shadow: 0px 1px 3px #ccc;
+		box-shadow: 0px 1px 3px #ccc;
 	}
 
-		.profile .section a.profile-section-toggle-button {
-			background: #ccc;
-			font-weight: bold;
-			border-top: 1px solid #ccc;
-			border-bottom: none;
-			display: block;
-			padding: 6px 10px 4px 10px;
-			-moz-border-radius-bottomright: 5px;
-			-webkit-border-bottom-right-radius: 5px;
-			border-bottom-right-radius: 5px;
-			-moz-border-radius-topright: 5px;
-			-webkit-border-top-right-radius: 5px;
-			border-top-right-radius: 5px;
-			background: #000 url(../images/alert-overlay.png) repeat-x;
-			color: #fff;
-			border: none;
+.cmtls-member-profile-container .content-toolbar ul.cmtls-member-profile-overview {
+	float: left;
+	margin: 0 20px 20px 0;
+	max-width: 380px;
+}
 
-			box-shadow: 0 2px 5px #999;
-			-webkit-box-shadow: 0 2px 5px #999;
-			-moz-box-shadow: 0 2px 5px #999;
-			opacity: 0.8;
-			-moz-opacity: 0.8;
-			filter:alpha(opacity=80);
-		}
+.cmtls-member-profile-container .dashboard-item .author,
+.cmtls-member-profile-container .dashboard-item .time {
+	display: inline;
+}
 
-			.profile .section a.profile-section-toggle-button:hover {
-				background: #111 url(../images/alert-overlay.png) repeat-x;
-			}
 
-		.profile .section a.edit-profile-section {
-			position: absolute;
-			top: 7px;
-			right: 15px;
-			font-size: 12px;
-			color: #fff;
-			border: none;
-		}
-
-		.profile .section .profile-section-container {
-			padding: 10px;
-
-		}
-
-			.profile .section .profile-section-container img.avatar {
-				float: left;
-				border: 1px dotted #ccc;
-				margin-bottom: 10px;
-			}
-
-				.profile .section .profile-section-container ul li {
-					margin-left: 30px;
-					width: 405px;
-					font-size: 12px;
-					list-style-type: none;
-					padding: 3px 0 0 0;
-					border-bottom: 1px dotted #ccc;
-				}
-
-				.profile .section .profile-section-container ul li .line-description {
-					opacity: 0.5;
-					-moz-opacity: 0.5;
-					filter:alpha(opacity=50);
-					display: inline;
-					font-weight: bold;
-				}
-
-			.profile .section .profile-section-container .actions-node {
-				position: relative;
-				background: #fff;
-				border: 1px solid #f0efec;
-				font-size: 12px;
-				-moz-border-radius: 5px;
-				-webkit-border-radius: 5px;
-				border-radius: 5px;
-				margin-bottom: 5px;
-			}
-
-				.profile .section .profile-section-container .actions-node:hover {
-					border: 1px solid #cfcfcf;
-				}
-
-				.profile .section .profile-section-container .actions-node a.group-name {
-					background: #3C8A2E;
-					color: #fff;
-					display: inline-block;
-					padding: 7px 8px 5px 10px;
-					line-height: 1;
-					text-transform: uppercase;
-					font-size: 10px;
-					border: none;
-
-					-moz-border-radius-topleft: 3px;
-					-webkit-border-top-left-radius: 3px;
-					border-top-left-radius: 3px;
-
-				}
-
-				.profile .section .profile-section-container .actions-node a.tool-name {
-					background: #66b600 url(../images/pointer-right.png) no-repeat;
-					color: #fff;
-					display: inline-block;
-					padding: 7px 10px 5px 18px;
-					margin-left: -5px;
-					line-height: 1;
-					text-transform: uppercase;
-					font-size: 10px;
-					border: none;
-				}
-
-				.profile .section .profile-section-container .actions-node .content {
-					padding: 5px 10px;
-					border-bottom: 1px dotted #999;
-				}
-
-					.profile .section .profile-section-container .actions-node .content .author {
-						display: inline;
-						margin-left: 5px;
-					}
-
-					.profile .section .profile-section-container .actions-node .content .time {
-						color: #999;
-						display: inline;
-					}
-					
-.notification-description {
+.cmtls-member-notifications {
 	font-size: 12px;
 }
-					
+
 #cmtls-member-notification-settings-form {
-	font-size: 12px;
+	margin-top: -20px;
 }
 
+	#cmtls-member-notification-settings-form
 
 	#cmtls-member-notification-settings-form legend {
 		display: inline-block;
@@ -1489,7 +1355,7 @@ body {
 		display: inline-block;
 	}
 
-					
+
 
 /* Groups
 -------------------------------------------------------------- */
@@ -1825,8 +1691,7 @@ body {
 
 /* Custom Checkboxes + Radios
 -------------------------------------------------------------- */
-
-
+/*
 label.label_radio {
 	display: block;
 	cursor: pointer;
@@ -1871,10 +1736,11 @@ label.label_check {
 .has-js .label_radio input {
 	position: absolute; left: -9999px;
 }
-
+*/
 
 /* Registration
 -------------------------------------------------------------- */
+/*
 .registration-form {
 	width: 400px;
 	display: block;
@@ -1936,10 +1802,11 @@ label.label_check {
 			-moz-opacity: 1;
 			filter:alpha(opacity=1);
 		}
-
+*/
 
 /* Map pop-up add
 -------------------------------------------------------------- */
+/*
 .pop {
 	position: relative;
 	display: inline;
@@ -1990,6 +1857,7 @@ label.label_check {
 		z-index: 2000;
 		background: #333 url(../images/alert-overlay.png) repeat-x;
 	}
+*/
 
 /* Choose file button
 -------------------------------------------------------------- */
@@ -2171,6 +2039,25 @@ a.back-to-website-button {
 	}
 
 
+/* Site footer
+-------------------------------------------------------------- */
+/* Both divs and the height is nescessary for positioning footer always on bottom of the page.
+   Adjust height according to your site needs */
+#pre-footer,
+#footer {
+	height: 50px;
+}
+
+#pre-footer {
+	clear: both;
+	margin-top: 10px;
+}
+
+#footer {
+	position: absolute;
+	bottom: 15px;
+}
+
 /* jQuery UI overrides for modalframe
 -------------------------------------------------------------- */
 #ui-dialog-title-modalframe-container {
@@ -2205,4 +2092,24 @@ a.back-to-website-button {
 
 iframe#modalframe-element {
 	border: none;
+}
+
+/* Warning for older browsers
+-------------------------------------------------------------- */
+#cmlts-browser-warning {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #fff;
+	z-index: 20000;
+	text-align: center;
+	padding-top: 120px;
+}
+
+#cmlts-browser-warning p {
+	font-size: 20px;
 }

@@ -8,7 +8,5 @@
  */
 ?>
 <?php foreach ($rows as $id => $row): ?>
-	<div class="comment-item">
 	   <?php print $row; ?>
-	</div>
 <?php endforeach; ?>

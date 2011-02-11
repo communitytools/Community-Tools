@@ -9,21 +9,6 @@ function cmtls_openid_menu()
 {
 	$items = array();
 
-	/*
-	 * Admin pages
-	 */
-	/*$items['admin/settings/cmtls-authentication/facebook'] = array(
-		'title' => 'Facebook',
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('cmtls_fb_admin'),
-		'access arguments' => array('access administration pages'),
-		'type' => MENU_LOCAL_TASK, // TODO: needs some checking, currently half-operational
-	);*/
-
-	/*
-	 * Public pages
-	 */
-
 	$items['cmtls/login/openid'] = array(
 		'title' => 'Connect with ID card',
 		'page callback' => 'cmtls_openid_login',
@@ -68,8 +53,12 @@ function cmtls_openid_add_form_fields($form)
 	);
 	
 	unset($form['openid_links']);
+	
+	// Unset OpenID specific stuff
+	unset($form['openid_identifier'], $form['openid.return_to']);
 
 	drupal_add_css(drupal_get_path('module', 'cmtls_openid') . '/css/cmtls_openid.css');
+	drupal_add_js(drupal_get_path('module', 'cmtls_openid') . '/js/app.js');
 			
 	return $form;
 }
@@ -85,7 +74,7 @@ function cmtls_openid_form_alter(&$form, &$form_state, $form_id){
 		case 'user_login':
 			
 			$form = cmtls_openid_add_form_fields($form);
-
+			
 			break;
 
 		/**
@@ -118,6 +107,10 @@ function cmtls_openid_form_alter(&$form, &$form_state, $form_id){
 						'#type' => 'value',
 						'#value' => $session['euid'],
 					);
+					
+					$form['#submit'][] = 'cmtls_openid_user_ie_submit';
+					
+					$form_state['redirect'] = 'cmtls';
 				}
 			}
 			elseif(!$module)
@@ -129,6 +122,15 @@ function cmtls_openid_form_alter(&$form, &$form_state, $form_id){
 	}
 }
 
+function cmtls_openid_user_ie_submit($form, &$form_state)
+{
+	if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') && in_array('modalframe_form_submit', $form['#submit']))
+	{
+		unset($GLOBALS['modalframe_close_dialog']);
+	}
+	
+	return $form;
+}
 
 /**
  * Submit callback for user_login
@@ -154,12 +156,25 @@ function cmtls_openid_login(){
 
 	$session = cmtls_openid_get_session();
 
-	if($session['status'] == 'success'){
-		return cmtls_auth_user_login($session['euid'], 'cmtls_openid');
-	}elseif($openid_session['status'] == 'cancel'){
+	if($session['status'] == 'success')
+	{
+		$display = cmtls_auth_user_login($session['euid'], 'cmtls_openid');
+		
+		if(!$display && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE'))
+		{
+			drupal_goto('cmtls');
+		}
+		else
+		{
+			return $display;
+		}
+	}
+	elseif($openid_session['status'] == 'cancel')
+	{
 		drupal_set_message(t("Authentication cancelled."));
 		drupal_goto('cmtls/login');
-	}else{
+	}else
+	{
 		drupal_set_message(t("Authentication failed."), 'error');
 		drupal_goto('cmtls/login');
 	}

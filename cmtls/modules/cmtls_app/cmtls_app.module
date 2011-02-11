@@ -54,11 +54,14 @@ function cmtls_app_reorder_perm($node)
  */
 function cmtls_app_init()
 {
-	// adds current app node to cmtls js space
-	$current_group = _cmtls_group_get_current();
-	$current_app = _cmtls_app_get_current($current_group);
-	
-	drupal_add_js(array('cmtls' => array('currentApp' => _cmtls_node_json_prepare($current_app))), 'setting');
+	if(_cmtls_is())
+	{
+		// adds current app node to cmtls js space
+		$current_group = _cmtls_group_get_current();
+		$current_app = _cmtls_app_get_current($current_group);
+		
+		drupal_add_js(array('cmtls' => array('currentApp' => _cmtls_node_json_prepare($current_app))), 'setting');
+	}
 }
 
 /**
@@ -214,27 +217,6 @@ function cmtls_app_page($group, $app)
 }
 
 /**
- * Implents hook_nodeapi()
- * Adds app default map stuff to app nodes
- *
- * @param node $node
- * @param string $op
- * @param unknown_type $a3
- * @param unknown_type $a4
- * @return array
- */
-/*
-function cmtls_app_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
-{
-	global $user;
-	
-	if($op == 'load' && $node->type == 'cmtls_app')
-	{
-	}
-}
-*/
-
-/**
  * Implements hook_preprocess()
  * Adds current groups current app node to template variables
  *
@@ -243,14 +225,26 @@ function cmtls_app_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
  */
 function cmtls_app_preprocess(&$vars, $hook)
 {
-	$current_group = _cmtls_group_get_current();
-	$current_app = _cmtls_app_get_current($current_group);
-
-	if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
+	static $cache;
 	
-	$vars['cmtls'] += array(
-		'current_app' => $current_app,
-	);
+	if(_cmtls_is())
+	{
+		if($cache)
+		{
+			$vars['cmtls'] = $cache;
+		}
+		else 
+		{
+			$current_group = _cmtls_group_get_current();
+			$current_app = _cmtls_app_get_current($current_group);
+		
+			if(!isset($vars['cmtls'])) $vars['cmtls'] = array();
+			
+			$cache = $vars['cmtls'] += array(
+				'current_app' => $current_app,
+			);
+		}
+	}
 }
 
 function cmtls_app_form_cmtls_app_node_form_alter(&$form, &$form_state)

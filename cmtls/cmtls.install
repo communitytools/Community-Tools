@@ -94,6 +94,13 @@ function cmtls_install()
 	db_query("INSERT INTO {sections_data} (sid, name, status, path, theme, visibility, weight) VALUES ('1', 'Administration theme', '1', 'admin\r\nadmin/*', 'garland', '1', '-10')");
 	db_query("INSERT INTO {sections_data} (sid, name, status, path, theme, visibility, weight) VALUES ('2', 'cmtls', '1', 'cmtls\r\ncmtls/*', 'cmtls_theme', '1', '0')");
 	
+	// synchonize notifications actions
+	$actions = actions_list();
+	actions_synchronize($actions);
+	
+	// add trigger events
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', 'cmtls_notify_action', 2)");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('comment', 'insert', 'cmtls_notify_comment_action', 2)");
 }
 
 /**

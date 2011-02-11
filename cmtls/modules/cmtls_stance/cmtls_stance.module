@@ -101,7 +101,7 @@ function cmtls_stance_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 				$stance->user_url = url('cmtls/' . $main_group->nid . '/member/' . $stance->uid, array('absolute' => TRUE));
 
 				$stances->sorted[$stance->stance][] = $stance;
-				$stances->all[] = $stance;
+				$stances->all[$stance->uid] = $stance;
 
 				if ($user->uid == $stance->uid) {
 					$stances->user_stance = $stance->stance;

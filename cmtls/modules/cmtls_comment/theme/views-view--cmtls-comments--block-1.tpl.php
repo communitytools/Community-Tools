@@ -31,11 +31,16 @@
 ?>
 <div class="cmtls-thread-comments-container">
 
-	<?php print l('&larr; '.t('Go back'), _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid, array('html' => TRUE, 'attributes' => array('class' => 'back-button'))); ?>
-	<div style="clear: both;"></div>
-	
+
+	<div class="content-toolbar">
+		<h1>
+			<?php print l('&larr;', _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid, array('html' => TRUE, 'attributes' => array('class' => 'back-button'))); ?>
+			<?php print check_plain($cmtls['current_thread']->title); ?>
+		</h1>
+	</div> <!-- content-toolbar -->
+
 	<div class="forum">
-		<h1><?php print l($cmtls['current_forum']->title, _cmtls_app_get_path().'/forum'); ?> &rarr; <?php print l($cmtls['current_thread']->title, _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid); ?></h1>
+		
 		<table class="forum-single">
 			<tr>
 				<td class="author">

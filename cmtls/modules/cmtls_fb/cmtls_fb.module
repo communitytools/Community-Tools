@@ -11,20 +11,13 @@ function cmtls_fb_menu()
 {
 	$items = array();
 
-	/*
-	 * Admin pages
-	 */
-	$items['admin/settings/cmtls-authentication/facebook'] = array(
+	$items['admin/build/cmtls/facebook'] = array(
 		'title' => 'Facebook',
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('cmtls_fb_admin'),
 		'access arguments' => array('administer cmtls'),
-		'type' => MENU_LOCAL_TASK, // TODO: needs some checking, currently half-operational
+		'type' => MENU_LOCAL_TASK,
 	);
-
-	/*
-	 * Public pages
-	 */
 
 	$items['cmtls/login/facebook'] = array(
 		'title' => 'Connect with Facebook',
@@ -181,16 +174,16 @@ function cmtls_fb_admin(){
 		'#title' => t('Application ID'),
 		'#default_value' => variable_get('fb_app_id', ''),
 		'#size' => 32,
-		'#description' => t("Your application's ID."),
+		'#description' => t('Your application\'s ID.'),
 		'#required' => TRUE,
 	);
 	
 	$form['fb_secret_key'] = array(
 		'#type' => 'textfield',
-		'#title' => t('Application Secret Key'),
+		'#title' => t('Application Secret'),
 		'#default_value' => variable_get('fb_secret_key', ''),
 		'#size' => 32,
-		'#description' => t("Your application's secret key."),
+		'#description' => t('Your application\'s secret.'),
 		'#required' => TRUE,
 	);
 

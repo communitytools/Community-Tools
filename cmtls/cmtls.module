@@ -28,6 +28,14 @@ function cmtls_init()
 	modalframe_parent_js();
 	
 	drupal_set_html_head('<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js"></script>');
+	
+	drupal_add_js('var addthis_config = {
+	ui_language: "en",
+	ui_cobrand: "Community Tools",
+	ui_click: true,
+	services_compact: "facebook,twitter,linkedin,orkut,tumblr,email,blogger,delicious,digg,menu",
+	ui_use_css: false // doesnt seem to work?
+};', 'inline');
 }
 
 /**
@@ -451,12 +459,18 @@ function cmtls_menu()
 	$items = array();
 	
 	$items['admin/build/cmtls'] = array(
-		'title' => 'Community Tools',
-		'description' => 'Community Tools',
+		'title' => t('Community Tools'),
+		'description' => t('Community Tools configuration'),
 		'page callback' => 'drupal_get_form',
-		'page arguments' => array('cmtls_admin_settings'),
+		'page arguments' => array('cmtls_config_form'),
 		'access arguments' => array('administer cmtls'),
 		'type' => MENU_NORMAL_ITEM
+	);
+	
+	$items['admin/build/cmtls/notifications'] = array(
+		'title' => t('Notifications'),
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'weight' => -20,
 	);
 	
 	$items['cmtls/node/%node'] = array(
@@ -472,31 +486,9 @@ function cmtls_menu()
 	return $items;
 }
 
-function cmtls_admin_settings()
+function cmtls_config_form(&$form_state)
 {
 	$form = array();
-	
-	// Define Form
-	$form['cmtls_map_default_layer'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Default map layer'),
-		'#description' => t('Default map layer machine name: osm_mapnik, google_satellite, google_hybrid, google_normal, google_physical'),
-		'#default_value' => variable_get('cmtls_map_default_layer', 'osm_mapnik'),
-	);
-	
-	$form['cmtls_map_default_centerpoint'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Default map centerpoint'),
-		'#description' => t('Geo coordinate: latitude, longitude. Example: 24.734559058178, 59.424735894784'),
-		'#default_value' => variable_get('cmtls_map_default_centerpoint', '25.013607,58.595272'),
-	);
-	
-	$form['cmtls_map_default_zoom'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Default map zoom'),
-		'#description' => t('The zoom state'),
-		'#default_value' => variable_get('cmtls_map_default_zoom', '8'),
-	);
 	
 	$form['cmtls_comment_notifications'] = array(
 		'#type' => 'checkbox',
@@ -524,6 +516,13 @@ function cmtls_block($op = 'list', $delta = 0, $edit = array())
 	{
 		$blocks = array();
 		
+		$blocks['powered_by_cmtls'] = array(
+			'info' => t('Powered by Community Tools'),
+			'weight' => '10',
+			// Not worth caching.
+			'cache' => BLOCK_NO_CACHE,
+		);
+		
 		$blocks['cmtls_site_menu'] = array(
 			'info' => t('Community Tools: site menu'),
 			'status' => 1,
@@ -531,6 +530,18 @@ function cmtls_block($op = 'list', $delta = 0, $edit = array())
 		);
 		
 		return $blocks;
+	}
+	
+	if($op == 'view' && $delta == 'powered_by_cmtls')
+	{
+		$image_path = url(drupal_get_path('theme', 'cmtls_theme').'/images/ct-logo-small.png', array('absolute' => TRUE));
+		
+		$block = array(
+			'subject' => NULL, // Don't display a title
+			'content' => '<a href="http://www.communitytools.info/"><img border="0" src="'.$image_path.'" title="'.t('Powered by Community Tools').'" alt="'.t('Powered by Community Tools').'"></a>',
+		);
+		
+		return $block;
 	}
 	
 	if($op == 'view' && $delta == 'cmtls_site_menu')
@@ -698,8 +709,10 @@ function cmtls_cron()
 	if(!empty($mail_contents['new_content']) || !empty($mail_contents['commented_content']) || !empty($mail_contents['new_groups']))
 	{
 		$site_name = variable_get('site_name', 'CT');
+		$main_group = _cmtls_group_get_main();
+		$profile_link = url('cmtls/'.$main_group->nid.'/member/', array('absolute' => TRUE));
 		
-		foreach($users as $user_id => &$user) if(!isset($user->data['cmtls']['notifications']['group']) || $user->data['cmtls']['notifications']['group'])
+		foreach($users as $user_id => &$user) if($user_id == 1 && !isset($user->data['cmtls']['notifications']['group']) || $user->data['cmtls']['notifications']['group'])
 		{
 			// if any users groups has new content
 			$user_new_content_group_ids = array_intersect($user->groups, $new_content_group_ids);
@@ -708,11 +721,11 @@ function cmtls_cron()
 			{
 				$body = '';
 				
-				$content_body = '';
-				$comments_body = '';
-					
 				foreach ($user_new_content_group_ids as &$group_id)
 				{
+					$content_body = '';
+					$comments_body = '';
+					
 					$user_new_content_app_ids = array_intersect(array_keys($groups[$group_id]->apps), $new_content_app_ids);
 					
 					$i = 0;
@@ -720,8 +733,8 @@ function cmtls_cron()
 					{
 						if(!empty($mail_contents['new_content'][$app_id]) && (!isset($user->data['cmtls']['notifications']['apps']['daily'][$app_id]) || $user->data['cmtls']['notifications']['apps']['daily'][$app_id]))
 						{
-							$content_body .= implode("\n", $mail_contents['new_content'][$app_id])."\n";
 							$i++;
+							$content_body .= implode("\n", $mail_contents['new_content'][$app_id])."\n";
 						}
 					}
 						
@@ -736,7 +749,6 @@ function cmtls_cron()
 						if(!empty($mail_contents['commented_content'][$app_id]) && (!isset($user->data['cmtls']['notifications']['apps']['daily'][$app_id]) || $user->data['cmtls']['notifications']['apps']['daily'][$app_id]))
 						{
 							$i++;
-							
 							$comments_body .= implode("\n", $mail_contents['commented_content'][$app_id])."\n";
 						}
 					}
@@ -745,9 +757,9 @@ function cmtls_cron()
 					{
 						$comments_body = t('New comments have been posted in !groupname', array('!groupname' => $groups[$group_id]->title))."\n".$comments_body."\n";
 					}
+					
+					$body .= $content_body.$comments_body;
 				}
-				
-				$body = $content_body.$comments_body;
 				
 				if(!empty($mail_contents['new_groups']))
 				{
@@ -765,12 +777,12 @@ function cmtls_cron()
 							t('Here\'s a summary of !sitename daily changes', array('!sitename' => $site_name)).':'."\n\n".
 							$body.
 							"\n"."\n".'---'."\n".
-							'Community Tools'."\n"
+							$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$user->uid))."\n"
 						,
 					);
 					
 					drupal_mail('cmtls', 'cmtls_mail', $user->mail, language_default(), $message);
-					//exit;
+					//printr($message);
 					
 					$users_sent++;
 				}
@@ -811,12 +823,12 @@ function cmtls_theme($existing)
 	);
 }
 
-function cmtls_ajax_response($content)
+function cmtls_ajax_response($content, $options = array())
 {
 	// add features
 	$features = cmtls_map_format_features(_cmtls_map_features('get'));
 	
-	print drupal_json(array('content' => $content, 'features' => $features));
+	print drupal_json(array('content' => $content, 'features' => $features, 'options' => $options));
 	exit;
 }
 
@@ -827,12 +839,12 @@ function cmtls_ajax_response($content)
  */
 function cmtls_preprocess(&$vars, $hook)
 {
-	static $pager;
-	
 	if ($hook != 'cmtls_sm_share' && strpos($hook, 'views_view_fields') === 0 && isset($vars['view']) && isset($vars['fields']) && isset($vars['fields']['nid']))
 	{
 		$vars['sm_share_buttons'] = theme('cmtls_sm_share', $GLOBALS['base_url'].'/'.cmtls_path_to_node($vars['fields']['nid']->raw));
 	}
+	
+	static $pager;
 	
 	if ($hook != 'cmtls_pager' && $hook != 'cmtls_sm_share')
 	{
@@ -858,6 +870,20 @@ function cmtls_preprocess(&$vars, $hook)
 				'cmtls_pager',
 				'?'.implode('&', $pager_links)
 			);
+		}
+	}
+	
+	static $region;
+	
+	if($hook != 'page' && $hook != 'node' && $hook != 'cmtls_sm_share' && $hook != 'cmtls_pager' && $hook != 'block' && $hook != 'cmtls_content_header')
+	{
+		if(!$region)
+		{
+			$vars['cmtls_content_header'] = $region = theme('blocks', 'cmtls_content_header');
+		}
+		else 
+		{
+			$vars['cmtls_content_header'] = $region;
 		}
 	}
 }
@@ -943,7 +969,7 @@ function cmtls_forms_alter($form, $form_state)
 	
 	if ($form['#node'] && $form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] && ($form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] != 'GEOMETRYCOLLECTION()'))
 	{
-		$form['geolocation']['#collapsible'] = FALSE;
+		$form['geolocation']['#collapsed'] = TRUE;
 	}
 
 	if($form['buttons']['delete'])
@@ -994,7 +1020,7 @@ function cmtls_forms_after_build($form, &$form_state)
 	$form['og_groups'] = $form['og_nodeapi']['visible']['og_groups'];
 	$form['og_groups']['#options'] = $form['og_groups']['#type']=='select' ? form_options_flatten($form['og_groups']['#options']) : $form['og_groups']['#options'];
 	$form['og_groups']['#type'] = 'value';
-	$form['og_groups']['#value'] = $form_state['values']['og_groups'] = isset($node->og_groups) ? $node->og_groups : array($current_group->nid => $current_group->nid);
+	$form['og_groups']['#value'] = $form_state['values']['og_groups'] = isset($node->og_groups) && sizeof($node->og_groups) ? $node->og_groups : array($current_group->nid => $current_group->nid);
 
 	$form['og_public'] = $form['og_nodeapi']['visible']['og_public'];
 	$form['og_public']['#type'] = 'value';
@@ -1107,7 +1133,7 @@ function cmtls_notify_action($node, $context = array())
 {
 	if(!$node->og_groups) return;
 	
-	$group = array_pop($node->og_groups);
+	$group = reset($node->og_groups);
 	
 	if(!$group) return;
 	
@@ -1124,19 +1150,22 @@ function cmtls_notify_action($node, $context = array())
 	
 	$site_name = variable_get('site_name', 'CT');
 	
+	$main_group = _cmtls_group_get_main();
+	$profile_link = url('cmtls/'.$main_group->nid.'/member/', array('absolute' => TRUE));
+	
 	while ($user = db_fetch_object($result))
 	{
 		$user->data = unserialize($user->data);
 		if($user->data['cmtls']['notifications']['group'] && $user->data['cmtls']['notifications']['apps']['instant'][$node->parent])
 		{
 			$message = array(
-				'subject' => t('!sitename new post', array('!sitename' => $site_name)),
+				'subject' => t('!sitename has new post', array('!sitename' => $site_name)),
 				'body' =>
 					t('Hello !username', array('!username' => $user->name)).','."\n\n".
-					t('There\'s a post at !sitename', array('!sitename' => $site_name)).':'."\n\n".
+					t('!sitename has new post', array('!sitename' => $site_name)).':'."\n\n".
 					$body.
 					"\n"."\n".'---'."\n".
-					'Community Tools'."\n"
+					$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$user->uid))."\n"
 				,
 			);
 			
@@ -1168,7 +1197,12 @@ function cmtls_notify_comment_action($comment, $context = array())
     	$current_group = _cmtls_group_get_current();
     	
 		$site_name = variable_get('site_name', 'CT');
+		
+		$node_link = url(cmtls_path_to_node($node, $current_group), array('absolute' => TRUE));
     	
+		$main_group = _cmtls_group_get_main();
+		$profile_link = url('cmtls/'.$main_group->nid.'/member/', array('absolute' => TRUE));
+		
     	// notify node author
 		if($user->uid != $node->uid)
 		{
@@ -1185,9 +1219,11 @@ function cmtls_notify_comment_action($comment, $context = array())
 							array(
 								'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
 								'!nodetitle' => $node->title,
-								'!nodelink' => url(cmtls_path_to_node($node, $current_group), array('absolute' => TRUE)),
+								'!nodelink' => $node_link,
 							)
-						)."\n",
+						).
+						"\n".'---'."\n".
+						$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$author->uid))."\n",
 				);
 				
 				drupal_mail('cmtls', 'cmtls_mail', $author->mail, language_default(), $message);
@@ -1212,9 +1248,11 @@ function cmtls_notify_comment_action($comment, $context = array())
 							array(
 								'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
 								'!nodetitle' => $node->title,
-								'!nodelink' => url(cmtls_path_to_node($node, $current_group), array('absolute' => TRUE)),
+								'!nodelink' => $node_link,
 							)
-						)."\n",
+						).
+						"\n".'---'."\n".
+						$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$commenter->uid))."\n",
 				);
 				
 				drupal_mail('cmtls', 'cmtls_mail', $commenter->mail, language_default(), $message);

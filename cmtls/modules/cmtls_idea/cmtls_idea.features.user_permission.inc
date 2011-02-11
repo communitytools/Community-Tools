@@ -40,15 +40,6 @@ function cmtls_idea_user_default_permissions() {
     ),
   );
 
-  // Exported permission: edit field_cmtls_idea_post_on_fb
-  $permissions['edit field_cmtls_idea_post_on_fb'] = array(
-    'name' => 'edit field_cmtls_idea_post_on_fb',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'authenticated user',
-    ),
-  );
-
   // Exported permission: edit field_cmtls_idea_status
   $permissions['edit field_cmtls_idea_status'] = array(
     'name' => 'edit field_cmtls_idea_status',
@@ -61,15 +52,6 @@ function cmtls_idea_user_default_permissions() {
   // Exported permission: edit own cmtls_idea content
   $permissions['edit own cmtls_idea content'] = array(
     'name' => 'edit own cmtls_idea content',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'authenticated user',
-    ),
-  );
-
-  // Exported permission: view field_cmtls_idea_post_on_fb
-  $permissions['view field_cmtls_idea_post_on_fb'] = array(
-    'name' => 'view field_cmtls_idea_post_on_fb',
     'roles' => array(
       '0' => 'admin',
       '1' => 'authenticated user',

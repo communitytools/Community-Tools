@@ -50,7 +50,7 @@ function cmtls_event_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Location',
-      'weight' => '9',
+      'weight' => '10',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -220,7 +220,7 @@ function cmtls_event_content_default_fields() {
       'max_filesize_per_file' => '10M',
       'max_filesize_per_node' => '50M',
       'label' => 'Files',
-      'weight' => '10',
+      'weight' => '11',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
@@ -292,10 +292,74 @@ function cmtls_event_content_default_fields() {
       'autocompletion_field_cmtls_address_type' => 'input',
       'position' => '10',
       'label' => 'Geo info',
-      'weight' => '8',
+      'weight' => '9',
       'description' => '',
       'type' => 'openlayers_geocoder_widget',
       'module' => 'openlayers_geocoder',
+    ),
+  );
+
+  // Exported field: field_cmtls_registration_open
+  $fields['cmtls_event-field_cmtls_registration_open'] = array(
+    'field_name' => 'field_cmtls_registration_open',
+    'type_name' => 'cmtls_event',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'datetime',
+    'required' => '0',
+    'multiple' => '0',
+    'module' => 'date',
+    'active' => '1',
+    'granularity' => array(
+      'year' => 'year',
+      'month' => 'month',
+      'day' => 'day',
+      'hour' => 'hour',
+      'minute' => 'minute',
+    ),
+    'timezone_db' => 'UTC',
+    'tz_handling' => 'site',
+    'todate' => '',
+    'repeat' => 0,
+    'repeat_collapsed' => '',
+    'default_format' => 'medium',
+    'widget' => array(
+      'default_value' => 'blank',
+      'default_value_code' => '',
+      'default_value2' => 'same',
+      'default_value_code2' => '',
+      'input_format' => 'd.m.Y - H:i',
+      'input_format_custom' => '',
+      'increment' => '1',
+      'text_parts' => array(),
+      'year_range' => '-3:+3',
+      'label_position' => 'above',
+      'label' => 'Registration open until',
+      'weight' => '-2',
+      'description' => '',
+      'type' => 'date_popup',
+      'module' => 'date',
     ),
   );
 
@@ -306,6 +370,7 @@ function cmtls_event_content_default_fields() {
   t('Files');
   t('Geo info');
   t('Location');
+  t('Registration open until');
 
   return $fields;
 }

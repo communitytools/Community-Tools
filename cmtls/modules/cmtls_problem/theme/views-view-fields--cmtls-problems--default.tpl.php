@@ -45,7 +45,7 @@ $current_app = _cmtls_app_get_current($current_group);
 			<?php print t('reported'); ?> <?php print $fields['created']->content; ?> &middot;
 		</div>
 
-		<div class="meta-status <?php print ($fields['field_cmtls_problem_status_value']->raw ? 'closed' : 'open'); ?>">
+		<div id="cmtls-problem-status-<?php print $fields['nid']->raw; ?>" class="meta-problem-status <?php print ($fields['field_cmtls_problem_status_value']->raw ? 'closed' : 'open'); ?>">
 			<?php print t($fields['field_cmtls_problem_status_value']->content); ?>
 		</div>
 
@@ -113,6 +113,8 @@ $current_app = _cmtls_app_get_current($current_group);
 
 		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php print l($fields['title']->raw, cmtls_problem_path($node, $cmtls['current_group'])); ?></h1>
 
+		<div class="meta-problem-status <?php print ($fields['field_cmtls_problem_status_value']->raw ? 'closed' : 'open'); ?>"><?php print t($fields['field_cmtls_problem_status_value']->content); ?></div>
+
 		<?php if (is_array($node->taxonomy)): ?>
 			<?php if (count($node->taxonomy) > 0): ?>
 				<div class="meta-tags">
@@ -135,8 +137,6 @@ $current_app = _cmtls_app_get_current($current_group);
 			<?php print t('Repoted').' '.$fields['created']->content; ?> &middot;
 			<?php print $fields['comment_count']->raw ? format_plural($fields['comment_count']->raw,'1 comment','@count comments').' &middot; ' : ''; ?>
 		</div>
-
-		<div class="meta-status <?php print ($fields['field_cmtls_problem_status_value']->raw ? 'closed' : 'open'); ?>"><?php print t($fields['field_cmtls_problem_status_value']->content); ?></div>
 
 		<?php print node_teaser($fields['body']->content, NULL, 200); ?><?php print node_teaser($fields['body']->content, NULL, 200) < $fields['body']->content ? '..' : NULL; ?>
 		 &middot; <a href="<?php print base_path().cmtls_problem_path($node); ?>" title="<?php print t('Read more'); ?>"><?php print t('Read more'); ?></a>

@@ -10,58 +10,53 @@
   <?php print $head; ?>
   <title><?php print $head_title; ?></title>
   <?php print $styles; ?>
-	<!--[if lt IE 8]>
-		<style type="text/css">
-			li a {display:inline-block;}
-			li a {display:block;}
-		</style>
-	<![endif]-->
   <?php print $scripts; ?>
 </head>
-<body style="background-image: url(<?php print $cmtls['current_group_properties']['background_image']; ?>);">
+<body<?php $cmtls['current_group_properties']['background_image'] ? print ' style="background-image: url('.$cmtls['current_group_properties']['background_image'].'"' : NULL; ?>>
 	<div class="filters">
 			<a href="javascript:void(0);" onclick="mapLocationSwitcer('map-only');"><?php print t('Map'); ?></a> |
 			<a href="javascript:void(0);" onclick="mapLocationSwitcer('text-map');"><?php print t('Map and Text'); ?></a> |
 			<a href="javascript:void(0);" onclick="mapLocationSwitcer('text-only');"><?php print t('Text'); ?></a>
 	</div>
-	<div id="header">		
-		<div class="header-container">	
-		
+	<div id="header">
+		<div class="header-container">
+
 			<div id="cmtls-site-menu">
-				<ul>
+				<ul id="cmtls-select-group-menu">
 					<li><a href="" class="select-group-menu"><span><?php print ($user->uid ? t('My groups') : t('Groups')); ?></span></a></li>
-				</ul>		
+				</ul>
 				<?php print $cmtls_site_menu; ?>
 			</div>
-			
+
 			<?php if($user->uid): ?>
 				<?php print views_embed_view('cmtls_groups', 'default', $user->uid); ?>
 			<?php else: ?>
 				<?php print views_embed_view('cmtls_groups', 'default'); ?>
 			<?php endif; ?>
-			
+
 			<div class="community-name">
-				<?php print l('', $base_url, array('attributes' => array('class' => 'ct-logo-small', 'target' => '_blank'))); ?>
-				<div class="community-title"><?php print l($cmtls['main_group']->title, 'cmtls/'.$cmtls['main_group']->nid); ?></div>
-				<div class="arrow-right">&gt;</div>
-				<div class="current-group-name"><?php print l($cmtls['current_group']->title, 'cmtls/'.$cmtls['current_group']->nid, array('attributes' => array('class' => ($cmtls['current_group']->og_private ? 'closed' : '')))); ?></div>
-				<?php if($user->uid): ?>
-					<?php if(og_is_group_member($cmtls['current_group'], FALSE)): ?>
-						<?php print l(t('(Members)'), 'cmtls/'.$cmtls['current_group']->nid.'/members', array('attributes' => array('class' => 'ct-members-join'))); ?>
-					<?php else: ?>
-						<?php print l(t('(Join group)'), 'cmtls/'.$cmtls['current_group']->nid.'/join', array('attributes' => array('class' => 'ct-members-join modalframe-child'))); ?>
-					<?php endif; ?>
+				<?php print l('', $base_url, array('attributes' => array('class' => 'logo'))); ?>
+				<div class="community-title"><?php print l($site_name, 'cmtls/'.$cmtls['main_group']->nid); ?></div>
+				<?php if($cmtls['main_group']->nid != $cmtls['current_group']->nid): ?>
+					<div class="arrow-right">&gt;</div>
+					<div class="current-group-name"><?php print l($cmtls['current_group']->title, 'cmtls/'.$cmtls['current_group']->nid, array('attributes' => array('class' => ($cmtls['current_group']->og_private ? 'closed' : '')))); ?></div>
 				<?php endif; ?>
+					<?php if($user->uid): ?>
+						<?php if(og_is_group_member($cmtls['current_group'], FALSE)): ?>
+							<?php print l(t('(Members)'), 'cmtls/'.$cmtls['current_group']->nid.'/members', array('attributes' => array('class' => 'ct-members-join'))); ?>
+						<?php else: ?>
+							<?php print l(t('(Join group)'), 'cmtls/'.$cmtls['current_group']->nid.'/join', array('attributes' => array('class' => 'ct-members-join modalframe-child'))); ?>
+						<?php endif; ?>
+					<?php endif; ?>				
 			</div>
-		
+
 			<?php print l('', $base_url, array('attributes' => array('class' => 'back-to-website-button'))); ?>
-	
+
 		</div>
-		
-		<div class="background-image" style="background-image: url(<?php print $cmtls['current_group_properties']['background_image']; ?>);"></div>
-		
+
+		<div class="background-image"<?php $cmtls['current_group_properties']['background_image'] ? print ' style="background-image: url('.$cmtls['current_group_properties']['background_image'].'"' : NULL; ?>></div>
 		<div class="background"></div>
-		
+
 		<?php /*
 		<div class="community-name">
 			<?php print l($cmtls['main_group']->title, 'cmtls/'.$cmtls['main_group']->nid); ?>
@@ -69,8 +64,8 @@
 				<a href="http://www.communitytools.info">Community Tools</a>
 			</div>
 		</div>*/ ?>
-		
-		<?php if($user->uid): ?>	
+
+		<?php if($user->uid): ?>
 		<div class="profile-background">
 			<ul class="profile-selector">
 				<li>
@@ -84,12 +79,12 @@
 				</li>
 			</ul>
 		</div>
-		
+
 		<?php else: ?>
 		<div class="profile-background">
 			<ul class="profile-selector">
 				<li>
-					<a href="javascript:void(0);"><?php print t('Member'); ?></a>
+					<a href="javascript:void(0);"><?php print t('Account'); ?></a>
 					<ul class="hidden">
 						<li><?php print l(t('Login'), 'cmtls/login', array('attributes' => array('class' => 'modalframe-child'))); ?></li>
 						<li><?php print l(t('Register'), 'cmtls/register', array('attributes' => array('class' => 'modalframe-child'))); ?></li>
@@ -98,18 +93,20 @@
 			</ul>
 		</div>
 		<?php endif; ?>
-		
+
 		<?php /* <input class="global-search" type="text" name="some_name" value="Otsing " id="some_name"> */ ?>
-		
+
 	</div>
-	
+
 	<?php print views_embed_view('cmtls_apps', 'default', $cmtls['current_group']->nid); ?>
-	
+
 	<div id="content" class="<?php print $cmtls['map']['class'] ? $cmtls['map']['class'] : 'text-only'; ?>">
 		<div id="text-container">
 			<?php print $content; ?>
+			<div id="pre-footer"></div>
+			<div id="footer"><?php print $footer_message . $footer ?></div>
 		</div>
-		
+
 		<div id="map"><?php print $cmtls['map']['output']; ?></div>
 	</div>
 
@@ -123,15 +120,15 @@
 	      tab_bg_color:'#3C8A2E',
 	      tab_hover_color:'#163D0E'
 	      };
-	      
+
 	      (function() {
 		  var _ue = document.createElement('script'); _ue.type = 'text/javascript'; _ue.async = true;
 		  _ue.src = ('https:' == document.location.protocol ? 'https://s3.amazonaws.com/' : 'http://') + 'cdn.userecho.com/js/widget-1.4.gz.js';
 		  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(_ue, s);
 		})();
 	</script>
-	
+
 	<?php print $closure ?>
-	
+
 </body>
 </html>

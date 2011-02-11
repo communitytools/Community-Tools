@@ -42,7 +42,7 @@ function cmtls_problem_init()
 		drupal_add_feed(url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/rss', array('absolute' => TRUE)), $app->title);
 	}
 
-	//drupal_add_js(drupal_get_path('module', 'cmtls_problem') .'/js/app.js');
+	drupal_add_js(drupal_get_path('module', 'cmtls_problem') .'/js/app.js');
 }
 
 /**
@@ -139,17 +139,224 @@ function cmtls_problem_menu()
 		'type' => MENU_CALLBACK,
 	);
 
-	$items['cmtls/%node/%node/problem/tag/%'] = array(
-		'title callback' => 'cmtls_page_title',
-		'title arguments' => array(4),
-		'page callback' => 'cmtls_problem_page_taxonomy',
-		'page arguments' => array(1, 2, 5),
-		'access callback' => 'node_access',
-		'access arguments' => array('view', 2),
+	$items['admin/build/cmtls/problems'] = array(
+		'title' => t('Problems'),
+		'description' => t('Problems'),
+		'page callback' => 'cmtls_problem_templates_page',
+		'access arguments' => array('administer cmtls'),
+		'type' => MENU_LOCAL_TASK,
+	);
+	
+	$items['admin/build/cmtls/problems/list'] = array(
+		'title' => t('Answer templates'),
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'weight' => -20,
+	);
+
+	$items['admin/build/cmtls/problems/add'] = array(
+		'title' => t('Add'),
+		'description' => t('Add problem answer template'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('cmtls_problem_template_edit_form'),
+		'access arguments' => array('administer cmtls'),
+		'type' => MENU_LOCAL_TASK,
+	);
+
+	$items['admin/build/cmtls/problems/%/edit'] = array(
+		'title' => t('Community Tools: Problem edit template'),
+		'description' => 'Community Tools',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('cmtls_problem_template_edit_form', 5),
+		'access arguments' => array('administer cmtls'),
 		'type' => MENU_CALLBACK,
 	);
 
 	return $items;
+}
+
+function cmtls_problem_templates_page()
+{
+	$output = '';
+	
+	$templates = variable_get('cmtls_problem_answer_templates', array());
+	
+	if(sizeof($templates))
+	{
+		$templates = unserialize($templates);
+		
+		foreach ($templates as $key => &$template)
+		{
+			$template['edit_link'] = l(t('Edit'), 'admin/build/cmtls/problems/template/'.$key.'/edit');
+		}
+		
+		$output = theme_table(array(t('Template name'), t('Template content'), NULL), $templates);
+	}
+	else 
+	{
+		$output = t('No answer templates defined');
+	}
+	
+	return $output;
+}
+
+function cmtls_problem_template_add_form(&$form_state)
+{
+	$form['title'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Template name'),
+		'#required' => TRUE,
+	);
+	
+	$form['template'] = array(
+		'#type' => 'textarea',
+		'#title' => t('Template content'),
+		'#required' => TRUE,
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save'),
+	);
+
+	$form['#submit'] = array(
+		'cmtls_problem_template_save',
+	);
+	
+	$form['#redirect'] = 'admin/build/cmtls/problems/templates/list';
+	
+	return $form;
+}
+
+/**
+ * Creates, edits and deletes problem templates
+ *
+ * @param unknown_type $form_state
+ * @param unknown_type $tid
+ * @return unknown
+ */
+function cmtls_problem_template_edit_form(&$form_state, $tid = NULL)
+{
+	$templates = variable_get('cmtls_problem_answer_templates', array());
+	
+	if(sizeof($templates))
+	{
+		$templates = unserialize($templates);
+	}
+	
+	if($tid)
+	{
+		if($templates[$tid])
+		{
+			// edit
+			$form['#template'] = $template = $templates[$tid];
+			$form['#tid'] = $tid;
+		}
+		else 
+		{
+			return FALSE;
+		}
+	}
+	else 
+	{
+		// create
+		$form['#template'] = array('title' => NULL, 'template' => NULL);
+		$form['#tid'] = 0;
+		$form['#redirect'] = 'admin/build/cmtls/problems/templates/list';
+	}
+	
+	$form['title'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Template name'),
+		'#required' => TRUE,
+		'#default_value' => $template['title'],
+	);
+	
+	$form['template'] = array(
+		'#type' => 'textarea',
+		'#title' => t('Template content'),
+		'#required' => TRUE,
+		'#default_value' => $template['template'],
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save'),
+	);
+	
+	// add delete
+	if($tid)
+	{
+		$form['delete'] = array(
+			'#type' => 'submit',
+			'#value' => t('Delete'),
+		);
+	}
+
+	$form['#submit'] = array(
+		'cmtls_problem_template_save',
+	);
+		
+	return $form;
+}
+
+/**
+ * Saves or deletes problem template
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_problem_template_save($form, &$form_state)
+{
+	$templates = variable_get('cmtls_problem_answer_templates', array());
+	
+	if(sizeof($templates))
+	{
+		$templates = unserialize($templates);
+	}
+	
+	if($form['#template'] && $form['#tid'])
+	{
+		if($templates[$form['#tid']])
+		{
+			// delete
+			if($form_state['values']['op'] == t('Delete'))
+			{
+				unset($templates[$form['#tid']]);
+				$form_state['redirect'] = 'admin/build/cmtls/problems/templates/list';
+			}
+			// edit
+			else 
+			{
+				$templates[$form['#tid']] = array(
+					'title' => $form_state['values']['title'],
+					'template' => $form_state['values']['template'],
+				);
+			}
+		}
+	}
+	else 
+	{
+		// add
+		if(sizeof($templates))
+		{
+			$templates[] = array(
+				'title' => $form_state['values']['title'],
+				'template' => $form_state['values']['template'],
+			);
+		}
+		// first must start at index 1, 0 is reserved for select dropdown
+		else 
+		{
+			$templates[1] = array(
+				'title' => $form_state['values']['title'],
+				'template' => $form_state['values']['template'],
+			);
+		}
+	}
+	
+	//printr($templates); exit;
+	
+	variable_set('cmtls_problem_answer_templates', serialize($templates));
 }
 
 function cmtls_problems_page($app_id)
@@ -161,18 +368,6 @@ function cmtls_problems_page($app_id)
 
 	//return theme('cmtls_pager');
 	return theme('cmtls_problems_content', $app_id, theme('cmtls_pager'));
-}
-
-/**
- * Problems filtered by taxonomy term/tag view
- *
- * @param node $group
- * @param node $app
- * @param string $taxonomy
- * @return string
- */
-function cmtls_problem_page_taxonomy($group, $app, $taxonomy) {
-	return views_embed_view('cmtls_problems', 'default', $app->nid, 'all', $taxonomy);
 }
 
 /**
@@ -227,11 +422,56 @@ function cmtls_problem_form_comment_form_alter(&$form, &$form_state)
 
 	if ($node->type == 'cmtls_problem')
 	{
+		if($GLOBALS['user'] && ($GLOBALS['user']->uid == 1 || in_array('admin', $GLOBALS['user']->roles)))
+		{
+			$templates = variable_get('cmtls_problem_answer_templates', array());
+			
+			if(sizeof($templates))
+			{
+				$templates = unserialize($templates);
+				
+				$template = array(
+					'title' => t('Choose answer template'),
+					'template' => '',
+				);
+				
+				array_unshift($templates, $template);
+				
+				$vars = array(
+					'cmtls' => array(
+						'problems' => array(
+							'templates' => $templates,
+						),
+					),
+				);
+				
+				drupal_add_js($vars, 'setting');
+				
+				$options = array();
+				
+				foreach ($templates as &$template)
+				{
+					$options[] = $template['title'];
+				}
+				
+				$form['answer_templates'] = array(
+					'#type' => 'select',
+					'#title' => t('Choose answer template'),
+					'#options' => $options,
+					'#attributes' => array(
+						'id' => 'cmtls-problem-comment-template-'.$node->nid,
+						'class' => 'cmtls-problem-comment-template-option',
+					),
+				);
+			}
+		}
+		
 		if ($node->field_cmtls_problem_status[0]['value'] == 0)
 		{
 			$form['problem_status_fixed'] = array(
 				'#type' => 'checkbox',
 				'#default_value' => 0,
+				'#weight' => 19,
 				'#title' => t('This problem has been fixed'),
 			);
 		}
@@ -240,10 +480,11 @@ function cmtls_problem_form_comment_form_alter(&$form, &$form_state)
 			$form['problem_status_reported'] = array(
 				'#type' => 'checkbox',
 				'#default_value' => 0,
+				'#weight' => 19,
 				'#title' => t('This problem has not been fixed'),
 			);
 		}
-
+		
 		$form['#submit'] = array_merge(array('cmtls_problem_comment_submit'), $form['#submit']);
 	}
 }
@@ -277,7 +518,7 @@ function cmtls_problem_form_submit($form, &$form_state)
 	global $user;
 	
 	$form_state['values']['field_cmtls_status_uid'][0]['value'] = $user->uid;
-	$form_state['values']['field_cmtls_problem_status'][0]['value'] = 0;
+	$form_state['values']['field_cmtls_problem_status'][0]['value'] = $form['#node']->nid ? $form['#node']->field_cmtls_problem_status[0]['value'] : 0;
 }
 
 function cmtls_problem_comment_submit($form, &$form_state)
@@ -308,6 +549,13 @@ function cmtls_problem_comment_submit($form, &$form_state)
 		content_update($node);
 
 		db_query("DELETE FROM {cache_content} WHERE cid = '%s'", 'content:' . $node->nid . ':' . $node->vid);
+		
+		$form_state['#cmtls_comment_options'] = array(
+			'callback' => 'cmtlsProblemStatusUpdate',
+			'nid' => $node->nid,
+			'status' => $node->field_cmtls_problem_status[0]['value'],
+			'status_label' => $node->field_cmtls_problem_status[0]['value'] ? t('Fixed') : t('New report'),
+		);
 	}
 }
 
@@ -502,4 +750,56 @@ function cmtls_problem_cmtls_app_links($node = NULL)
 			'delete' => 'problem/'.$node->nid.'/delete',
 		),
 	);
+}
+
+function cmtls_problem_cmtls_group_overview($app)
+{
+	$return = array(
+		'total comments' => 0,
+		'total posts' => 0,
+		'posts column' => NULL,
+		'comments column' => NULL,
+	);	
+	
+	$group_id = array_pop($app->og_groups);
+	
+	$sql = 'SELECT SUM(node_comment_statistics.comment_count) AS comments FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d AND node_comment_statistics.comment_count > 0';
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total comments'] = $result['comments'];
+	
+	$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid LEFT JOIN {content_type_cmtls_problem} AS content_type_cmtls_problem ON node.nid = content_type_cmtls_problem.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_problem' AND content_type_cmtls_problem.field_cmtls_problem_status_value = 0";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$new = $result['posts'];
+	if (!$new) $new = NULL;
+	
+	$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid LEFT JOIN {content_type_cmtls_problem} AS content_type_cmtls_problem ON node.nid = content_type_cmtls_problem.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_problem' AND content_type_cmtls_problem.field_cmtls_problem_status_value = 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$fixed = $result['posts'];	
+	if (!$fixed) $fixed = NULL;
+	
+	$return['total posts'] = $new + $fixed;
+	
+	if($new) $new = l(format_plural($new,'1 new','@count new'), 'cmtls/'.$group_id.'/'.$app->nid, array('query' => 'action=search&predefined_choice=1'));
+	
+	if($fixed && $new) $new .= ' &middot; ';
+
+	if($fixed) $fixed = l(format_plural($fixed,'1 fixed','@count fixed'), 'cmtls/'.$group_id.'/'.$app->nid, array('query' => 'action=search&predefined_choice=2'));
+	
+	if($fixed || $new)
+	{
+		$return['posts column'] = $new.$fixed;
+	}
+	else 
+	{
+		$return['posts column'] = t('No problems posted');
+	}
+	
+	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$time_diff = time() - $result['last_comment_timestamp'];
+	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	
+	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;
+	
+	return $return;
 }

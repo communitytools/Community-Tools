@@ -27,23 +27,23 @@ foreach($view->result as $id => $result)
 
 	if(date('d.m', $today) == $start_date)
 	{
-		$dividers[t('Today').', '.$today_name.' '.$start_date][] = $id;
+		$dividers[t('Today').', '.$today_name.' &middot; '.$start_date][] = $id;
 	}
 	else if(date('d.m', $tomorrow) == $start_date)
 	{
-		$dividers[t('Tomorrow').', '.$tomorrow_name.' '.$start_date][] = $id;
+		$dividers[t('Tomorrow').', '.$tomorrow_name.' &middot; '.$start_date][] = $id;
 	}
 	else
 	{
-		$dividers[t(date('l', $start_timestamp)).' '.$start_date][] = $id;
+		$dividers[t(date('l', $start_timestamp)).' &middot; '.$start_date][] = $id;
 
 	}
 }
 
 ?>
 <?php foreach ($dividers as $divider => $row_ids): ?>
-	<div class="event-group-header">
-		<?php print $divider; ?>
+	<div class="content-group-header">
+		<span><?php print $divider; ?></span>
 	</div>
 
 	<?php foreach ($row_ids as $id): ?>

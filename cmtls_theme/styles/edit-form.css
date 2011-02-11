@@ -9,7 +9,8 @@ input.form-submit {
 	.node-form input#edit-submit.form-submit,
 	#user-register input#edit-submit.form-submit,
 	#user-login input#edit-submit.form-submit,
-	#user-profile-form input#edit-submit.form-submit {
+	#user-profile-form input#edit-submit.form-submit,
+	#cmtls-map-choose-app-form input#edit-submit.form-submit {
 		font-size: 15px;
 		background: url("jquery.ui/images/ui-bg_green.png") repeat-x scroll 50% 50% #4CA20B;
 		color: #fff;
@@ -124,12 +125,22 @@ fieldset.collapsible legend a {
 
 /* Login */
 
+#user-login {
+	margin-bottom: 15px;
+}
+
 #user-login input {
 	font-size: 18px;
 }
 
-#user-login #password-remind-link {
+
+#user-login #external-authentication input {
+	border: none;
+}
+
+#user-login #password-remind-link, #user-login #register-link {
 	display: inline-block;
+	padding-right: 10px;
 }
 
 /* reposition Drupal's default ajax gif for our input height */
@@ -214,7 +225,6 @@ fieldset.collapsible legend a {
 
 /* Multiple file upload, in gallery
 -------------------------------------------------------------- */
-
 #upload-buttons {
 	font-size: 12px;
 }
@@ -228,6 +238,23 @@ fieldset.collapsible legend a {
 		position: absolute;
 		top: 0;
 	}
+
+
+/* Choose application after clicking on map for creating new point
+-------------------------------------------------------------- */
+#cmtls-map-choose-app-form {
+	font-size: 18px;
+	margin-top: -1em;
+}
+
+	#cmtls-map-choose-app-form .form-radios {
+		padding-top: 0;
+		margin-top: 0;
+	}
+
+		#cmtls-map-choose-app-form .form-radios .form-item {
+			display: inline-block;
+		}
 
 
 /* Modalframe itself
@@ -288,13 +315,15 @@ fieldset.collapsible legend a {
 	}
 	#external-authentication {
 		float: left;
-		text-align:center
+		text-align:center;
+		width: 200px;
+		padding-top: 12px;
 		}
 		#external-authentication div.form-item{
 			margin:1em 0
 		}
 	#internal-authentication {
-		float: right
+		float: right;
 	}
 	.form-column input.form-text {
 		width: 80%;

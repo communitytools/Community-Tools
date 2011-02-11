@@ -5,7 +5,16 @@ img.context_anchor {
 	cursor: pointer;
 	width: 18px;
 	height: 18px;
+	opacity: 0.5;
+	-moz-opacity: 0.5;
+	filter:alpha(opacity=50);
 }
+
+	img.context_anchor:hover {
+		opacity: 1;
+		-moz-opacity: 1;
+		filter:alpha(opacity=100);
+	}
 
 ul.context_plugin_dropdown {
 	display: none;

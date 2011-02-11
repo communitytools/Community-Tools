@@ -75,11 +75,17 @@ th {
 
 a img {
 	border: none;
-/*	display: block; */
 }
 
 .hidden {
 	display: none;
+}
+
+.left {
+	float: left;
+}
+.right {
+	float: right;	
 }
 /* fix for system.theme.css in Drupal http://drupal.org/node/93357 */
 tbody {

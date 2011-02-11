@@ -422,3 +422,39 @@ function cmtls_article_cmtls_app_links($node = NULL)
 		),
 	);
 }
+
+function cmtls_article_cmtls_group_overview($app)
+{
+	$return = array(
+		'total comments' => 0,
+		'total posts' => 0,
+		'posts column' => NULL,
+		'comments column' => NULL,
+	);	
+	
+	$group_id = array_pop($app->og_groups);
+	
+	$sql = 'SELECT SUM(node_comment_statistics.comment_count) AS comments FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d AND node_comment_statistics.comment_count > 0';
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total comments'] = $result['comments'];
+	
+	$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_article'";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total posts'] = $result['posts'];
+	
+	$sql = "SELECT node.created FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_article' ORDER BY node.nid DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$time_diff = time() - $result['created'];
+	$last_posted = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	
+	$return['posts column'] = $return['total posts'] ? format_plural($return['total posts'],'1 post','@count posts').' &middot; '.t('last').' '.$last_posted : t('No posts yet');
+	
+	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$time_diff = time() - $result['last_comment_timestamp'];
+	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	
+	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;	
+	
+	return $return;
+}

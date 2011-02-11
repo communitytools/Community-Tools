@@ -6,8 +6,11 @@ core = 6.x
 engine = phptemplate
 
 scripts[] = scripts/main.js
+scripts[] = scripts/jquery.cookie.js
 
 regions[cmtls_site_menu] = Community Tools Site Menu
+regions[cmtls_content_header] = Community Tools Content Header
+regions[footer] = Footer
 
 ; Community Tools styles
 stylesheets[screen][] = styles/reset.css

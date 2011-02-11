@@ -32,13 +32,23 @@
 ?>
 <div class="cmtls-threads-container">
 
-	<div class="toolbar">
-		<?php print l('&larr; '.t("Back to topics' page"), _cmtls_app_get_path().'/forum', array('html' => TRUE, 'attributes' => array('class' => 'back-button'))); ?>
-		<?php if($user->uid && og_is_group_member($cmtls['current_group'], TRUE, $user->uid)) print l(t('Start a thread'), _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid.'/add', array('attributes' => array('class' => 'cmtls-button-add modalframe-child'))); ?>
-	</div> <!-- toolbar -->
-						
+	<div class="content-toolbar">
+
+		<div class="toolbar-description">
+			<?php print l('&larr;', _cmtls_app_get_path().'/forum', array('html' => TRUE, 'attributes' => array('class' => 'back-button'))); ?>
+			<h1><?php print check_plain($cmtls['current_forum']->title); ?></h1>
+			<p><?php print check_plain($cmtls['current_forum']->body); ?></p>
+		</div>
+
+		<div class="toolbar-buttons">
+			<?php if($user->uid && og_is_group_member($cmtls['current_group'], TRUE, $user->uid)) print l(t('Start a thread'), _cmtls_app_get_path().'/forum/'.$cmtls['current_forum']->nid.'/add', array('attributes' => array('class' => 'cmtls-button-add modalframe-child'))); ?>
+		</div>
+		<div class="clear"></div>
+
+	</div> <!-- content-toolbar -->
+
 	<div class="forum">
-		<h1><?php print l($cmtls['current_forum']->title, _cmtls_app_get_path().'/forum'); ?></h1>
+
 		<div class="forum-discussions-list">
 			<ul>
 				<?php print $rows; ?>

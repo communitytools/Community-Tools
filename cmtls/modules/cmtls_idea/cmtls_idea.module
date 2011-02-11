@@ -202,9 +202,33 @@ function cmtls_idea_page($group, $app, $idea)
 function cmtls_idea_form_cmtls_idea_node_form_alter(&$form, &$form_state)
 {
 	if(!_cmtls_is()) return;
-	
+
+	global $user;
+
 	$form = cmtls_forms_alter($form, $form_state);
-	
+
+	if(!$form['#node']->nid && $user->euid && variable_get('fb_app_id', NULL) && cmtls_auth_authentication_module() == 'cmtls_fb')
+	{
+		$form['fb_post_wall'] = array(
+			'#type' => 'checkbox',
+			'#title' => t('Post this idea also on my Facebook wall'),
+			'#description' => NULL,
+			'#default_value' => 0,
+		);
+
+		// Create container for Facebook's JSDK
+		$form['fb_jsdk_container'] = array(
+			'#type' => 'markup',
+			'#value' => '<div id="fb-root"></div>',
+			'#weight' => 500, // Sink the element
+		);
+
+		$submit = array_search('cmtls_forms_submit', $form['#submit']);
+		$form['#submit'][$submit] = 'cmtls_idea_add_to_fb_wall';
+
+		$form['buttons']['submit']['#submit'][] = 'cmtls_idea_prevent_redirect';
+	}
+
 	$form['#after_build'][] = 'cmtls_idea_node_form_after_build';
 }
 
@@ -219,17 +243,103 @@ function cmtls_idea_node_form_after_build($form, &$form_state)
 {
 	global $user;
 
-	if (!$user->fbuid || $form['nid']['#value'])
-	{
-		$form['field_cmtls_idea_post_on_fb'] = NULL;
-	}
-
 	foreach ($form['taxonomy']['tags'] as $t_id => $taxonomy) if ($taxonomy['#title']) {
 		$form['taxonomy']['tags'][$t_id]['#title'] = t('Tags');
-	}	
+	}
 
 	return $form;
 }
+
+/**
+ *
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_idea_prevent_redirect($form, &$form_state)
+{
+	if($form_state['values']['fb_post_wall'] && $fb_app_id = variable_get('fb_app_id', ''))
+	{
+		$form_state['redirect'] = FALSE;
+	}
+	else
+	{
+		// Tell the parent window to close the modal frame dialog.
+		modalframe_close_dialog(array(
+			'refresh' => TRUE,
+		));
+	}
+}
+
+/**
+ *
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function cmtls_idea_add_to_fb_wall($form, &$form_state)
+{
+	if($form_state['values']['fb_post_wall'] && $fb_app_id = variable_get('fb_app_id', ''))
+	{
+		$form_state['redirect'] = FALSE;
+		$_SESSION['cmtls_idea_fb_publish'] = TRUE;
+	}
+	else
+	{
+		// Tell the parent window to close the modal frame dialog.
+		modalframe_close_dialog(array(
+			'refresh' => TRUE,
+		));
+	}
+}
+
+/**
+ * Implents hook_nodeapi()
+ *
+ * @param node $node
+ * @param string $op
+ * @param unknown_type $a3
+ * @param unknown_type $a4
+ * @return array
+ */
+function cmtls_idea_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
+{
+	global $user;
+
+	if($op == 'insert' && $user->uid && $node->type == 'cmtls_idea' && $_SESSION['cmtls_idea_fb_publish'])
+	{
+		unset($_SESSION['cmtls_idea_fb_publish']);
+
+		$fb_app_id = variable_get('fb_app_id', NULL);
+
+		if(!$fb_app_id) return;
+
+		// add facebook stream to wall
+		global $base_url;
+		$site = variable_get('site_name', $base_url);
+
+		$attachment = array(
+			'name'        => strip_tags($node->title),
+			'href'        => url(cmtls_path_to_node($node), array('absolute' => TRUE)),
+			'caption'     => t("{*actor*} created a new post !site", array("!site" => $site)),
+		);
+		$action_links = array(
+			array(
+				'text'  => $site,
+				'href'  => $base_url,
+			),
+		);
+		$message = strip_tags($node->body);
+		$method = 'stream.publish';
+		$user_message_prompt = t('Share your idea');
+		$streamPublishArgs = compact('method', 'message', 'attachment', 'action_links', 'user_message_prompt');
+
+		drupal_add_js(array('cmtls' => array('Facebook' => array('appId' => $fb_app_id, ))), 'setting');
+		drupal_add_js(array('cmtls' => array('Facebook' => array('streamPublish' => $streamPublishArgs, ))), 'setting');
+		drupal_add_js(drupal_get_path('module', 'cmtls_idea').'/js/fb_publish.js');
+	}
+}
+
 
 /**
  * Implements hook_theme()
@@ -344,36 +454,6 @@ function cmtls_idea_cmtls_stance_info()
 	);
 }
 
-
-/**
- * Implents hook_nodeapi()
- * Adds context menu edit actions (by invoking hook_cmtls_context) and adds cmtls_context_button attribute to nodes
- *
- * @param node $node
- * @param string $op
- * @param unknown_type $a3
- * @param unknown_type $a4
- * @return array
- */
-function cmtls_idea_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
-{
-	global $user;
-
-	if ($op == 'insert' && $user->uid && strpos($node->type, 'cmtls_idea') === 0)
-	{
-		/*
-		if ($node->field_cmtls_idea_post_on_fb[0]['value'] == '1')
-		{
-			$_SESSION['fbconnect_feed'] = array(
-				'type'    => 'node',
-				'title'   => $node->title,
-				'nodeurl' => url('node/' . $node->nid, array('absolute' => TRUE)),
-			);
-		}
-		*/
-	}
-}
-
 /**
  * Implements hook_cmtls_filter_info()
  *
@@ -441,4 +521,39 @@ function cmtls_idea_cmtls_app_links($node = NULL)
 			'delete' => 'idea/'.$node->nid.'/delete',
 		),
 	);
+}
+
+function cmtls_idea_cmtls_group_overview($app)
+{
+	$return = array(
+		'total comments' => 0,
+		'total posts' => 0,
+		'posts column' => NULL,
+		'comments column' => NULL,
+	);
+
+	$group_id = array_pop($app->og_groups);
+
+	$sql = 'SELECT SUM(node_comment_statistics.comment_count) AS comments FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d AND node_comment_statistics.comment_count > 0';
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total comments'] = $result['comments'];
+
+	$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_idea'";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total posts'] = $result['posts'];
+
+	$sql = "SELECT node.created FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_idea' ORDER BY node.nid DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$time_diff = time() - $result['created'];
+	$last_posted = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+
+	$return['posts column'] = $return['total posts'] ? format_plural($return['total posts'],'1 post','@count posts').' &middot; '.t('last').' '.$last_posted : t('No posts yet');
+
+	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$time_diff = time() - $result['last_comment_timestamp'];
+	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+
+	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;
+	return $return;
 }

@@ -26,7 +26,7 @@
 	</div>
 	<h2><?php print l($fields['title']->raw, 'cmtls/'.$fields['nid']->raw); ?></h2><?php if($fields['private']->raw): ?><div class="private"></div><?php endif; ?>
 	<div class="groups-meta">
-		<?php if($user->uid && $fields['field_cmtls_group_main_value']->raw != 1 && og_is_group_member($fields['nid']->raw, TRUE, $user->uid) && $user->uid != $fields['uid']->raw) print l(t('Leave'), 'cmtls/'.$fields['nid']->raw.'/leave/'.$user->uid, array('attributes' => array('class' => 'modalframe-child request-join-button'))); ?>
+		<?php if($user->uid && $fields['field_cmtls_group_main_value']->raw != 1 && og_is_group_member($fields['nid']->raw, TRUE, $user->uid) && $user->uid != $fields['uid']->raw) print l(t('Leave'), 'cmtls/'.$fields['nid']->raw.'/leave/'.$user->uid, array('attributes' => array('class' => 'modalframe-child request-join-button'))); ?> <?php print l(t('Overview'), 'cmtls/'.$fields['nid']->raw.'/overview'); ?>
 	</div>
 	
 	

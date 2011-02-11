@@ -24,7 +24,7 @@
 <li>
 	<h2><?php if($fields['private']->raw): ?><?php print check_plain($fields['title']->raw); ?><?php else: ?><?php print l($fields['title']->raw, 'cmtls/'.$fields['nid']->raw); ?><?php endif; ?></h2><?php if($fields['private']->raw): ?><div class="private"></div><?php endif; ?>
 	<div class="groups-meta">
-		<?php if($user->uid) print l(($fields['selective']->raw || $fields['private']->raw ? t('Apply to join') : t('Join')), 'cmtls/'.$fields['nid']->raw.'/join', array('attributes' => array('class' => 'modalframe-child '.($fields['selective']->raw || $fields['private']->raw ? 'request-join-button' : 'join-button')))); ?>
+		<?php if($user->uid) print l(($fields['selective']->raw || $fields['private']->raw ? t('Apply to join') : t('Join')), 'cmtls/'.$fields['nid']->raw.'/join', array('attributes' => array('class' => 'modalframe-child '.($fields['selective']->raw || $fields['private']->raw ? 'request-join-button' : 'join-button')))); ?> <?php print l(t('Overview'), 'cmtls/'.$fields['nid']->raw.'/overview'); ?>
 	</div>
 	
 	<?php if($fields['field_cmtls_geoinfo_openlayers_wkt']->raw && $fields['field_cmtls_geoinfo_openlayers_wkt']->raw != 'GEOMETRYCOLLECTION()'): ?>	

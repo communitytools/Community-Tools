@@ -8,4 +8,128 @@
 function cmtls_place_install()
 {
 	cmtls_module_install('cmtls_place');
+	
+	cmtls_place_add_activities();
+}
+
+function cmtls_place_update_6003(&$sandbox)
+{
+	features_revert(array('cmtls_place' => array('node', 'content')));
+	
+	cmtls_place_add_activities();
+	
+	// Add simple note
+	$ret[] = array(
+		'success' => TRUE,
+		'query' => 'Reverted place feature, added activity templates',
+	);
+
+	return $ret;
+}
+
+function cmtls_place_add_activities()
+{
+	
+$activities = array(
+	14 => array(
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas koha <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/place/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas koha <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/place/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_place' => 'cmtls_place',
+		),
+		'aid' => 14,
+	),
+	15 => array(
+		'comment-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari kohale <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/place/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'node-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari kohale <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/place/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'node_comment_author-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari kohale <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/place/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'everyone-pattern-en' => '<div class="cmtls-data">
+	<span class="cmtls-group-id">[og-id]</span>
+	<span class="cmtls-group-name">[ogname]</span>
+	<span class="cmtls-app-id">[cmtls-app-id]</span>
+	<span class="cmtls-app-name">[cmtls-app-name]</span>
+</div>
+<div class="content">
+	<div class="author">
+		<a href="" class="small-avatar">[cmtls-member-avatar-url]</a>
+		[cmtls-member-name-link]
+	</div> 
+	lisas kommentaari kohale <a href="[site-url]/cmtls/[og-id]/[cmtls-app-id]/place/[nid]">[title]</a> <div class="time">&middot; <span class="unix-timestamp">[comment-raw]</span></div>
+</div>',
+		'activity_types' => array(
+			'cmtls_place' => 'cmtls_place',
+		),
+		'aid' => 15
+	),
+);
+	
+	// activities
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('14', 'activity', 'activity_record', '%s', 'Record an activity message when: node insert types Community Tools: place')", serialize($activities[14]));
+	db_query("INSERT INTO {actions} (aid, type, callback, parameters, description) VALUES ('15', 'activity', 'activity_record', '%s', 'Record an activity message when: comment insert types Community Tools: place')", serialize($activities[15]));
+	
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('14')");
+	db_query("INSERT INTO {actions_aid} (aid) VALUES ('15')");
+	
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', '14', '1')");
+	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('comment', 'insert', '15', '1')");
 }

@@ -99,6 +99,10 @@ function cmtls_profile_modules()
 
 		// Misc.
 		'token',
+		
+		// CAPTCHA
+		'captcha',
+		'image_captcha',
 
 		// Things general user never sees.
 		//'admin_menu',

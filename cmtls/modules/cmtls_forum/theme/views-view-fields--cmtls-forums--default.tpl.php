@@ -25,4 +25,5 @@
 	<div class="forum-topics-meta">
 		<?php print _cmtls_edit_button($fields['nid']->raw); ?>
 	</div>
+	<?php $fields['body']->raw ? print ' &middot; '.$fields['body']->raw : NULL; ?>
 </li>

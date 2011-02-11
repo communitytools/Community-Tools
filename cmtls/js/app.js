@@ -37,10 +37,10 @@ Drupal.cmtls = function ()
 
 		// jQuery UI common stuff
 		$('.cmtls-button, input.form-submit').livequery(function(){
-			$(this).button();
+			$(this).not('#external-authentication input.form-submit').button();
 		});
 		$('.cmtls-button-add').button({icons: {primary:'ui-icon-plus'}});
-		$('.cmtls-button-filter').button({icons: {primary:'ui-icon-triangle-1-s'}});
+		$('.cmtls-button-filter').button({icons: {primary:'ui-icon-search'}, text: false});
 
 		$.extend(Drupal.cmtls.instance.modalFrameOptions, {onSubmit: Drupal.cmtls.instance.modalFrameCallback});
 
@@ -156,6 +156,10 @@ Drupal.cmtls = function ()
 
 								// init the context menus
 								$('.context_anchor').contextMenu();
+								
+								// init addthis buttons
+								addthis.button('.addthis_button');
+								addthis.toolbox('#text-container');
 
 								nextPage++;
 
@@ -241,3 +245,61 @@ Drupal.behaviors.cmtls = function (context)
 		Drupal.cmtls.instance.init();
 	}
 };
+
+Drupal.behaviors.cmtls_toolbar_tabs = function(context)
+{
+	if(context == window.document)
+	{
+		// find the active tab
+		if(document.location.hash)
+		{
+			$('.toolbar-tabs li a').each(function (i)
+			{
+				var $this = $(this);
+				
+				if(this.hash == document.location.hash)
+				{
+					// show this tab content
+					$($this.attr('rel')).removeClass('hidden');
+					
+					// mark as selected
+					$this.parent().addClass('selected');
+				}
+			});
+		}
+		else if($('.toolbar-tabs li.selected').length == 1)
+		{
+			$($('.toolbar-tabs li.selected').children().attr('rel')).removeClass('hidden');
+		}
+		else
+		{
+			var $li = $('.toolbar-tabs li:first');
+			$li.addClass('selected');
+			$($li.children().attr('rel')).removeClass('hidden');
+		}
+		
+		$('.toolbar-tabs li a').click(function ()
+		{
+			var $this = $(this);
+			
+			// hide other tabs content
+			$this.parent().siblings().children().each(function ()
+			{
+				$($(this).attr('rel')).addClass('hidden');
+			});
+			
+			// show this tab content
+			$($this.attr('rel')).removeClass('hidden');
+			
+			// remove selected
+			$this.parent().siblings().removeClass('selected');
+			
+			// mark as selected
+			$this.parent().addClass('selected');
+			
+			if(this.hash) document.location.hash = this.hash;
+			
+			return false;
+		});
+	}
+}

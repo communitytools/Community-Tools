@@ -202,7 +202,7 @@ function theme_cmtls_filter_answer_form($form)
 			$form['date_from']['time'] = NULL;
 			$form['date_to']['time'] = NULL;
 			$output .= '<th>';
-			$output .= '<label for="from-date">' . t('Created between') . ':</label>';
+			$output .= '<label for="from-date">' . t('Date between') . ':</label>';
 			$output .= '</th>';
 			$output .= '<td>';
 			//$output .= '<input name="" id="from-date" size="8" value="" class="filter-input" type="text"> - <input name="" id="to-date" size="8" value="" class="filter-input" type="text">';

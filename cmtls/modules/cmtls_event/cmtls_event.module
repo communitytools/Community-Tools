@@ -196,8 +196,8 @@ function cmtls_event_form_alter(&$form, &$form_state, $form_id)
 			$form['field_cmtls_event_date'][0]['#default_value']['value2'] = date('Y-m-d 11:00', strtotime('tomorrow'));
 		}
 
+		$form['#after_build'][] = 'cmtls_event_form_after_build';
 	}
-	$form['#after_build'][] = 'cmtls_event_form_after_build';
 }
 
 /**
@@ -212,6 +212,8 @@ function cmtls_event_form_after_build($form, &$form_state)
 	$form['field_cmtls_event_lasts_all_day']['value']['#title'] = t('Event lasts all day');
 	$form['taxonomy']['tags'][1]['#title'] = t('Event keywords');
 
+//printr($form); exit;
+
 	return $form;
 }
 
@@ -224,12 +226,6 @@ function cmtls_event_form_after_build($form, &$form_state)
  */
 function cmtls_event_theme($existing) {
 	return array(
-		// stance
-/*		'cmtls_stance' => array (
-			'arguments' => array('node' => NULL, 'form' => NULL),
-			'template' => 'cmtls-stance',
-			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
-		),*/
 		// events page
 		'cmtls_events_content' => array (
 			'arguments' => array('app_id' => NULL),
@@ -413,7 +409,6 @@ function cmtls_event_cmtls_stance_info()
 	);
 }
 
-
 /**
  * Implements hook_cmtls_filter_info()
  *
@@ -499,4 +494,65 @@ function cmtls_event_cmtls_app_links($node = NULL)
 			'delete' => 'event/'.$node->nid.'/delete',
 		),
 	);
+}
+
+function cmtls_event_preprocess_cmtls_stance(&$vars)
+{
+	if($vars['node']->type == 'cmtls_event' && $vars['form'] && isset($vars['node']->field_cmtls_registration_open[0]['value']))
+	{
+		if(strtotime($vars['node']->field_cmtls_registration_open[0]['value']) < time())
+		$vars['form'] = t('Registration is now closed');
+	}
+}
+
+function cmtls_event_cmtls_group_overview($app)
+{
+	$return = array(
+		'total comments' => 0,
+		'total posts' => 0,
+		'posts column' => NULL,
+		'comments column' => NULL,
+	);	
+	
+	$group_id = array_pop($app->og_groups);
+	
+	$sql = 'SELECT SUM(node_comment_statistics.comment_count) AS comments FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d AND node_comment_statistics.comment_count > 0';
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total comments'] = $result['comments'];
+	
+	$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid LEFT JOIN {content_type_cmtls_event} AS content_type_cmtls_event ON node.nid = content_type_cmtls_event.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_event' AND content_type_cmtls_event.field_cmtls_event_date_value > NOW()";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$upcoming = $result['posts'];
+	if (!$upcoming) $upcoming = NULL;	
+	
+	$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid LEFT JOIN {content_type_cmtls_event} AS content_type_cmtls_event ON node.nid = content_type_cmtls_event.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_event' AND content_type_cmtls_event.field_cmtls_event_date_value < NOW()";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$past = $result['posts'];
+	if (!$past) $past = NULL;	
+	
+	$return['total posts'] = $upcoming + $past;
+	
+	if($upcoming) $upcoming = l(format_plural($upcoming,'1 upcoming','@count upcoming'), 'cmtls/'.$group_id.'/'.$app->nid);
+	
+	if($upcoming && $past) $upcoming .= ' &middot; ';
+	
+	if($past) $past = format_plural($past,'1 in past','@count in past');
+	
+	if($upcoming || $past)
+	{
+		$return['posts column'] = $upcoming.$past;
+	}
+	else 
+	{
+		$return['posts column'] = t('No events posted');
+	}
+	
+	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$time_diff = time() - $result['last_comment_timestamp'];
+	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	
+	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;	
+	
+	return $return;
 }

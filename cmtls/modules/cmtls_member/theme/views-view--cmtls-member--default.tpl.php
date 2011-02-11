@@ -29,12 +29,10 @@
  * @ingroup views_templates
  */
 ?>
-<div class="cmtls-member-container">
-
+<div class="cmtls-member-profile-container">
     <?php if ($rows): ?>
             <?php print $rows; ?>
     <?php elseif ($empty): ?>
             <?php print $empty; ?>
     <?php endif; ?>
-
-</div>
+</div> <!-- .cmtls-member-profile-container -->

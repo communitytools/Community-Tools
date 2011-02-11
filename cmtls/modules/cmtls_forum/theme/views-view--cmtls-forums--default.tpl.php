@@ -30,6 +30,11 @@
  */
 ?>
 <div class="cmtls-forums-container">
+
+	<div class="content-toolbar">
+		<h1><?php print check_plain($cmtls['current_app']->title); ?></h1>
+	</div> <!-- content-toolbar -->
+
 	<div class="forum">
 		<div class="forum-topics-list">
 			<ul>

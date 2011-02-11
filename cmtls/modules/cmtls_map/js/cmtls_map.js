@@ -175,7 +175,7 @@ Drupal.behaviors.cmtls_map_behavior_add_object = function (context)
 				Drupal.t('Temporary Features Layer'),
 				{
 					projection: new OpenLayers.Projection('EPSG:4326'),
-					styleMap: new OpenLayers.StyleMap({'default': data.map.styles.temporary}),
+					styleMap: new OpenLayers.StyleMap({'default': data.map.styles.temporary})
 				}
 			);
 			
@@ -186,7 +186,7 @@ Drupal.behaviors.cmtls_map_behavior_add_object = function (context)
 				OpenLayers.Handler.Point,
 				{
 					'displayClass': 'olControlDrawFeaturePoint',
-					'title': Drupal.t('Add point'),
+					'title': '+ '+Drupal.t('Add point')
 				}
 			);
 			
@@ -308,7 +308,7 @@ function mapResize()
 	
 	$content = $('#content');
 	
-	var olmap_width = $(window).width() - ($content.hasClass('map-only') ? 132 : 671);
+	var olmap_width = $(window).width() - ($content.hasClass('map-only') ? 120 : 671);
 	var olmap_height = $(window).height() - 100;
 	
 	if($content.hasClass('text-only'))
@@ -326,7 +326,7 @@ function mapResize()
 	}
 	else if($content.hasClass('map-only'))
 	{
-		$('#map').css('left', '132px');
+		$('#map').css('left', '120px');
 	}
 	
 	if($map.data('openlayers'))

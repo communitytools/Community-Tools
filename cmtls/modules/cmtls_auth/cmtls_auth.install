@@ -1,0 +1,34 @@
+<?php
+
+function cmtls_auth_install()
+{
+	cmtls_auth_add_captcha();
+}
+
+function cmtls_auth_update_6003(&$sandbox)
+{
+	//drupal_flush_all_caches(); // this forces drupal to enable captcha modules
+	include_once('includes/install.inc');
+	module_rebuild_cache();
+	drupal_install_modules(array('captcha', 'image_captcha'));
+	
+	cmtls_auth_add_captcha();
+	
+	// Add simple note
+	$ret[] = array(
+		'success' => TRUE,
+		'query' => 'Added CAPTCHA challenge to user registration',
+	);
+
+	return $ret;
+}
+
+function cmtls_auth_add_captcha()
+{
+	update_sql("UPDATE {captcha_points} SET module = 'image_captcha', captcha_type = 'Image' WHERE form_id = 'user_register'");
+	
+	variable_set('image_captcha_dot_noise', 1);
+	variable_set('image_captcha_line_noise', 1);
+	variable_set('image_captcha_noise_level', 3);
+	variable_set('image_captcha_code_length', 3);
+}

@@ -17,12 +17,8 @@ function cmtls_member_cmtls_app()
 	return array(
 		'cmtls_member' => array(
 			'title' => t('Members'),
-			'callback' => 'views_embed_view',
-			'callback arguments' => array(
-				'cmtls_members',
-				'default',
-				arg(1),
-			),
+			'callback' => 'cmtls_group_overview',
+			'callback arguments' => array(node_load(arg(1)), 'members'),
 		),
 	);
 }
@@ -48,8 +44,8 @@ function cmtls_member_menu()
 
 	$items['cmtls/%node/members'] = array(
 		'title' => 'Member',
-		'page callback' => 'cmtls_members_page',
-		'page arguments' => array(1),
+		'page callback' => 'cmtls_group_overview',
+		'page arguments' => array(1, 'members'),
 		'access callback' => 'node_access',
 		'access arguments' => array('view', 1),
 		'type' => MENU_CALLBACK,
@@ -157,6 +153,7 @@ function cmtls_member_page($group, $uid)
  * @param integer $uid user ID
  * @return unknown
  */
+/*
 function cmtls_members_page($group)
 {
 	global $user;
@@ -173,6 +170,7 @@ function cmtls_members_page($group)
 
 	return views_embed_view('cmtls_members', 'default', $group->nid);
 }
+*/
 
 /**
  * User profile form alter
@@ -362,6 +360,12 @@ function cmtls_member_delete_submit($form, &$form_state)
 function cmtls_member_theme($existing)
 {
 	return array(
+		// members page
+		'cmtls_members_content' => array (
+			'arguments' => array('group' => NULL, ),
+			'template' => 'cmtls-members-content',
+			'path' => drupal_get_path('module', 'cmtls_member').'/theme',
+		),
 		// members view
 		'views_view__cmtls_members__default' => array (
 			'arguments' => array('view' => NULL),
@@ -698,6 +702,8 @@ function cmtls_member_notification_settings_form(&$form_state, $account = NULL)
 		'cmtls_member_notification_settings_form_submit',
 	);
 	
+	$form['#redirect'] = array($_GET['q'], NULL, 'notifications');
+	
 	return $form;
 }
 
@@ -728,4 +734,27 @@ function cmtls_member_notification_settings_form_submit($form, &$form_state)
 	printr($settings);
 	printr($form_state); exit;
 	*/
+}
+
+/**
+ * Adds alphabet filter letter array to members list
+ *
+ * @param unknown_type $vars
+ */
+function cmtls_member_preprocess_cmtls_members_content(&$vars)
+{
+	if($vars['group'] && $vars['group']->nid)
+	{
+		$letters = array(t('All'));
+		
+		$sql = 'SELECT DISTINCT UPPER(SUBSTRING(value, 1, 1)) AS letter FROM {profile_values} AS profile_values LEFT JOIN {og_uid} AS og_uid ON profile_values.uid = og_uid.uid WHERE og_uid.nid = %d AND profile_values.fid = 2 ORDER BY letter ASC';
+		$result = db_query($sql, $vars['group']->nid);
+		
+		while ($letter = db_fetch_array($result)) if($letter['letter'])
+		{
+			$letters[] = $letter['letter'];
+		}
+		
+		$vars['member_filter_letters'] = $letters;
+	}
 }

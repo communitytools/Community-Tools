@@ -27,7 +27,6 @@ Drupal.behaviors.cmtls_comment = function(context)
 							}
 							
 							$this.data('cmtls_comments', {comments_loaded: true});
-							
 						},
 						error: function (XMLHttpRequest, textStatus, errorThrown)
 						{
@@ -68,6 +67,13 @@ Drupal.behaviors.cmtls_comment = function(context)
 						{
 							$('#cmtls-comments-' + nid).html(data.content);
 							$('textarea[name="comment"]', $this).val('');
+						}
+						
+						//console.log(data);
+						
+						if(data.options && data.options.callback && window[data.options.callback])
+						{
+							window[data.options.callback](data);
 						}
 						
 						$submit.val(submitVal);

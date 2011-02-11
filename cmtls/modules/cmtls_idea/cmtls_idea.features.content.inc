@@ -179,61 +179,6 @@ function cmtls_idea_content_default_fields() {
     ),
   );
 
-  // Exported field: field_cmtls_idea_post_on_fb
-  $fields['cmtls_idea-field_cmtls_idea_post_on_fb'] = array(
-    'field_name' => 'field_cmtls_idea_post_on_fb',
-    'type_name' => 'cmtls_idea',
-    'display_settings' => array(
-      'weight' => '8',
-      'parent' => '',
-      'label' => array(
-        'format' => 'above',
-      ),
-      'teaser' => array(
-        'format' => 'default',
-        'exclude' => 1,
-      ),
-      'full' => array(
-        'format' => 'default',
-        'exclude' => 1,
-      ),
-      '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      'token' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-    ),
-    'widget_active' => '1',
-    'type' => 'number_integer',
-    'required' => '0',
-    'multiple' => '0',
-    'module' => 'number',
-    'active' => '1',
-    'prefix' => '',
-    'suffix' => '',
-    'min' => '',
-    'max' => '',
-    'allowed_values' => '0|Don\'t post of Facebook wall
-1|Post the idea on my Facebook wall',
-    'allowed_values_php' => '',
-    'widget' => array(
-      'default_value' => array(
-        '0' => array(
-          'value' => NULL,
-        ),
-      ),
-      'default_value_php' => NULL,
-      'label' => 'Post on facebook wall',
-      'weight' => '8',
-      'description' => '',
-      'type' => 'optionwidgets_onoff',
-      'module' => 'optionwidgets',
-    ),
-  );
-
   // Exported field: field_cmtls_idea_status
   $fields['cmtls_idea-field_cmtls_idea_status'] = array(
     'field_name' => 'field_cmtls_idea_status',
@@ -296,7 +241,6 @@ function cmtls_idea_content_default_fields() {
   t('Files');
   t('Geo info');
   t('Location');
-  t('Post on facebook wall');
   t('Status');
 
   return $fields;

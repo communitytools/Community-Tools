@@ -460,7 +460,7 @@ function cmtls_gallery_folder_preprocess_fields_vars($vars)
 			$description = '';
 			$title = $vars['fields']['title']->raw;
 			$title_checked = check_plain($title);
-			$url = url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/album/'.$current_album->nid.'/'.$node->nid.'/download',array('absolute'=>TRUE));
+			$url = url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/album/'.$node->parent.'/'.$node->nid.'/download',array('absolute'=>TRUE));
 			
 			$album_object->icon = l('<img src="'.$icon.'" class="file-icon" alt="'.t('Icon for @file',array('@file'=>$title_checked)).'" />',$url,array('html'=>TRUE,'attributes'=>array('title'=>t('Click to download !file',array('!file'=>$title_checked)))));
 			$album_object->caption = l($title,$url,array('attributes'=>array('title'=>t('Click to download @file',array('@file'=>$title_checked)))));
@@ -781,4 +781,65 @@ function cmtls_album_path($album, $group = NULL)
 	if(!$group) $group = _cmtls_group_get_current();
 	
 	return 'cmtls/'.$group->nid.'/'.$album->parent.'/album/'.$album->nid;
+}
+
+function cmtls_gallery_cmtls_group_overview($app)
+{
+	$return = array(
+		'total comments' => 0,
+		'total posts' => 0,
+		'posts column' => NULL,
+		'comments column' => NULL,
+	);	
+	
+	$group_id = array_pop($app->og_groups);
+	
+	// get albums
+	$albums = array();
+	
+	$sql = "SELECT node.nid FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_album'";
+	$result = db_query($sql, $app->nid);
+	while ($album = db_fetch_array($result))
+	{
+		$albums[] = $album['nid'];
+	}
+	
+	if(sizeof($albums))
+	{
+		$albums = implode(',', $albums);
+		
+		/*
+		$sql = 'SELECT SUM(node_comment_statistics.comment_count) AS comments FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent IN (%s) AND node_comment_statistics.comment_count > 0';
+		$result = db_fetch_array(db_query($sql, $albums));
+		
+		$return['total comments'] = $result['comments'];
+		*/
+		
+		$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent IN (%s) AND node.type = 'cmtls_album_object'";
+		$result = db_fetch_array(db_query($sql, $albums));
+		$return['total posts'] = $result['posts'];
+		
+		$sql = "SELECT node.created FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent IN (%s) AND node.type = 'cmtls_album_object' ORDER BY node.nid DESC LIMIT 1";
+		$result = db_fetch_array(db_query($sql, $albums));
+		$time_diff = time() - $result['created'];
+		$last_posted = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+		
+		$return['posts column'] = $return['total posts'] ? format_plural($return['total posts'],'1 file','@count files').' &middot; '.t('last').' '.$last_posted : t('No files posted');
+		
+		/*
+		$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent IN (%s) ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
+		$result = db_fetch_array(db_query($sql, $albums));
+		$time_diff = time() - $result['last_comment_timestamp'];
+		$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+		
+		$return['comments column'] = $return['total comments'] ? l(t('!comments comments', array('!comments' => $return['total comments'])), 'cmtls/'.$group_id.'/'.$app->nid).' &middot; last '.$last_commented : NULL;
+		*/
+	}
+	else 
+	{
+		$return['posts column'] = t('No files posted');
+	}
+	
+	
+	return $return;
 }
