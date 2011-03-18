@@ -59,6 +59,15 @@ function cmtls_event_user_default_permissions() {
     ),
   );
 
+  // Exported permission: edit field_cmtls_registration_open
+  $permissions['edit field_cmtls_registration_open'] = array(
+    'name' => 'edit field_cmtls_registration_open',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'authenticated user',
+    ),
+  );
+
   // Exported permission: edit own cmtls_event content
   $permissions['edit own cmtls_event content'] = array(
     'name' => 'edit own cmtls_event content',

@@ -9,75 +9,75 @@
 	cursor: crosshair;
 }
 
+
 /* Map Controls
 ------------------------------------------------------------------------------ */
-.olControlPanel  {
+
+.olControlPanelCMTLSPanel {
 	position: absolute;
 	right: 7px;
 	top: 7px;
 	font-size: 11px;
-	box-shadow: 1px 1px 3px #666;
-	-webkit-box-shadow: 1px 1px 3px #666;
-	-moz-box-shadow: 1px 1px 3px #666;
-	/* Otherwise button hover transparency does not work well */
-	background: #fff;
+	box-shadow: 3px 0 3px #bbb;
+	-webkit-box-shadow: 3px 0 3px #bbb;
+	-moz-box-shadow: 3px 0 3px #bbb;
+}
+
+	.olControlPanelCMTLSPanel .selected {
+		background: #fff;
+	}
+	
+
+/* Map Tooltip
+------------------------------------------------------------------------------ 	*/
+/* On-map text "for new point, click on map */
+#cmtls-map-tooltip {
+	z-index: 2000;
+	position: absolute;
+	left: 55px;
+	top: 8px;
+	display: block;
+	padding: 3px 10px;
+	font-size: 12px;
+	color: #fff;
+	background-color: #3D892F;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
-	cursor: pointer;
+}	
+
+#cmtls-map-layer-switcher {
+	z-index: 2000;
+	position: fixed;
+	right: 12px;
+	top: 138px;
+	padding: 15px;
+	font-size: 11px;
+	background-color: #fff;
+	border: 1px solid #ddd;	
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	box-shadow: 3px 3px 3px #bbb;
+	-webkit-box-shadow: 3px 0 3px #bbb;
+	-moz-box-shadow: 3px 0 3px #bbb;
+	opacity: 0.85;
+	filter:alpha(opacity=85);	
 }
 
-.olControlPanel div {
-	display: inline-block;
-	background: #fff;
-	color: #333;
-	padding: 3px 10px;
-	border: 1px solid #C9C9C9;
-	/* Take that, stupid Openlayers on IE */
-	min-height: 19px;
-	min-width: 61px;
-}
-
-/* Navigation item */
-.olControlPanel .olControlNavigationItemInactive,
-.olControlPanel .olControlNavigationItemActive {
-	-moz-border-radius: 4px 0 0 4px;
-	-webkit-border-radius: 4px 0 0 4px;
-	border-radius: 4px 0 0 4px;
-	border-right: none;
-}
-
-/* New point item */
-.olControlPanel .olControlDrawFeaturePointItemActive,
-.olControlPanel .olControlDrawFeaturePointItemInactive  {
-	background: #ebebeb;
-	-moz-border-radius: 0 4px 4px 0;
-	-webkit-border-radius: 0 4px 4px 0;
-	border-radius: 0 4px 4px 0;
-}
-
-
-/* Inactive states */
-.olControlPanel .olControlNavigationItemInactive,
-.olControlPanel .olControlDrawFeaturePointItemInactive {
-	background: #F4F4F4; /* old browsers */
-	background: -moz-linear-gradient(top, #F4F4F4 0%, #DADADA 50%, #E7E7E7 100%); /* firefox */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F4F4F4), color-stop(50%,#DADADA), color-stop(100%,#E7E7E7)); /* webkit */
-	color: #333;
-	cursor: pointer;
-}
-
-	.olControlPanel .olControlNavigationItemInactive:hover,
-	.olControlPanel .olControlDrawFeaturePointItemInactive:hover {
-		background: #F4F4F4; /* old browsers */
-		background: -moz-linear-gradient(top, #F4F4F4 0%, #EBEBEB 100%); /* firefox */
-		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F4F4F4), color-stop(100%,#EBEBEB)); /* webkit */
-		color: #000;
+	#cmtls-map-layer-switcher ul {
+		margin: 0;
 	}
 
-/* Active states */
-.olControlPanel .olControlNavigationItemActive,
-.olControlPanel .olControlDrawFeaturePointItemActive {
-	background: #fff;
-	color: #666;
-}
+		#cmtls-map-layer-switcher ul ul {
+			margin-left: 19px;
+		}
+
+	#cmtls-map-layer-switcher li {
+		list-style: none;
+	}
+
+
+#cmtls-map-layer-switcher.hidden {
+	display: none;
+}	

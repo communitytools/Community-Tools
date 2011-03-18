@@ -206,5 +206,40 @@ Drupal.behaviors.cmtls_event = function(context)
 			$(this).parent().next('.event-toggle-container').slideToggle('slow');
 			return false;
 		});
+		
+		// add calendar shifting
+		$('#cmtls-horizontal-calendar-previous, #cmtls-horizontal-calendar-next').live('click', function()
+		{
+			shiftCalendar(this);
+			
+			return false;
+		});
 	}
+}
+
+function shiftCalendar(element)
+{
+	var url = Drupal.settings.basePath + 'cmtls/' + Drupal.settings.cmtls.currentGroup.nid + '/' + Drupal.settings.cmtls.currentApp.nid + '/calendar/ajax';
+	
+	var data = $(element).attr('href').split('?');
+	data = data[1] + '&ajax=1';
+	
+	$.ajax({
+		type: 'GET',
+		url: url,
+		success: function (data, textStatus, XMLHttpRequest)
+		{
+			if(data.content)
+			{
+				$('#cmtls-horizontal-calendar-container').html(data.content);
+			}
+		},
+		
+		error: function (XMLHttpRequest, textStatus, errorThrown)
+		{
+			alert(textStatus);
+		},
+		dataType: 'json',
+		data: data,
+	});
 }

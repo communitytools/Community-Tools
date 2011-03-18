@@ -73,9 +73,8 @@ $i = 0;
 	<?php if (is_array($node->taxonomy)): ?>
 		<?php if (count($node->taxonomy) > 0): ?>
 			<div class="meta-tags">
-				<?php print t('Tagged').': '; ?>
 				<?php foreach ($node->taxonomy as $term): ?>
-					<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php if ($i < count($node->taxonomy) - 1) print ', '; $i++; ?>
+					<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php $i++; ?>
 				<?php endforeach; ?>
 			</div> <!-- meta-tags -->
 			&middot;

@@ -65,12 +65,23 @@
 /* Tags */
 .meta-tags {
 	display: inline-block;
-	padding-left: 20px;
-	background: url('../images/tags.png') no-repeat 0 2px;
-	color: #777;
-	font-size: 12px;
 }
 
+.meta-tags a {
+	display: inline;
+	padding: 1px 4px 2px 4px;
+	color: #555;
+	border: 1px solid #E8E8E8;
+	background: #F3F3F3;
+	font-size: 10px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+
+	.meta-tags a:hover {
+		color: #2786C2;
+	}
 
 /* Social media share */
 .meta-share {
@@ -466,7 +477,7 @@ a.comments-button {
 	}
 
 
-/* Text Nodejavascript:void(0);
+/* Text Node
 ------------------------------------------------------------------------------ */
 .text-node {
 	position: relative;
@@ -500,16 +511,38 @@ a.comments-button {
 			display: inline-block;
 		}
 
+
+/* Idea
+------------------------------------------------------------------------------ */
+/*
+.text-node.idea {}
+
+.text-node.idea .comment.cmtls-stance-1 div.avatar {
+	border: 1px solid green;
+}
+
+.text-node.idea .comment.cmtls-stance-2 div.avatar {
+	border: 1px solid red;
+}
+*/
+
+/* Place
+------------------------------------------------------------------------------ */
+.meta-contacts {
+	margin-bottom: 15px;
+}
+
 /* Content grouping
 -------------------------------------------------------------- */
 .content-group-header {
 	padding: 15px 0 0 0;
-	margin: 0 0 -8px -25px;
+	margin: 0 -25px -8px -25px;
 	font-size: 11px;
 	font-weight: bold;
 	clear: both;
 	color: #555;
 	text-transform: uppercase;
+	border-bottom: 1px solid #E7E7E7;
 }
 
 	.content-group-header span {
@@ -528,16 +561,84 @@ a.comments-button {
 		color: #2786C2;
 	}
 
-
-
-/* Event Item
--------------------------------------------------------------- */
-
-/* TODO: This line is maybe not needed, search from code... */
-.text-node .content .event-header {
+/* Tags filter on top of text content
+------------------------------------------------------------------------------- */
+.cmtls-tag-cloud {
+	margin-top: 6px;
 	font-size: 12px;
 }
 
+/* Events calendar filter on top of text content
+------------------------------------------------------------------------------- */
+.cmtls-horizontal-calendar {
+	margin-top: 6px;
+	max-width: 501px; /* so, that next button would not float far away on text-only view */
+	line-height: 100%;
+}
+
+.cmtls-horizontal-calendar-navi {
+	color: #666;
+}
+
+#cmtls-horizontal-calendar-previous,
+#cmtls-horizontal-calendar-next {
+	padding: 0px 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	background: #E9E9E9;
+}
+
+	#cmtls-horizontal-calendar-previous:hover,
+	#cmtls-horizontal-calendar-next:hover {
+		background: #fff;
+	}
+
+#cmtls-horizontal-calendar-next {
+	float: right;
+}
+
+.cmtls-horizontal-calendar-dates {
+	font-size: 11px;
+	margin-top: 9px;
+}
+
+	.cmtls-horizontal-calendar-dates span {
+		padding: 1px 2px;
+	}
+
+	.cmtls-horizontal-calendar-dates .saturday,
+	.cmtls-horizontal-calendar-dates .sunday {
+		background: #E9E9E9;
+	}
+
+	.cmtls-horizontal-calendar-dates .saturday {
+		margin-right: -1px;
+		padding-right: 3px;
+		-moz-border-radius-topleft: 3px;
+		-webkit-border-top-left-radius: 3px;
+		border-top-left-radius: 3px;
+		-moz-border-radius-bottomleft: 3px;
+		-webkit-border-bottom-left-radius: 3px;
+		border-bottom-left-radius: 3px;
+
+	}
+
+	.cmtls-horizontal-calendar-dates .sunday {
+		-moz-border-radius-topright: 3px;
+		-webkit-border-top-right-radius: 3px;
+		border-top-right-radius: 3px;
+		-moz-border-radius-bottomright: 3px;
+		-webkit-border-bottom-right-radius: 3px;
+		border-bottom-right-radius: 3px;
+	}
+
+
+/* Event Item
+------------------------------------------------------------------------------- */
+.cmtls-events-container .text-node {
+	/* border: none; */
+}
 
 h1 span.date {
 	color: #999;
@@ -589,10 +690,29 @@ h1 span.date {
 		float: left;
 	}
 
+/* Text content ajax button
+-------------------------------------------------------------- */
+#cmtls-pager {
+	display: inline-block;
+	width: 100%;
+	border: 1px solid #E8E8E8;
+	background: #F3F3F3;
+	text-align: center;
+	margin-top: 10px;
+	font-size: 12px;
+}
+
+#cmtls-pager-more-button {
+	display: block;
+}
+
+#cmtls-pager.hidden,
+#cmtls-pager-more-button.hidden {
+	display: none;
+}
 
 /* Rich Text
 -------------------------------------------------------------- */
-
 .cke_show_borders p {
 	margin-bottom: 15px;
 }

@@ -21,3 +21,16 @@ function cmtls_event_update_6003(&$sandbox)
 
 	return $ret;
 }
+
+function cmtls_event_update_6004(&$sandbox)
+{
+	features_revert(array('cmtls_event' => array('user_permission', )));
+	
+	// Add simple note
+	$ret[] = array(
+		'success' => TRUE,
+		'query' => 'Reverted Event feature',
+	);
+
+	return $ret;
+}

@@ -199,15 +199,3 @@ sup {
 sub {
 	top: .5ex;
 }
-
-.big-arrow {
-	color: #333;
-	font-size: 25px;
-	line-height: 1;
-	font-weight: bold;
-	margin: 0 3px;
-	
-	opacity: 0.5;
-	-moz-opacity: 0.5;
-	filter:alpha(opacity=50);
-}

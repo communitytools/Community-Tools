@@ -41,12 +41,10 @@
 	right: 5px;
 	border: none;
 	opacity: 0.6;
-	-moz-opacity: 0.6;
 	filter:alpha(opacity=60);
 }
 
 	.cmtls-map-popup-contents a.cmtls-map-popup-close:hover {
 		opacity: 1;
-		-moz-opacity: 1;
 		filter:alpha(opacity=1);
 	}

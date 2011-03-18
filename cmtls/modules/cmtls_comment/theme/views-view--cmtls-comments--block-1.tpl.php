@@ -47,7 +47,7 @@
 					<?php print _cmtls_member_avatar($cmtls['current_thread_author'], 16); ?> <?php print _cmtls_member_name(array('name' => (object)array('raw' => $cmtls['current_thread_author']->name), 'value' => (object)array('raw' => $cmtls['current_thread_author']->profile_cmtls_member_name), 'uid' => (object)array('raw' => $cmtls['current_thread_author']->uid)), TRUE); ?>
 				</td>
 				<td class="message">
-					<?php print check_plain($cmtls['current_thread']->body); ?>
+					<?php print check_markup($cmtls['current_thread']->body); ?>
 				</td>
 				<td class="date">
 					<?php print date('d.m.Y H:i', $cmtls['current_thread']->created); ?>

@@ -18,13 +18,11 @@
 	margin-left: 3px;
 	display: inline;
 	opacity: 0.5;
-	-moz-opacity: 0.5;
 	filter:alpha(opacity=50);
 }
 
 	.forum .forum-topics-list ul li:hover .forum-topics-meta {
 		opacity: 1;
-		-moz-opacity: 1;
 		filter:alpha(opacity=1);
 	}
 	
@@ -59,13 +57,11 @@
 		cursor: pointer;
 		display: inline-block;
 		opacity: 0.5;
-		-moz-opacity: 0.5;
 		filter:alpha(opacity=50);
 	}
 	
 		.forum .forum-topics-list ul li .forum-topics-meta a.move-forum-topic-up:hover {
 			opacity: 1;
-			-moz-opacity: 1;
 			filter:alpha(opacity=1);
 		}
 	
@@ -79,13 +75,11 @@
 		cursor: pointer;
 		display: inline-block;
 		opacity: 0.5;
-		-moz-opacity: 0.5;
 		filter:alpha(opacity=50);
 	}
 	
 		.forum .forum-topics-list ul li .forum-topics-meta a.move-forum-topic-down:hover {
 			opacity: 1;
-			-moz-opacity: 1;
 			filter:alpha(opacity=1);
 		}
 
@@ -243,14 +237,12 @@
 	border: none;
 	background: url('../img/pin.png') no-repeat 0 0;
 	opacity: 0.5;
-	-moz-opacity: 0.5;
 	filter:alpha(opacity=50);
 	}
 
 	.forum .forum-discussions-list .forum-pin a.selected,
 	.forum .forum-discussions-list .forum-pin a:hover {
 		opacity: 1;
-		-moz-opacity: 1;	
 		filter:alpha(opacity=1);
 		border: none;
 	}

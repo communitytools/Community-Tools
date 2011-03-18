@@ -9,6 +9,9 @@
  */
 function cmtls_install()
 {
+	// enable user selected translations
+	variable_set('language_negotiation', 2);
+
 	// Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
 	db_query("UPDATE {system} SET weight = 11 WHERE type = 'module' AND name = '%s'", 'cmtls');
 	
@@ -136,6 +139,31 @@ function cmtls_update_6002(&$sandbox)
 	$ret[] = array(
 		'success' => TRUE,
 		'query' => 'Added notifications actions',
+	);
+
+	return $ret;
+}
+
+function cmtls_update_6004(&$sandbox)
+{
+	locale_system_update(array('cmtls'));
+	
+	$modules = array('cmtls_place');
+	
+	// enable user selected translations
+	variable_set('language_negotiation', 2);
+	
+	// Enable much of the architecture via features.
+	foreach ($modules as $module)
+	{
+		_drupal_install_module($module);
+		module_enable(array($module));  
+	}
+	
+	// Add simple note
+	$ret[] = array(
+		'success' => TRUE,
+		'query' => 'Enabled places',
 	);
 
 	return $ret;

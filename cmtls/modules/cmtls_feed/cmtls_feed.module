@@ -1,0 +1,128 @@
+<?php
+
+//include_once('cmtls_feed.features.inc');
+
+/**
+ * Implements hook_init()
+ *
+ */
+function cmtls_feed_init()
+{
+}
+
+function cmtls_feed_form_cmtls_app_node_form_alter(&$form, &$form_state)
+{
+	if(!_cmtls_is()) return;
+	
+	$form['#after_build'][] = 'cmtls_feed_app_after_build';
+}
+
+function cmtls_feed_app_after_build($form, &$form_state)
+{
+	if($form['#node']->app_type && module_invoke($form['#node']->app_type, 'cmtls_feed_config'))
+	{
+		$form['feeds']['FeedsHTTPFetcher']['source']['#required'] = NULL;
+		
+		$form['feeds']['#title'] = t('RSS import settings');
+		$form['feeds']['#collapsible'] = TRUE;
+		$form['feeds']['#collapsed'] = TRUE;
+	
+		$form['cmtls_app_config']['feeds'] = $form['feeds'];
+	}
+	else 
+	{
+		$form['#feed_id'] = NULL;
+	}
+	
+	$form['feeds'] = NULL;
+	
+	$form['title']['#required'] = TRUE;
+	
+	return $form;
+}
+
+// allow nodeheirarchy mapping, append to body field
+
+/**
+ * Implementation of hook_feeds_parser_sources_alter().
+ */
+function cmtls_feed_feeds_parser_sources_alter(&$sources, $content_type)
+{
+	if (!empty($content_type))
+	{
+		$sources['parent:nodehierarchy'] = array(
+			'name' => t('Feed node: nodehierarchy'),
+			'description' => t('nodehierarchy'),
+			'callback' => 'cmtls_feed_feeds_get_nh_source',
+		);
+	}
+}
+
+/**
+ * Callback, returns OG of feed node.
+ */
+function cmtls_feed_feeds_get_nh_source(FeedsImportBatch $batch, $key)
+{
+	$node = node_load($batch->feed_nid);
+	
+	if ($node = node_load($batch->feed_nid))
+	{
+		return $node->nid;
+	}
+}
+
+/**
+ * Implementation of hook_feeds_node_processor_targets_alter().
+ */
+function cmtls_feed_feeds_node_processor_targets_alter(&$targets, $content_type)
+{
+	$targets['parent'] = array(
+		'name' => t('nodeheirarchy parent'),
+		'callback' => 'cmtls_feed_feeds_set_nh_target',
+		'description' => t('nodeheirarchy parent.'),
+	);
+	
+	$targets['body_append'] = array(
+		'name' => t('Append link to body'),
+		'callback' => 'cmtls_feed_feeds_set_append_target',
+		'description' => t('Append the value to the body as a link'),
+	);
+}
+
+/**
+ * Callback for mapping.
+ */
+function cmtls_feed_feeds_set_nh_target(&$node, $key, $value)
+{
+	$node->parent = $value;
+}
+
+/**
+ * Callback for mapping.
+ */
+function cmtls_feed_feeds_set_append_target(&$node, $key, $value)
+{
+	$value = urldecode($value);
+	
+	$node->body .= '<p><a href="'.$value.'" target="_blank">'.$value.'</a></p>';
+}
+
+
+/**
+* Implementation of hook_feeds_plugins().
+*/
+function cmtls_feed_feeds_plugins()
+{
+	$info = array();
+	$info['SimplePieGeoWKTParser'] = array(
+		'name' => 'SimplePie WKT parser',
+		'description' => 'Joins geo location into WKT',
+		'handler' => array(
+			'parent' => 'FeedsSimplePieParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
+			'class' => 'SimplePieGeoWKTParser',
+			'file' => 'simplepiegeowktparser.inc',
+			'path' => drupal_get_path('module', 'cmtls_feed'),
+		),
+	);
+	return $info;
+}

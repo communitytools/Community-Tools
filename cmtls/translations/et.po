@@ -1,0 +1,1794 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2011-03-16 11:39+0000\n"
+"PO-Revision-Date: 2011-03-16 11:39+0000\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Estonian <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: cmtls.module:274 modules/cmtls_comment/cmtls_comment.module:51 modules/cmtls_group/cmtls_group.module:297;321 modules/cmtls_member/cmtls_member.module:248;263;280;298
+msgid "Cancel"
+msgstr "Katkesta"
+
+#: cmtls.module:464 cmtls.info:0;0;0 modules/cmtls_app/cmtls_app.info:0 modules/cmtls_article/cmtls_article.info:0 modules/cmtls_auth/cmtls_auth.info:0 modules/cmtls_comment/cmtls_comment.info:0 modules/cmtls_dashboard/cmtls_dashboard.info:0 modules/cmtls_event/cmtls_event.info:0 modules/cmtls_fb/cmtls_fb.info:0 modules/cmtls_feed/cmtls_feed.info:0 modules/cmtls_filter/cmtls_filter.info:0 modules/cmtls_forum/cmtls_forum.info:0 modules/cmtls_gallery/cmtls_gallery.info:0 modules/cmtls_group/cmtls_group.info:0 modules/cmtls_idea/cmtls_idea.info:0 modules/cmtls_map/cmtls_map.info:0 modules/cmtls_member/cmtls_member.info:0 modules/cmtls_openid/cmtls_openid.info:0 modules/cmtls_place/cmtls_place.info:0 modules/cmtls_problem/cmtls_problem.module:167 modules/cmtls_problem/cmtls_problem.info:0 modules/cmtls_stance/cmtls_stance.info:0 modules/cmtls_upload/cmtls_upload.info:0
+msgid "Community Tools"
+msgstr "Community Tools"
+
+#: cmtls.module:465
+msgid "Community Tools configuration"
+msgstr ""
+
+#: cmtls.module:473 modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:156;260
+msgid "Notifications"
+msgstr "Teavitused"
+
+#: cmtls.module:497
+msgid "Send notifications about new comments to users"
+msgstr "Saada kasutajatele kohene teade uutest kommentaaridest"
+
+#: cmtls.module:498
+msgid "Notifications are sent the owner of the commented node and all commenters in that node"
+msgstr "Teade saadetakse postituse autorile ja teistele kommenteerijatele"
+
+#: cmtls.module:504
+msgid "Send daily e-mail about new content to users"
+msgstr "Saada kasutajatele igapäevane teade uuest sisust"
+
+#: cmtls.module:505
+msgid "Notifications are sent daily about new content and commented content within last 24hrs"
+msgstr ""
+"Teates kuvatakse linke viimase ööpäeva jooksul lisandunud sisule ja "
+"kommentaaridele "
+
+#: cmtls.module:522;543;543
+msgid "Powered by Community Tools"
+msgstr ""
+
+#: cmtls.module:529
+msgid "Community Tools: site menu"
+msgstr "Community Tools: site menu"
+
+#: cmtls.module:565;567
+msgid "+ Add page"
+msgstr "+ Lisa leht"
+
+#: cmtls.module:747
+msgid "New content in !groupname"
+msgstr "Uued postitused grupis !groupname"
+
+#: cmtls.module:762
+msgid "New comments have been posted in !groupname"
+msgstr "!groupname, uued kommentaarid"
+
+#: cmtls.module:770
+msgid "The following new groups have been created"
+msgstr "Loodud on järgmised uued grupid"
+
+#: cmtls.module:778
+msgid "!sitename daily summary"
+msgstr "!sitename päeva kokkuvõte"
+
+#: cmtls.module:780;1176
+msgid "Hello !username"
+msgstr "Tere !username"
+
+#: cmtls.module:781
+msgid "Here's a summary of !sitename daily changes"
+msgstr "Siin on kokkuvõte !sitename veebisaidi viimase ööpäeva uuendustest"
+
+#: cmtls.module:784;1180;1239;1269
+msgid "You can change your notification settings at !link"
+msgstr "Sa saad muuta oma teavitusi siit: !link"
+
+#: cmtls.module:968 modules/cmtls_group/cmtls_group.module:360
+msgid "Geolocation"
+msgstr "Geopunkt"
+
+#: cmtls.module:986 modules/cmtls_app/cmtls_app.module:32;97 modules/cmtls_group/cmtls_group.module:355 modules/cmtls_member/cmtls_member.module:66 modules/cmtls_problem/cmtls_problem.module:291;322
+msgid "Delete"
+msgstr "Kustuta"
+
+#: cmtls.module:1012 modules/cmtls_app/cmtls_app.module:332 modules/cmtls_forum/cmtls_forum.module:247 modules/cmtls_gallery/cmtls_gallery.module:585 modules/cmtls_group/cmtls_group.module:446
+msgid "New"
+msgstr "Uus"
+
+#: cmtls.module:1078
+msgid "Tags"
+msgstr "Võtmesõnad"
+
+#: cmtls.module:1121
+msgid "Send instant notifications on new nodes"
+msgstr ""
+
+#: cmtls.module:1129
+msgid "Send instant notifications on new comments"
+msgstr ""
+
+#: cmtls.module:1174;1177
+msgid "!sitename has new post"
+msgstr "Veebisaidis !sitename on uus postitus"
+
+#: cmtls.module:1229;1259
+msgid "has commented on"
+msgstr "kommenteeris"
+
+#: cmtls.module:1230;1260
+msgid "User !username commented on \"!nodetitle\""
+msgstr "Kasutaja !username kommenteeris postitust \"!nodetitle\" "
+
+#: cmtls.module:453
+msgid "administer cmtls"
+msgstr "administer cmtls"
+
+#: modules/cmtls_app/cmtls_app.features.content.inc:169
+msgid "App configuration"
+msgstr ""
+
+#: modules/cmtls_app/cmtls_app.features.content.inc:170
+msgid "App type"
+msgstr "Rakenduse tüüp"
+
+#: modules/cmtls_app/cmtls_app.features.content.inc:171
+msgid "Custom view"
+msgstr "Views mooduli view"
+
+#: modules/cmtls_app/cmtls_app.features.inc:19 modules/cmtls_app/cmtls_app.info:0
+msgid "Community Tools: App"
+msgstr "Community Tools Tööriist"
+
+#: modules/cmtls_app/cmtls_app.features.inc:23 modules/cmtls_group/cmtls_group.features.inc:23
+msgid "Name"
+msgstr "Nimetus"
+
+#: modules/cmtls_app/cmtls_app.features.inc:25 modules/cmtls_dashboard/cmtls_dashboard.features.inc:25 modules/cmtls_forum/cmtls_forum.features.inc:25 modules/cmtls_gallery/cmtls_gallery.features.content.inc:458 modules/cmtls_group/cmtls_group.features.inc:25 modules/cmtls_member/cmtls_member.features.inc:25 modules/cmtls_member/cmtls_member.module:240 modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:186 modules/cmtls_problem/cmtls_problem.module:406
+msgid "Description"
+msgstr "Kirjeldus"
+
+#: modules/cmtls_app/cmtls_app.module:17 modules/cmtls_forum/cmtls_forum.module:17;41 modules/cmtls_group/cmtls_group.module:17 modules/cmtls_member/cmtls_member.module:55 modules/cmtls_problem/cmtls_problem.module:189
+msgid "Edit"
+msgstr "Muuda"
+
+#: modules/cmtls_app/cmtls_app.module:22;108 modules/cmtls_forum/cmtls_forum.module:22;129
+msgid "Move up"
+msgstr "Liiguta üles"
+
+#: modules/cmtls_app/cmtls_app.module:27;117 modules/cmtls_forum/cmtls_forum.module:27;138
+msgid "Move down"
+msgstr "Liiguta alla"
+
+#: modules/cmtls_app/cmtls_app.module:167
+msgid "This not an app."
+msgstr "Tegemist ei ole tööriistaga"
+
+#: modules/cmtls_app/cmtls_app.module:174
+msgid "Custom view name not set!"
+msgstr "View nimi on määramata!"
+
+#: modules/cmtls_app/cmtls_app.module:204
+msgid "No page callback set."
+msgstr ""
+
+#: modules/cmtls_app/cmtls_app.module:295
+msgid "Configuration"
+msgstr ""
+
+#: modules/cmtls_app/cmtls_app.module:332
+msgid "app"
+msgstr "rakendus"
+
+#: modules/cmtls_app/cmtls_app.module:126
+msgid "RSS"
+msgstr "RSS"
+
+#: modules/cmtls_app/cmtls_app.module:135;144
+msgid "App"
+msgstr "Tööriist"
+
+#: modules/cmtls_app/cmtls_app.info:0
+msgid "Community Tools apps"
+msgstr "Community Tools tööriistad"
+
+#: modules/cmtls_app/theme/views-view--cmtls-apps--default.tpl.php:37
+msgid "Add tool"
+msgstr "Lisa tööriist"
+
+#: modules/cmtls_article/cmtls_article.features.content.inc:184 modules/cmtls_event/cmtls_event.features.content.inc:370 modules/cmtls_idea/cmtls_idea.features.content.inc:241 modules/cmtls_place/cmtls_place.features.content.inc:401 modules/cmtls_problem/cmtls_problem.features.content.inc:294
+msgid "Files"
+msgstr "Failid"
+
+#: modules/cmtls_article/cmtls_article.features.content.inc:185 modules/cmtls_event/cmtls_event.features.content.inc:371 modules/cmtls_group/cmtls_group.features.content.inc:296 modules/cmtls_idea/cmtls_idea.features.content.inc:242 modules/cmtls_place/cmtls_place.features.content.inc:402 modules/cmtls_problem/cmtls_problem.features.content.inc:295
+msgid "Geo info"
+msgstr "Geoandmed"
+
+#: modules/cmtls_article/cmtls_article.features.content.inc:186 modules/cmtls_event/cmtls_event.features.content.inc:372 modules/cmtls_idea/cmtls_idea.features.content.inc:243 modules/cmtls_place/cmtls_place.features.content.inc:403 modules/cmtls_problem/cmtls_problem.features.content.inc:296
+msgid "Location"
+msgstr "Asukoht"
+
+#: modules/cmtls_article/cmtls_article.features.inc:22
+msgid "Community Tools: Artikkel"
+msgstr ""
+
+#: modules/cmtls_article/cmtls_article.features.inc:26 modules/cmtls_event/cmtls_event.features.inc:23 modules/cmtls_idea/cmtls_idea.features.inc:23 modules/cmtls_place/cmtls_place.features.inc:26 modules/cmtls_problem/cmtls_problem.features.inc:23
+msgid "Pealkiri"
+msgstr ""
+
+#: modules/cmtls_article/cmtls_article.features.inc:28 modules/cmtls_idea/cmtls_idea.features.inc:25 modules/cmtls_place/cmtls_place.features.inc:28 modules/cmtls_problem/cmtls_problem.features.inc:25
+msgid "Tekst"
+msgstr ""
+
+#: modules/cmtls_article/cmtls_article.module:17
+msgid "Edit article"
+msgstr "Muuda artiklit"
+
+#: modules/cmtls_article/cmtls_article.module:52
+msgid "Articles"
+msgstr "Artiklid"
+
+#: modules/cmtls_article/cmtls_article.module:54
+msgid "post"
+msgstr "postitus"
+
+#: modules/cmtls_article/cmtls_article.module:96 modules/cmtls_place/cmtls_place.module:96
+msgid "Sorting settings"
+msgstr "Järjestamise seaded"
+
+#: modules/cmtls_article/cmtls_article.module:103 modules/cmtls_place/cmtls_place.module:103
+msgid "Sorting field"
+msgstr "Sorteerimise väli"
+
+#: modules/cmtls_article/cmtls_article.module:106 modules/cmtls_place/cmtls_place.module:106
+msgid "Created date"
+msgstr "Loomise aeg"
+
+#: modules/cmtls_article/cmtls_article.module:107
+msgid "Article title"
+msgstr "Artikli pealkiri"
+
+#: modules/cmtls_article/cmtls_article.module:113 modules/cmtls_place/cmtls_place.module:113
+msgid "Sorting order"
+msgstr "Järjestus"
+
+#: modules/cmtls_article/cmtls_article.module:116 modules/cmtls_place/cmtls_place.module:116
+msgid "Ascending"
+msgstr "Kasvav"
+
+#: modules/cmtls_article/cmtls_article.module:117 modules/cmtls_place/cmtls_place.module:117
+msgid "Descending"
+msgstr "Kahanev"
+
+#: modules/cmtls_article/cmtls_article.module:209
+msgid "This not a article."
+msgstr "Tegemist ei ole artikliga."
+
+#: modules/cmtls_article/cmtls_article.module:372 modules/cmtls_idea/cmtls_idea.module:447 modules/cmtls_place/cmtls_place.module:382 modules/cmtls_problem/cmtls_problem.module:674
+msgid "Latest posts"
+msgstr "Viimased postitused"
+
+#: modules/cmtls_article/cmtls_article.module:379;410 modules/cmtls_event/cmtls_event.module:448;490 modules/cmtls_idea/cmtls_idea.module:453;484 modules/cmtls_place/cmtls_place.module:389;420 modules/cmtls_problem/cmtls_problem.module:702;733
+msgid "Most commented"
+msgstr "Enim kommenteeritud"
+
+#: modules/cmtls_article/cmtls_article.module:400 modules/cmtls_event/cmtls_event.module:480 modules/cmtls_idea/cmtls_idea.module:474 modules/cmtls_place/cmtls_place.module:410 modules/cmtls_problem/cmtls_problem.module:723
+msgid "Time added"
+msgstr "Loomise aeg"
+
+#: modules/cmtls_article/cmtls_article.module:405 modules/cmtls_dashboard/cmtls_dashboard.features.inc:23 modules/cmtls_event/cmtls_event.module:485 modules/cmtls_forum/cmtls_forum.features.inc:23;34 modules/cmtls_gallery/cmtls_gallery.features.inc:61;72 modules/cmtls_idea/cmtls_idea.module:479 modules/cmtls_member/cmtls_member.features.inc:23 modules/cmtls_place/cmtls_place.module:415 modules/cmtls_problem/cmtls_problem.module:728
+msgid "Title"
+msgstr "Pealkiri"
+
+#: modules/cmtls_article/cmtls_article.module:455;462 modules/cmtls_event/cmtls_event.module:665 modules/cmtls_forum/cmtls_forum.module:514;521 modules/cmtls_gallery/cmtls_gallery.module:840 modules/cmtls_idea/cmtls_idea.module:530;537 modules/cmtls_problem/cmtls_problem.module:802
+msgid "last"
+msgstr "viimane"
+
+#: modules/cmtls_article/cmtls_article.module:455 modules/cmtls_forum/cmtls_forum.module:514;525 modules/cmtls_idea/cmtls_idea.module:530
+msgid "No posts yet"
+msgstr "Midagi pole veel postitatud"
+
+#: modules/cmtls_article/cmtls_article.module:455 modules/cmtls_group/theme/cmtls-group-overview.tpl.php:31 modules/cmtls_idea/cmtls_idea.module:530
+msgid "1 post"
+msgid_plural "@count posts"
+msgstr[0] "1 postitus"
+msgstr[1] "@count postitust"
+
+#: modules/cmtls_article/cmtls_article.module:462 modules/cmtls_article/theme/views-view-fields--cmtls-articles--default.tpl.php:84 modules/cmtls_event/cmtls_event.module:665 modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:117;186 modules/cmtls_forum/cmtls_forum.module:521 modules/cmtls_group/theme/cmtls-group-overview.tpl.php:32 modules/cmtls_idea/cmtls_idea.module:537 modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:71;109 modules/cmtls_place/theme/views-view-fields--cmtls-places--default.tpl.php:103;137 modules/cmtls_problem/cmtls_problem.module:802 modules/cmtls_problem/theme/views-view-fields--cmtls-problems--default.tpl.php:99;136
+msgid "1 comment"
+msgid_plural "@count comments"
+msgstr[0] "1 kommentaar"
+msgstr[1] "@count kommentaari"
+
+#: modules/cmtls_article/cmtls_article.module:134;145
+msgid "Article"
+msgstr "Artikkel"
+
+#: modules/cmtls_article/cmtls_article.module:154
+msgid "Delete article"
+msgstr "Kustuta artikkel"
+
+#: modules/cmtls_article/cmtls_article.info:0
+msgid "Community Tools: Article"
+msgstr "Community Tools: Artikkel"
+
+#: modules/cmtls_article/cmtls_article.info:0
+msgid "Community Tools: Articles"
+msgstr "Community Tools: Artiklid"
+
+#: modules/cmtls_article/theme/cmtls-articles-content.tpl.php:17;19 modules/cmtls_article/theme/views-view--cmtls-articles--default.tpl.php:35;37
+msgid "Add article"
+msgstr "Lisa postitus"
+
+#: modules/cmtls_article/theme/cmtls-articles-content.tpl.php:22 modules/cmtls_event/theme/cmtls-events-content.tpl.php:22 modules/cmtls_idea/theme/cmtls-ideas-content.tpl.php:16 modules/cmtls_place/theme/cmtls-places-content.tpl.php:23 modules/cmtls_problem/theme/cmtls-problems-content.tpl.php:22
+msgid "Filter"
+msgstr "Filter"
+
+#: modules/cmtls_article/theme/views-view-fields--cmtls-articles--default.tpl.php:40 modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:75 modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:20 modules/cmtls_place/theme/views-view-fields--cmtls-places--default.tpl.php:60
+msgid "wrote"
+msgstr "kirjutas"
+
+#: modules/cmtls_article/theme/views-view-fields--cmtls-articles--default.tpl.php:84 modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:117 modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:71 modules/cmtls_place/theme/views-view-fields--cmtls-places--default.tpl.php:103 modules/cmtls_problem/theme/views-view-fields--cmtls-problems--default.tpl.php:99
+msgid "Comment"
+msgstr "Kommenteeri"
+
+#: modules/cmtls_auth/cmtls_auth.module:96
+msgid "Forgot your password?"
+msgstr "Unustasid parooli?"
+
+#: modules/cmtls_auth/cmtls_auth.module:96
+msgid "Request new password via e-mail."
+msgstr "Soovin uut parooli e-posti vahendusel."
+
+#: modules/cmtls_auth/cmtls_auth.module:115
+msgid "Full name"
+msgstr "Täisnimi"
+
+#: modules/cmtls_auth/cmtls_auth.module:150
+msgid "Select how to connect to @site"
+msgstr "Vali saidiga @site ühinemise viis"
+
+#: modules/cmtls_auth/cmtls_auth.module:152
+msgid "I don't have a user on @site. Create new account for me."
+msgstr "Mul ei ole veel @site saidis kontot, loo mulle uus."
+
+#: modules/cmtls_auth/cmtls_auth.module:153
+msgid "I already have a user on @site. Connect my accounts."
+msgstr "Mul juba on siin saidis konto, ühenda uus ja olemasolev omavahel."
+
+#: modules/cmtls_auth/cmtls_auth.module:170
+msgid "Enter your username and password below to authenticate yourself and connect to your existing @site account"
+msgstr "Sisesta oma olemasoleva konto kasutajanimi ja parool, et seda siduda."
+
+#: modules/cmtls_auth/cmtls_auth.module:181 modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "Continue"
+msgstr "Jätka"
+
+#: modules/cmtls_auth/cmtls_auth.module:219
+msgid "Error saving user account."
+msgstr "Viga kasutajakonto salvestamisel."
+
+#: modules/cmtls_auth/cmtls_auth.module:299
+msgid "Username field is required"
+msgstr "Kasutajanime täitmine on kohustuslik"
+
+#: modules/cmtls_auth/cmtls_auth.module:303
+msgid "Password field is required"
+msgstr "Parooli sisestamine on kohustuslik"
+
+#: modules/cmtls_auth/cmtls_auth.module:310
+msgid "Sorry, unrecognized username or password."
+msgstr "Vale kasutajanimi või parool."
+
+#: modules/cmtls_auth/cmtls_auth.module:364
+msgid "Error connecting to your existing account."
+msgstr ""
+
+#: modules/cmtls_auth/cmtls_auth.module:405
+msgid "Error logging the user in"
+msgstr ""
+
+#: modules/cmtls_auth/cmtls_auth.module:16
+msgid "Login"
+msgstr "Logi sisse"
+
+#: modules/cmtls_auth/cmtls_auth.module:24
+msgid "Create new account"
+msgstr "Loo uus konto"
+
+#: modules/cmtls_auth/cmtls_auth.info:0;0
+msgid "Community Tools: Authentication"
+msgstr ""
+
+#: modules/cmtls_comment/cmtls_comment.module:148
+msgid "Latest comments"
+msgstr "Viimased kommentaarid"
+
+#: modules/cmtls_comment/cmtls_comment.module:164 modules/cmtls_comment/theme/views-view-fields--cmtls-comments--block-1.tpl.php:34;34 modules/cmtls_comment/theme/views-view-fields--cmtls-comments--default.tpl.php:40;40
+msgid "Delete comment"
+msgstr "Kustuta kommentaar"
+
+#: modules/cmtls_comment/cmtls_comment.module:175
+msgid "Comments"
+msgstr "Kommentaarid"
+
+#: modules/cmtls_comment/cmtls_comment.info:0
+msgid "Community Tools: Comment"
+msgstr "Community Tools: Kommentaarid"
+
+#: modules/cmtls_comment/cmtls_comment.info:0
+msgid "Community Tools  comments"
+msgstr "Community Tools kommentaarid"
+
+#: modules/cmtls_comment/js/app.js:0
+msgid "Saving ..."
+msgstr "Salvestan ..."
+
+#: modules/cmtls_comment/theme/cmtls-comments.tpl.php:24
+msgid "Loading ..."
+msgstr "Laadin ..."
+
+#: modules/cmtls_comment/theme/cmtls-comments.tpl.php:40
+msgid "Please <a href=\"@href\" class=\"@class\">log in</a> to leave a comment."
+msgstr ""
+"Kommenteerimiseks <a href=\"@href\" class=\"@class\">logi palun "
+"sisse</a>."
+
+#: modules/cmtls_comment/theme/views-view-fields--cmtls-comments--block-2.tpl.php:29
+msgid "commented on"
+msgstr "kommenteeris"
+
+#: modules/cmtls_dashboard/cmtls_dashboard.features.inc:19 modules/cmtls_dashboard/cmtls_dashboard.info:0;0
+msgid "Community Tools: Dashboard"
+msgstr "Community Tools: Ülevaade (dashboard)"
+
+#: modules/cmtls_dashboard/cmtls_dashboard.module:9
+msgid "Dashboard"
+msgstr "Ülevaade"
+
+#: modules/cmtls_dashboard/theme/cmtls-dashboard-content.tpl.php:11;13 modules/cmtls_problem/cmtls_problem.module:157
+msgid "Add"
+msgstr ""
+
+#: modules/cmtls_event/cmtls_event.features.content.inc:368 modules/cmtls_gallery/cmtls_gallery.features.content.inc:457
+msgid "Date"
+msgstr "Kuupäev"
+
+#: modules/cmtls_event/cmtls_event.features.content.inc:369 modules/cmtls_event/cmtls_event.module:208
+msgid "Event lasts all day"
+msgstr "Kestab kogu päeva"
+
+#: modules/cmtls_event/cmtls_event.features.content.inc:373
+msgid "Registration open until"
+msgstr "Registreerumine on avatud kuni"
+
+#: modules/cmtls_event/cmtls_event.features.inc:19
+msgid "Community Tools: Sündmus"
+msgstr ""
+
+#: modules/cmtls_event/cmtls_event.features.inc:25
+msgid "Kirjeldus"
+msgstr ""
+
+#: modules/cmtls_event/cmtls_event.module:16
+msgid "Edit event"
+msgstr "Muuda sündmust"
+
+#: modules/cmtls_event/cmtls_event.module:45
+msgid "Events"
+msgstr "Sündmused"
+
+#: modules/cmtls_event/cmtls_event.module:47;99
+msgid "event"
+msgstr "sündmus"
+
+#: modules/cmtls_event/cmtls_event.module:108
+msgid "Delete event"
+msgstr "Kustuta sündmus"
+
+#: modules/cmtls_event/cmtls_event.module:129
+msgid "Send e-mail to participants"
+msgstr ""
+
+#: modules/cmtls_event/cmtls_event.module:168
+msgid "This is not an event."
+msgstr "Tegemist ei ole sündmusega."
+
+#: modules/cmtls_event/cmtls_event.module:209
+msgid "Event keywords"
+msgstr "Sündmuse võtmesõnad"
+
+#: modules/cmtls_event/cmtls_event.module:402 modules/cmtls_stance/cmtls_stance.module:266
+msgid "Yes"
+msgstr "Jah"
+
+#: modules/cmtls_event/cmtls_event.module:403 modules/cmtls_stance/cmtls_stance.module:267
+msgid "Maybe"
+msgstr "Võibolla"
+
+#: modules/cmtls_event/cmtls_event.module:404 modules/cmtls_stance/cmtls_stance.module:268
+msgid "No"
+msgstr "Ei"
+
+#: modules/cmtls_event/cmtls_event.module:405 modules/cmtls_stance/cmtls_stance.module:269
+msgid "Unanswered"
+msgstr "Ei vasta"
+
+#: modules/cmtls_event/cmtls_event.module:409
+msgid "Attending"
+msgstr "Osalen"
+
+#: modules/cmtls_event/cmtls_event.module:424
+msgid "Next 7 days"
+msgstr "Järgmised 7 päeva"
+
+#: modules/cmtls_event/cmtls_event.module:436
+msgid "Next 30 days"
+msgstr "Järgmised 30 päeva"
+
+#: modules/cmtls_event/cmtls_event.module:475
+msgid "Event date"
+msgstr ""
+
+#: modules/cmtls_event/cmtls_event.module:517
+msgid "Registration is now closed"
+msgstr "Registreerumine on nüüdseks lõppenud"
+
+#: modules/cmtls_event/cmtls_event.module:657
+msgid "No events posted"
+msgstr ""
+
+#: modules/cmtls_event/cmtls_event.module:645
+msgid "1 upcoming"
+msgid_plural "@count upcoming"
+msgstr[0] "1 tulekul"
+msgstr[1] "@count tulekul"
+
+#: modules/cmtls_event/cmtls_event.module:649
+msgid "1 in past"
+msgid_plural "@count in past"
+msgstr[0] "1 möödunud"
+msgstr[1] "@count möödunud"
+
+#: modules/cmtls_event/cmtls_event.module:138;147 modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:125
+msgid "Add to calendar"
+msgstr "Lisa kalendrisse"
+
+#: modules/cmtls_event/cmtls_event.info:0;0
+msgid "Community Tools: Event"
+msgstr "Community Tools: Sündmus"
+
+#: modules/cmtls_event/theme/cmtls-events-content.tpl.php:17;19 modules/cmtls_event/theme/views-view--cmtls-events--default.tpl.php:35;37
+msgid "Add event"
+msgstr "Lisa sündmus"
+
+#: modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:49;148
+msgid "Whole day"
+msgstr "Kogu päev"
+
+#: modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:121
+msgid "Attend"
+msgstr "Osale"
+
+#: modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:128
+msgid "Send email to participants"
+msgstr ""
+
+#: modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:194;194 modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:117;117 modules/cmtls_place/theme/views-view-fields--cmtls-places--default.tpl.php:144;144 modules/cmtls_problem/theme/views-view-fields--cmtls-problems--default.tpl.php:140;140
+msgid "Read more"
+msgstr "Loe lähemalt"
+
+#: modules/cmtls_event/theme/views-view-fields--cmtls-events--default.tpl.php:121;187
+msgid "1 attending"
+msgid_plural "@count attending"
+msgstr[0] "1 osaleja"
+msgstr[1] "@count osalejat"
+
+#: modules/cmtls_event/theme/views-view-unformatted--cmtls-events--default.tpl.php:30
+msgid "Today"
+msgstr "Täna"
+
+#: modules/cmtls_event/theme/views-view-unformatted--cmtls-events--default.tpl.php:34
+msgid "Tomorrow"
+msgstr "Homme"
+
+#: modules/cmtls_fb/cmtls_fb.module:81;23
+msgid "Connect with Facebook"
+msgstr "Facebooki kaudu registreerumine"
+
+#: modules/cmtls_fb/cmtls_fb.module:153
+msgid "Use my Facebook avatar as my profile picture"
+msgstr "Kasuta mu Facebooki pilti"
+
+#: modules/cmtls_fb/cmtls_fb.module:174
+msgid "Application ID"
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.module:177
+msgid "Your application's ID."
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.module:183
+msgid "Application Secret"
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.module:186
+msgid "Your application's secret."
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.module:200
+msgid "Application ID can contain only numeric characters."
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.module:205
+msgid "Invalid secret key."
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.module:248
+msgid "Error logging the user in."
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.module:15
+msgid "Facebook"
+msgstr ""
+
+#: modules/cmtls_fb/cmtls_fb.info:0;0
+msgid "Community Tools: Facebook Integration"
+msgstr ""
+
+#: modules/cmtls_feed/simplepiegeowktparser.inc:16
+msgid "Geo location as WKT"
+msgstr ""
+
+#: modules/cmtls_feed/simplepiegeowktparser.inc:17
+msgid "Transforms geo data into WKT"
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.module:26
+msgid "RSS import settings"
+msgstr "RSS impordi seaded"
+
+#: modules/cmtls_feed/cmtls_feed.module:54
+msgid "Feed node: nodehierarchy"
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.module:55
+msgid "nodehierarchy"
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.module:80
+msgid "nodeheirarchy parent"
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.module:82
+msgid "nodeheirarchy parent."
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.module:86
+msgid "Append link to body"
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.module:88
+msgid "Append the value to the body as a link"
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.info:0
+msgid "Community Tools: Feed"
+msgstr ""
+
+#: modules/cmtls_feed/cmtls_feed.info:0
+msgid "Community Tools: Feeds"
+msgstr ""
+
+#: modules/cmtls_filter/cmtls_filter.module:177
+msgid "Search"
+msgstr "Otsi"
+
+#: modules/cmtls_filter/cmtls_filter.module:205
+msgid "Date between"
+msgstr "Kuupäevavahemik"
+
+#: modules/cmtls_filter/cmtls_filter.module:218
+msgid "Keyword or phrase"
+msgstr "Võtmesõna või fraas"
+
+#: modules/cmtls_filter/cmtls_filter.module:234
+msgid "Sort by"
+msgstr "Sorteeri"
+
+#: modules/cmtls_filter/cmtls_filter.info:0;0
+msgid "Community Tools: Filter"
+msgstr ""
+
+#: modules/cmtls_filter/theme/cmtls-filter.tpl.php:19
+msgid "or"
+msgstr "või"
+
+#: modules/cmtls_forum/cmtls_forum.features.inc:19 modules/cmtls_forum/cmtls_forum.info:0;0
+msgid "Community Tools: Forum"
+msgstr "Community Tools: Foorum"
+
+#: modules/cmtls_forum/cmtls_forum.features.inc:30
+msgid "Community Tools: Forum thread"
+msgstr "Community Tools: Foorumi lõim"
+
+#: modules/cmtls_forum/cmtls_forum.features.inc:36
+msgid "Body"
+msgstr "Tekst"
+
+#: modules/cmtls_forum/cmtls_forum.module:66
+msgid "Forums"
+msgstr "Foorumid"
+
+#: modules/cmtls_forum/cmtls_forum.module:67
+msgid "topic"
+msgstr "teema"
+
+#: modules/cmtls_forum/cmtls_forum.module:189
+msgid "This not a forum."
+msgstr "Tegemist ei ole foorumiga."
+
+#: modules/cmtls_forum/cmtls_forum.module:206
+msgid "This not a thread."
+msgstr "Tegemist ei ole lõimega."
+
+#: modules/cmtls_forum/cmtls_forum.module:247
+msgid "thread"
+msgstr "lõim"
+
+#: modules/cmtls_forum/cmtls_forum.module:514
+msgid "1 thread"
+msgid_plural "@count threads"
+msgstr[0] "1 lõim"
+msgstr[1] "@count lõime"
+
+#: modules/cmtls_forum/cmtls_forum.module:108
+msgid "Delete forum"
+msgstr "Kustuta foorum"
+
+#: modules/cmtls_forum/cmtls_forum.module:147
+msgid "Add thread"
+msgstr "Lisa lõim"
+
+#: modules/cmtls_forum/theme/views-view--cmtls-forums--default.tpl.php:43
+msgid "+ Add topic"
+msgstr "+ Lisa teema"
+
+#: modules/cmtls_forum/theme/views-view--cmtls-threads--default.tpl.php:44
+msgid "Start a thread"
+msgstr "Algata lõim"
+
+#: modules/cmtls_forum/theme/views-view-fields--cmtls-threads--default.tpl.php:30
+msgid "Last reply"
+msgstr "Viimane vastus"
+
+#: modules/cmtls_gallery/cmtls_gallery.features.content.inc:455 modules/cmtls_group/cmtls_group.features.content.inc:295 modules/cmtls_member/cmtls_member.module:237 modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:183
+msgid "Address"
+msgstr "Aadress"
+
+#: modules/cmtls_gallery/cmtls_gallery.features.content.inc:456
+msgid "Cover image"
+msgstr "Kaanepilt"
+
+#: modules/cmtls_gallery/cmtls_gallery.features.content.inc:459
+msgid "Upload file"
+msgstr "Lae üles"
+
+#: modules/cmtls_gallery/cmtls_gallery.features.content.inc:460
+msgid "Use as album's cover image"
+msgstr "Kasuta albumi kaanepildina"
+
+#: modules/cmtls_gallery/cmtls_gallery.features.inc:57
+msgid "Community Tools: Album"
+msgstr "Community Tools: Album"
+
+#: modules/cmtls_gallery/cmtls_gallery.features.inc:68
+msgid "Community Tools: Album Object"
+msgstr "Community Tools: Album"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:14
+msgid "Gallery"
+msgstr "Galerii"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:15;585
+msgid "folder"
+msgstr "kaust"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:34
+msgid "Edit album"
+msgstr "Muuda albumit"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:39;182
+msgid "Delete album"
+msgstr "Kustuta album"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:46
+msgid "Edit file"
+msgstr "Muuda faili"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:51
+msgid "Delete file"
+msgstr "Kustuta fail"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:465
+msgid "Icon for @file"
+msgstr "Ikoon failile @file"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:465
+msgid "Click to download !file"
+msgstr "Lae alla !file"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:466
+msgid "Click to download @file"
+msgstr "Lae alla @file"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:642
+msgid "Upload files"
+msgstr "Lae üles"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:673 modules/cmtls_member/cmtls_member.module:734 modules/cmtls_problem/cmtls_problem.module:218;283 modules/cmtls_stance/cmtls_stance.module:182
+msgid "Save"
+msgstr "Salvesta"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:840;853
+msgid "No files posted"
+msgstr "Ühtegi faili pole veel postitatud"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:840
+msgid "1 file"
+msgid_plural "@count files"
+msgstr[0] "1 fail"
+msgstr[1] "@count faili"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:130
+msgid "Delete image"
+msgstr "Kustuta pilt"
+
+#: modules/cmtls_gallery/cmtls_gallery.module:141
+msgid "Download image"
+msgstr "Lae pilt alla"
+
+#: modules/cmtls_gallery/cmtls_gallery.info:0
+msgid "Community Tools: Gallery"
+msgstr "Community Tools: Galerii"
+
+#: modules/cmtls_gallery/cmtls_gallery.info:0
+msgid "Community Tools gallery"
+msgstr "Community Tools galerii"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:17
+msgid "@photos"
+msgstr "@photos"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:19
+msgid "@documents"
+msgstr "@documents"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:21
+msgid "@videos"
+msgstr "@videos"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:23
+msgid "@audiofiles"
+msgstr "@audiofiles"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:36 modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "Add files"
+msgstr "Lisa faile"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:17
+msgid "1 photo"
+msgid_plural "@count photos"
+msgstr[0] "1 foto"
+msgstr[1] "@count pilti"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:19
+msgid "1 document"
+msgid_plural "@count documents"
+msgstr[0] "1 dokument"
+msgstr[1] "@count dokumenti"
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:21
+msgid "1 video"
+msgid_plural "@count videos"
+msgstr[0] ""
+msgstr[1] ""
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-album--default.tpl.php:23
+msgid "1 audio file"
+msgid_plural "@count audio files"
+msgstr[0] ""
+msgstr[1] ""
+
+#: modules/cmtls_gallery/theme/views-view--cmtls-gallery--default.tpl.php:9
+msgid "Add folder"
+msgstr "Lisa kaust"
+
+#: modules/cmtls_group/cmtls_group.features.content.inc:297
+msgid "Main group"
+msgstr "Peagrupp"
+
+#: modules/cmtls_group/cmtls_group.features.content.inc:298
+msgid "Posting settings"
+msgstr "Postituse seaded"
+
+#: modules/cmtls_group/cmtls_group.features.content.inc:299
+msgid "background"
+msgstr "taustapilt"
+
+#: modules/cmtls_group/cmtls_group.features.inc:19 modules/cmtls_group/cmtls_group.info:0
+msgid "Community Tools: Group"
+msgstr "Community Tools: Grupp"
+
+#: modules/cmtls_group/cmtls_group.module:176
+msgid "This is not a group."
+msgstr "Tegemist ei ole grupiga."
+
+#: modules/cmtls_group/cmtls_group.module:205
+msgid "Group has no content"
+msgstr "Grupis puudub sisu"
+
+#: modules/cmtls_group/cmtls_group.module:207
+msgid "Start by adding tools on the left."
+msgstr "Alusta tööriista lisamisega vasakult"
+
+#: modules/cmtls_group/cmtls_group.module:403
+msgid "Application to join group"
+msgstr "Avaldus grupiga liitumiseks"
+
+#: modules/cmtls_group/cmtls_group.module:405
+msgid "User !username (!profilelink) requested to join group !groupname (!grouplink)"
+msgstr ""
+"User !username (!profilelink) soovib liituda grupiga !groupname "
+"(!grouplink)"
+
+#: modules/cmtls_group/cmtls_group.module:411
+msgid "Approve"
+msgstr "Nõustu"
+
+#: modules/cmtls_group/cmtls_group.module:412
+msgid "Deny"
+msgstr "Lükka tagasi"
+
+#: modules/cmtls_group/cmtls_group.module:413
+msgid "In self defence wrote"
+msgstr "Põhjenduseks kirjutas"
+
+#: modules/cmtls_group/cmtls_group.module:420
+msgid "Your application was sent successfully"
+msgstr "Sinu avaldus on edukalt saadetud"
+
+#: modules/cmtls_group/cmtls_group.module:446
+msgid "group"
+msgstr "grupp"
+
+#: modules/cmtls_group/cmtls_group.module:620
+msgid "!name already approved to group %group."
+msgstr "!name on juba grupi %group liikmeks võetud."
+
+#: modules/cmtls_group/cmtls_group.module:640;659
+msgid "!sitename - Application to join group !groupname approved"
+msgstr "!sitename - Avaldus grupiga !groupname liitumiseks on heaks kiidetud"
+
+#: modules/cmtls_group/cmtls_group.module:644
+msgid "Admin !adminname (!admin_profilelink) approved user's !username (!user_profilelink) request to join group !groupname (!grouplink)"
+msgstr ""
+"Administraator !adminname (!admin_profilelink) lubas kasutajal "
+"!username (!user_profilelink) liituda grupiga !groupname (!grouplink)"
+
+#: modules/cmtls_group/cmtls_group.module:663
+msgid "Admin !adminname (!admin_profilelink) approved your request to join group !groupname (!grouplink)"
+msgstr ""
+"Administraator !adminname (!admin_profilelink) andis nõusoleku sinu "
+"avaldusele liitumaks grupiga !groupname (!grouplink)"
+
+#: modules/cmtls_group/cmtls_group.module:682
+msgid "Membership request denied."
+msgstr "Liitumise avaldus lükati tagasi."
+
+#: modules/cmtls_group/cmtls_group.module:696;717
+msgid "!sitename - Application to join group !groupname rejected"
+msgstr ""
+
+#: modules/cmtls_group/cmtls_group.module:700
+msgid "Admin !adminname (!admin_profilelink) rejected user's !username (!user_profilelink) request to join group !groupname (!grouplink)"
+msgstr ""
+
+#: modules/cmtls_group/cmtls_group.module:721
+msgid "Admin !adminname (!admin_profilelink) rejected your request to join group !groupname (!grouplink)"
+msgstr ""
+
+#: modules/cmtls_group/cmtls_group.module:881
+msgid "This is not a group"
+msgstr ""
+
+#: modules/cmtls_group/cmtls_group.module:85
+msgid "Delete group"
+msgstr "Kustuta grupp"
+
+#: modules/cmtls_group/cmtls_group.module:105 modules/cmtls_group/theme/views-view--cmtls-groups--block-1.tpl.php:38 modules/cmtls_map/cmtls_map.module:586 modules/cmtls_member/cmtls_member.module:670
+msgid "Groups"
+msgstr "Grupid"
+
+#: modules/cmtls_group/cmtls_group.module:112;134;143
+msgid "Join group"
+msgstr "Liitu grupiga"
+
+#: modules/cmtls_group/cmtls_group.module:123
+msgid "Leave group"
+msgstr "Lahku grupist"
+
+#: modules/cmtls_group/cmtls_group.info:0
+msgid "Community Tools groups"
+msgstr "Community Tools grupid"
+
+#: modules/cmtls_group/theme/cmtls-group-overview.tpl.php:13 modules/cmtls_group/theme/views-view-fields--cmtls-groups--block-1.tpl.php:27 modules/cmtls_group/theme/views-view-fields--cmtls-groups--block-2.tpl.php:29
+msgid "Overview"
+msgstr "Ülevaade"
+
+#: modules/cmtls_group/theme/cmtls-group-overview.tpl.php:18 modules/cmtls_member/cmtls_member.module:19
+msgid "Members"
+msgstr "Liikmed"
+
+#: modules/cmtls_group/theme/cmtls-group-overview.tpl.php:33
+msgid "1 member"
+msgid_plural "@count members"
+msgstr[0] "1 liige"
+msgstr[1] "@count liiget"
+
+#: modules/cmtls_group/theme/views-view--cmtls-groups--block-1.tpl.php:38
+msgid "Other groups"
+msgstr "Teised grupid"
+
+#: modules/cmtls_group/theme/views-view--cmtls-groups--block-2.tpl.php:34
+msgid "My groups"
+msgstr "Minu grupid"
+
+#: modules/cmtls_group/theme/views-view--cmtls-groups--block-2.tpl.php:41
+msgid "+ Create a new group"
+msgstr "+ Loo uus grupp"
+
+#: modules/cmtls_group/theme/views-view-fields--cmtls-groups--block-1.tpl.php:27
+msgid "Apply to join"
+msgstr "Soovin liituda"
+
+#: modules/cmtls_group/theme/views-view-fields--cmtls-groups--block-1.tpl.php:27
+msgid "Join"
+msgstr "Liitun"
+
+#: modules/cmtls_group/theme/views-view-fields--cmtls-groups--block-2.tpl.php:29
+msgid "Leave"
+msgstr "Lahkun"
+
+#: modules/cmtls_idea/cmtls_idea.features.content.inc:244 modules/cmtls_problem/cmtls_problem.features.content.inc:297
+msgid "Status"
+msgstr "Staatus"
+
+#: modules/cmtls_idea/cmtls_idea.features.inc:19 modules/cmtls_idea/cmtls_idea.info:0;0
+msgid "Community Tools: Idea"
+msgstr ""
+
+#: modules/cmtls_idea/cmtls_idea.module:17
+msgid "Edit idea"
+msgstr "Idee muutmine"
+
+#: modules/cmtls_idea/cmtls_idea.module:57
+msgid "Ideas"
+msgstr "Ideed"
+
+#: modules/cmtls_idea/cmtls_idea.module:59
+msgid "idea"
+msgstr "Idee"
+
+#: modules/cmtls_idea/cmtls_idea.module:189
+msgid "This not a idea."
+msgstr "Tegemist ei ole ideega."
+
+#: modules/cmtls_idea/cmtls_idea.module:214
+msgid "Post this idea also on my Facebook wall"
+msgstr "Lisa see idee ka minu Facebooki seinale"
+
+#: modules/cmtls_idea/cmtls_idea.module:304
+msgid "{*actor*} created a new post !site"
+msgstr ""
+
+#: modules/cmtls_idea/cmtls_idea.module:314
+msgid "Share your idea"
+msgstr ""
+
+#: modules/cmtls_idea/cmtls_idea.module:426
+msgid "For"
+msgstr "Poolt"
+
+#: modules/cmtls_idea/cmtls_idea.module:427
+msgid "Against"
+msgstr "Vastu"
+
+#: modules/cmtls_idea/cmtls_idea.module:428
+msgid "Abstain"
+msgstr "Ei vasta"
+
+#: modules/cmtls_idea/cmtls_idea.module:432 modules/cmtls_stance/cmtls_stance.module:62;273
+msgid "Answer"
+msgstr "Vastus"
+
+#: modules/cmtls_idea/cmtls_idea.module:122
+msgid "Delete idea"
+msgstr "Idee kustutamine"
+
+#: modules/cmtls_idea/theme/cmtls-ideas-content.tpl.php:11;13 modules/cmtls_idea/theme/views-view--cmtls-ideas--default.tpl.php:4;6
+msgid "Add idea"
+msgstr "Uus idee"
+
+#: modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:75;110
+msgid "for"
+msgstr "poolt"
+
+#: modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:75;110
+msgid "against"
+msgstr "vastu"
+
+#: modules/cmtls_idea/theme/views-view-fields--cmtls-ideas--default.tpl.php:75
+msgid "Vote"
+msgstr "Hääleta"
+
+#: modules/cmtls_map/cmtls_map.module:23
+msgid "No map"
+msgstr "Kaarti ei kasutata"
+
+#: modules/cmtls_map/cmtls_map.module:24
+msgid "Map is hidden"
+msgstr "Kaart on peidetud"
+
+#: modules/cmtls_map/cmtls_map.module:25
+msgid "Map is half page"
+msgstr "Kaart täidab pool sisuosast"
+
+#: modules/cmtls_map/cmtls_map.module:26
+msgid "Map is full page"
+msgstr "Kaart täidab kogu sisuosa"
+
+#: modules/cmtls_map/cmtls_map.module:38
+msgid "Map settings"
+msgstr "Kaardi seaded"
+
+#: modules/cmtls_map/cmtls_map.module:45
+msgid "Default map state"
+msgstr "Kaardi kuvamine"
+
+#: modules/cmtls_map/cmtls_map.module:69
+msgid "Map icon"
+msgstr "Ikoon kaardil"
+
+#: modules/cmtls_map/cmtls_map.module:271
+msgid "White"
+msgstr "Valge"
+
+#: modules/cmtls_map/cmtls_map.module:276
+msgid "White selected"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:280
+msgid "Red"
+msgstr "Punane"
+
+#: modules/cmtls_map/cmtls_map.module:285
+msgid "Red selected"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:289
+msgid "Blue"
+msgstr "Sinine"
+
+#: modules/cmtls_map/cmtls_map.module:294
+msgid "Blue selected"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:298
+msgid "Yellow"
+msgstr "Kollane"
+
+#: modules/cmtls_map/cmtls_map.module:303
+msgid "Yellow selected"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:315
+msgid "Community Tools: map marker"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:607
+msgid "Features"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:730
+msgid "cmtls_map"
+msgstr "cmtls_map"
+
+#: modules/cmtls_map/cmtls_map.module:731
+msgid "Community Tools: Map vector layer type"
+msgstr "Community Tools: Kaardi vektorikihi tüüp"
+
+#: modules/cmtls_map/cmtls_map.module:780
+msgid "Pop Up"
+msgstr "Hüpik"
+
+#: modules/cmtls_map/cmtls_map.module:781
+msgid "Adds clickable info boxes to points or shapes on maps."
+msgstr "Lisab klikitavad infokastid kaardipunktidele."
+
+#: modules/cmtls_map/cmtls_map.module:791
+msgid "Add object"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:792
+msgid "Adds object."
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:899
+msgid "What would you like to add?"
+msgstr "Mida sa soovid lisada?"
+
+#: modules/cmtls_map/cmtls_map.module:908;909
+msgid "Map"
+msgstr "Kaart"
+
+#: modules/cmtls_map/cmtls_map.module:926
+msgid "Google API Key"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:928
+msgid "<a href=\"@google\">Obtain an API key from Google for your domain</a>"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:933
+msgid "Default map layer"
+msgstr "Vaikimisi kaardi kiht"
+
+#: modules/cmtls_map/cmtls_map.module:934
+msgid "Default map layer machine name: osm_mapnik, google_satellite, google_hybrid, google_normal, google_physical"
+msgstr ""
+"Vaikimisi kaardi aluskiht: osm_mapnik, google_satellite, "
+"google_hybrid, google_normal, google_physical"
+
+#: modules/cmtls_map/cmtls_map.module:940
+msgid "Default map centerpoint"
+msgstr "Algne kaardi keskkoht"
+
+#: modules/cmtls_map/cmtls_map.module:941
+msgid "Geo coordinate: latitude, longitude. Example: 24.734559058178, 59.424735894784"
+msgstr "Geo koordinaat. Näiteks: 24.734559058178, 59.424735894784"
+
+#: modules/cmtls_map/cmtls_map.module:947
+msgid "Default map zoom"
+msgstr "Vaikimisi kaardi suurendus"
+
+#: modules/cmtls_map/cmtls_map.module:948
+msgid "The zoom state"
+msgstr "Suurendus numbrina"
+
+#: modules/cmtls_map/cmtls_map.module:954
+msgid "Map extent"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:955
+msgid "Restrict the map extent, example show only Tallinn: 2744305.6715101,8264843.4899684,2765784.4764543,8285672.5801724"
+msgstr ""
+
+#: modules/cmtls_map/cmtls_map.module:1016
+msgid "Choose"
+msgstr "Vali"
+
+#: modules/cmtls_map/cmtls_map.info:0;0
+msgid "Community Tools: Map"
+msgstr "Community Tools: Kaart"
+
+#: modules/cmtls_map/js/cmtls_map.js:0
+msgid "Temporary Features Layer"
+msgstr ""
+
+#: modules/cmtls_map/js/cmtls_map.js:0
+msgid "Add point"
+msgstr "Lisa punkt"
+
+#: modules/cmtls_map/js/cmtls_map.js:0
+msgid "Click on the map to add new point"
+msgstr "Punkti lisamiseks kliki soovitud kohas kaardile"
+
+#: modules/cmtls_map/js/cmtls_map.js:0
+msgid "Layers"
+msgstr "Kihid"
+
+#: modules/cmtls_map/js/cmtls_map.js:0
+msgid "Move"
+msgstr "Liiguta"
+
+#: modules/cmtls_member/cmtls_member.features.inc:19
+msgid "Community Tools: Group Member"
+msgstr "Community Tools: Grupi liige"
+
+#: modules/cmtls_member/cmtls_member.module:238 modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:184 modules/cmtls_place/cmtls_place.features.content.inc:404
+msgid "Phone"
+msgstr "Telefon"
+
+#: modules/cmtls_member/cmtls_member.module:239 modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:185
+msgid "Skype"
+msgstr "Skype"
+
+#: modules/cmtls_member/cmtls_member.module:241 modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:187
+msgid "Homepage"
+msgstr "Kodulehekülg"
+
+#: modules/cmtls_member/cmtls_member.module:654
+msgid "New replies to my posts or comments, instantly"
+msgstr "Kui vastatakse minu postitustele või kommentaaridele, koheselt\r\n"
+
+#: modules/cmtls_member/cmtls_member.module:664
+msgid "New posts in my groups"
+msgstr "Kui tekib uut sisu minu gruppides"
+
+#: modules/cmtls_member/cmtls_member.module:715
+msgid "Instantly"
+msgstr "Kohe"
+
+#: modules/cmtls_member/cmtls_member.module:724
+msgid "Daily"
+msgstr "Kord päevas"
+
+#: modules/cmtls_member/cmtls_member.module:784 modules/cmtls_member/theme/cmtls-members-content.tpl.php:18
+msgid "All"
+msgstr "Kõik"
+
+#: modules/cmtls_member/cmtls_member.module:812
+msgid "Subject"
+msgstr "Teema"
+
+#: modules/cmtls_member/cmtls_member.module:818
+msgid "Content"
+msgstr "Sisu"
+
+#: modules/cmtls_member/cmtls_member.module:824
+msgid "Send"
+msgstr "Saada"
+
+#: modules/cmtls_member/cmtls_member.module:37;46 modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:177
+msgid "Member"
+msgstr "Liige"
+
+#: modules/cmtls_member/cmtls_member.module:77;88
+msgid "Create group administrator"
+msgstr "Loo grupi administraator"
+
+#: modules/cmtls_member/cmtls_member.info:0
+msgid "Community Tools: Member"
+msgstr "Community Tools: Liige"
+
+#: modules/cmtls_member/cmtls_member.info:0
+msgid "Group members"
+msgstr "Grupi liikmed"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:138
+msgid "Updates"
+msgstr "Uuendused"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:147
+msgid "My content"
+msgstr "Minu sisu"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:175 modules/cmtls_member/theme/views-view-fields--cmtls-members--default.tpl.php:29
+msgid "Group administrator"
+msgstr "Grupi administraator"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:175;177
+msgid "Change"
+msgstr "Muuda"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:195
+msgid "Edit profile"
+msgstr "Muuda profiili"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:217
+msgid "Recent activity in my groups"
+msgstr "Viimati toimunu minu gruppides"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:239
+msgid "My recent activities"
+msgstr "Minu viimased toimingud"
+
+#: modules/cmtls_member/theme/views-view-fields--cmtls-member--default.tpl.php:261
+msgid "Send me e-mail notifications on"
+msgstr "Teavita mind e-kirja teel"
+
+#: modules/cmtls_openid/cmtls_openid.module:50;85;13
+msgid "Connect with ID card"
+msgstr "ID-kaardi või Mobiili ID kaudu registreerumine"
+
+#: modules/cmtls_openid/cmtls_openid.module:174
+msgid "Authentication cancelled."
+msgstr ""
+
+#: modules/cmtls_openid/cmtls_openid.module:178
+msgid "Authentication failed."
+msgstr ""
+
+#: modules/cmtls_openid/cmtls_openid.info:0;0
+msgid "Community Tools: OpenID.ee Integration"
+msgstr ""
+
+#: modules/cmtls_place/cmtls_place.features.content.inc:400 modules/cmtls_place/theme/views-view-fields--cmtls-places--default.tpl.php:79
+msgid "Contact"
+msgstr "Kontakt"
+
+#: modules/cmtls_place/cmtls_place.features.content.inc:405
+msgid "Website"
+msgstr "Veebisait"
+
+#: modules/cmtls_place/cmtls_place.features.content.inc:406
+msgid "e-mail"
+msgstr "e-mail"
+
+#: modules/cmtls_place/cmtls_place.features.inc:22 modules/cmtls_place/cmtls_place.info:0
+msgid "Community Tools: Place"
+msgstr ""
+
+#: modules/cmtls_place/cmtls_place.module:17
+msgid "Edit place"
+msgstr "Muuda kohta"
+
+#: modules/cmtls_place/cmtls_place.module:52
+msgid "Places"
+msgstr "Kohad"
+
+#: modules/cmtls_place/cmtls_place.module:54
+msgid "Place"
+msgstr "Koht"
+
+#: modules/cmtls_place/cmtls_place.module:107
+msgid "Place title"
+msgstr ""
+
+#: modules/cmtls_place/cmtls_place.module:209
+msgid "This not a place."
+msgstr ""
+
+#: modules/cmtls_place/cmtls_place.module:134;145
+msgid "place"
+msgstr "koht"
+
+#: modules/cmtls_place/cmtls_place.module:154
+msgid "Delete place"
+msgstr ""
+
+#: modules/cmtls_place/cmtls_place.info:0
+msgid "Community Tools: Places"
+msgstr ""
+
+#: modules/cmtls_place/js/cmtls_place.js:0
+msgid "More"
+msgstr "Rohkem"
+
+#: modules/cmtls_place/theme/cmtls-places-content.tpl.php:18;20 modules/cmtls_place/theme/views-view--cmtls-places--default.tpl.php:35;37
+msgid "Add place"
+msgstr "Lisa koht"
+
+#: modules/cmtls_problem/cmtls_problem.features.content.inc:298
+msgid "Status changed by user"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.features.inc:19 modules/cmtls_problem/cmtls_problem.info:0;0
+msgid "Community Tools: Problem"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:17
+msgid "Edit problem"
+msgstr "Probleemi muutmine"
+
+#: modules/cmtls_problem/cmtls_problem.module:57;143;144
+msgid "Problems"
+msgstr "Probleemid"
+
+#: modules/cmtls_problem/cmtls_problem.module:59
+msgid "problem"
+msgstr "probleem"
+
+#: modules/cmtls_problem/cmtls_problem.module:151
+msgid "Answer templates"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:158
+msgid "Add problem answer template"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:166
+msgid "Community Tools: Problem edit template"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:192;206;269
+msgid "Template name"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:192;212;276
+msgid "Template content"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:196
+msgid "No answer templates defined"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:385
+msgid "This not a problem."
+msgstr "Tegemist ei ole probleemiga."
+
+#: modules/cmtls_problem/cmtls_problem.module:434;459
+msgid "Choose answer template"
+msgstr ""
+
+#: modules/cmtls_problem/cmtls_problem.module:475
+msgid "This problem has been fixed"
+msgstr "Probleem on lahendatud"
+
+#: modules/cmtls_problem/cmtls_problem.module:484
+msgid "This problem has not been fixed"
+msgstr "Probleem ei ole lahendatud"
+
+#: modules/cmtls_problem/cmtls_problem.module:504
+msgid "Problem category"
+msgstr "Probleemi kategooria"
+
+#: modules/cmtls_problem/cmtls_problem.module:557;691
+msgid "Fixed"
+msgstr "Lahendatud"
+
+#: modules/cmtls_problem/cmtls_problem.module:557
+msgid "New report"
+msgstr "Lahendamata"
+
+#: modules/cmtls_problem/cmtls_problem.module:680
+msgid "Not fixed"
+msgstr "Lahendamata"
+
+#: modules/cmtls_problem/cmtls_problem.module:794
+msgid "No problems posted"
+msgstr "Ühtegi probleemi pole veel postitatud"
+
+#: modules/cmtls_problem/cmtls_problem.module:782
+msgid "1 new"
+msgid_plural "@count new"
+msgstr[0] "1 uus"
+msgstr[1] "@count uut"
+
+#: modules/cmtls_problem/cmtls_problem.module:786
+msgid "1 fixed"
+msgid_plural "@count fixed"
+msgstr[0] "1 lahendatud"
+msgstr[1] "@count lahendatud"
+
+#: modules/cmtls_problem/cmtls_problem.module:122
+msgid "Delete problem"
+msgstr "Probleemi kustutamine"
+
+#: modules/cmtls_problem/theme/cmtls-problems-content.tpl.php:17;19 modules/cmtls_problem/theme/views-view--cmtls-problems--default.tpl.php:35;37
+msgid "Add problem"
+msgstr "Lisa probleem"
+
+#: modules/cmtls_problem/theme/views-view-fields--cmtls-problems--default.tpl.php:45
+msgid "reported"
+msgstr "teatas"
+
+#: modules/cmtls_problem/theme/views-view-fields--cmtls-problems--default.tpl.php:135
+msgid "Repoted"
+msgstr "Teavitatud"
+
+#: modules/cmtls_stance/cmtls_stance.module:280
+msgid "access cmtls stance"
+msgstr ""
+
+#: modules/cmtls_stance/cmtls_stance.install:21
+msgid "Id of the user"
+msgstr "Kasutaja Id"
+
+#: modules/cmtls_stance/cmtls_stance.install:28 modules/cmtls_upload/cmtls_upload.install:56
+msgid "Id of the parent node"
+msgstr "Ülemise taseme node'i ID"
+
+#: modules/cmtls_stance/cmtls_stance.install:35
+msgid "Users stance on the matter"
+msgstr ""
+
+#: modules/cmtls_stance/cmtls_stance.info:0;0
+msgid "Community Tools: Stance"
+msgstr ""
+
+#: modules/cmtls_stance/theme/cmtls-stance.tpl.php:14
+msgid "Please <a href=\"@href\" class=\"@class\">log in</a> to submit your stance."
+msgstr "Vastamiseks <a href=\"@href\" class=\"@class\">logi palun sisse</a>. "
+
+#: modules/cmtls_upload/cmtls_upload.inc:12
+msgid "Malformed data."
+msgstr "Valel kujul andmed."
+
+#: modules/cmtls_upload/cmtls_upload.inc:21
+msgid "Session has expired. Some more meaningful notification text here"
+msgstr ""
+
+#: modules/cmtls_upload/cmtls_upload.inc:30
+msgid "Not enough permissions. Some more meaningful notification text here"
+msgstr ""
+
+#: modules/cmtls_upload/cmtls_upload.module:32
+msgid "Community Tools Upload Widget"
+msgstr "Community Tools Upload Widget"
+
+#: modules/cmtls_upload/cmtls_upload.module:33
+msgid "Upload widget for Community Tools"
+msgstr "Upload widget for Community Tools"
+
+#: modules/cmtls_upload/cmtls_upload.module:95 modules/cmtls_upload/cmtls_upload.info:0
+msgid "Community Tools: Upload"
+msgstr "Community Tools: Üleslaadimine"
+
+#: modules/cmtls_upload/cmtls_upload.module:132
+msgid "Click button on the left to start adding files to upload queue"
+msgstr "Kliki vasakut nuppu, et lisada üleslaadimiseks faile"
+
+#: modules/cmtls_upload/cmtls_upload.module:140
+msgid "Upload"
+msgstr "Lae üles"
+
+#: modules/cmtls_upload/cmtls_upload.module:13
+msgid "Community Tools Upload"
+msgstr "Community Tools Upload"
+
+#: modules/cmtls_upload/cmtls_upload.install:42
+msgid "Id of the file uploaded"
+msgstr "Üleslaetud faili ID"
+
+#: modules/cmtls_upload/cmtls_upload.install:49
+msgid "Id of the user who uploaded the file"
+msgstr "Üles laadinud kasutaja ID"
+
+#: modules/cmtls_upload/cmtls_upload.install:64
+msgid "Session id of the upload"
+msgstr "Sessiooni ID"
+
+#: modules/cmtls_upload/cmtls_upload.info:0
+msgid "Provides upload widget for Community Tools"
+msgstr ""
+
+#: modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "%count files in queue. %totalsize %unit in total"
+msgstr "Järjekorras on %count faili. Kokku %totalsize %unit"
+
+#: modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "Error queueing file <strong>%filename</strong>. %message"
+msgstr ""
+
+#: modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "%success files of %filecount uploaded successfully"
+msgstr ""
+
+#: modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "Error uploading file <strong>%file</strong>. Seems that the uploader doesn't have permissions to access your server (error code 401: Unauthorized)"
+msgstr ""
+"Faili <strong>%file</strong> üleslaadimisel tekkis viga. Tundub, et "
+"failide kirjutamiseks puuduvad õigused (vea kood 401: Unauthorized)"
+
+#: modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "Error uploading file <strong>%file</strong>. Seems that the uploader doesn't have permissions to access your server (error code 403: Forbidden)"
+msgstr ""
+"Faili <strong>%file</strong> üleslaadimisel tekkis viga. Tundub, et "
+"failide kirjutamiseks puuduvad õigused (vea kood 403: Forbidden)"
+
+#: modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "Start upload"
+msgstr "Lae üles"
+
+#: modules/cmtls_upload/js/cmtls_upload.js:0
+msgid "Cancel all uploads"
+msgstr "Katkesta üleslaadimised"
+
+#: theme/cmtls-pager.tpl.php:10
+msgid "Loading"
+msgstr "Laadin"
+
+#: theme/cmtls-pager.tpl.php:11
+msgid "More items"
+msgstr "Kuva rohkem"
+
+#: theme/cmtls-sm-share.tpl.php:11
+msgid "Share"
+msgstr "Jaga"
+
+#: modalframe-page.tpl.php:32
+msgid "Log in or <a href=\"@href\" class=\"@class\">sign up</a> to become a member."
+msgstr ""
+"Logi sisse või <a href=\"@href\" class=\"@class\">registreeru "
+"kasutajaks</a>."
+
+#: modalframe-page.tpl.php:33
+msgid "Register or <a href=\"@href\" class=\"@class\">log in</a> if you already have an account."
+msgstr ""
+"Registreeru või <a href=\"@href\" class=\"@class\">logi sisse</a>, "
+"kui sul juba on konto."
+
+#: node.tpl.php:54
+msgid "Edit"
+msgstr "Muuda"
+
+#: page.tpl.php:18
+msgid "Map"
+msgstr "Kaart"
+
+#: page.tpl.php:19
+msgid "Map and Text"
+msgstr "Kaart ja tekst"
+
+#: page.tpl.php:20
+msgid "Text"
+msgstr "Tekst"
+
+#: page.tpl.php:30
+msgid "My groups"
+msgstr "Minu grupid"
+
+#: page.tpl.php:30;80
+msgid "Groups"
+msgstr "Grupid"
+
+#: page.tpl.php:50
+msgid "(Members)"
+msgstr "(Liikmed)"
+
+#: page.tpl.php:52
+msgid "(Join group)"
+msgstr "(Liitu grupiga)"
+
+#: page.tpl.php:76
+msgid "My stuff"
+msgstr "Minu asjad"
+
+#: page.tpl.php:78
+msgid "Profile"
+msgstr "Profiil"
+
+#: page.tpl.php:81
+msgid "Log out"
+msgstr "Logi välja"
+
+#: page.tpl.php:91
+msgid "Account"
+msgstr "Konto"
+
+#: page.tpl.php:93
+msgid "Login"
+msgstr "Logi sisse"
+
+#: page.tpl.php:94
+msgid "Register"
+msgstr "Registreeru"
+
+#: cmtls_theme.info:0;0
+msgid "Community Tools: default theme"
+msgstr "Community Tools: vaikimisi theme"
+
+#: cmtls_theme.info:0
+msgid "Community Tools Site Menu"
+msgstr "Community Tools saidi menüü"
+
+#: cmtls_theme.info:0
+msgid "Community Tools Content Header"
+msgstr ""
+
+#: cmtls_theme.info:0
+msgid "Footer"
+msgstr "Jalus"
+
+#: scripts/main.js:0
+msgid "Sorry, our website only supports Internet Explorer version 8 and newer. Please upgrade."
+msgstr ""
+"Vabandust, meie sait toetab Internet Explorer versiooni 8 ja uuemaid. "
+"Palun uuenda oma brauserit."
+
+#: scripts/main.js:0
+msgid "Close"
+msgstr "Sulge"
+

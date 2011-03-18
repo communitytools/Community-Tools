@@ -50,7 +50,7 @@ function cmtls_place_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Location',
-      'weight' => '7',
+      'weight' => '6',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -100,7 +100,7 @@ function cmtls_place_content_default_fields() {
       'max_filesize_per_file' => '10M',
       'max_filesize_per_node' => '50M',
       'label' => 'Files',
-      'weight' => '5',
+      'weight' => '11',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
@@ -172,18 +172,238 @@ function cmtls_place_content_default_fields() {
       'autocompletion_field_cmtls_address_content' => '[street_address]',
       'autocompletion_field_cmtls_address_type' => 'input',
       'label' => 'Geo info',
-      'weight' => '6',
+      'weight' => '5',
       'description' => '',
       'type' => 'openlayers_geocoder_widget',
       'module' => 'openlayers_geocoder',
     ),
   );
 
+  // Exported field: field_cmtls_place_contact
+  $fields['cmtls_place-field_cmtls_place_contact'] = array(
+    'field_name' => 'field_cmtls_place_contact',
+    'type_name' => 'cmtls_place',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '0',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_cmtls_place_contact][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Contact',
+      'weight' => '7',
+      'description' => 'Contact name',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_cmtls_place_email
+  $fields['cmtls_place-field_cmtls_place_email'] = array(
+    'field_name' => 'field_cmtls_place_email',
+    'type_name' => 'cmtls_place',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '0',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_cmtls_place_email][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'e-mail',
+      'weight' => '9',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_cmtls_place_phone
+  $fields['cmtls_place-field_cmtls_place_phone'] = array(
+    'field_name' => 'field_cmtls_place_phone',
+    'type_name' => 'cmtls_place',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '0',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_cmtls_place_phone][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Phone',
+      'weight' => '8',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_cmtls_place_website
+  $fields['cmtls_place-field_cmtls_place_website'] = array(
+    'field_name' => 'field_cmtls_place_website',
+    'type_name' => 'cmtls_place',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '0',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_cmtls_place_website][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Website',
+      'weight' => '10',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
+  t('Contact');
   t('Files');
   t('Geo info');
   t('Location');
+  t('Phone');
+  t('Website');
+  t('e-mail');
 
   return $fields;
 }

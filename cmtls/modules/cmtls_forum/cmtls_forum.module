@@ -441,17 +441,21 @@ function cmtls_forum_cmtls_dashboard_block_content($group, $app)
 	$result = db_query('SELECT nodehierarchy.nid FROM {nodehierarchy} nodehierarchy WHERE nodehierarchy.parent = %d ORDER BY order_by', $app->nid);
 	while($row = db_fetch_array($result))
 	{
-		$forums[] = $row['nid'];
+		$node = node_load($row['nid']);
+		if($node->nid)
+		{
+			$forums[] = $row['nid'];
+		}
 	}
 	
-	$arguments = array(
-		'cmtls_threads',
-		'block_1',
-	);
-	
-	$arguments = array_merge($arguments, $forums);
-	
-	return call_user_func_array('views_embed_view', $arguments);
+	if(sizeof($forums))
+	{
+		return views_embed_view('cmtls_threads', 'block_1', implode('+', $forums));
+	}
+	else 
+	{
+		return '';
+	}
 }
 
 function cmtls_forum_cmtls_app_links($node = NULL)

@@ -105,7 +105,7 @@ function cmtls_event_menu() {
 	);
 
 	$items['cmtls/%node/%node/event/%node/delete'] = array(
-		'title' => 'Delete event',
+		'title' => t('Delete event'),
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('node_delete_confirm', 4),
 		'access callback' => 'node_access',
@@ -125,6 +125,15 @@ function cmtls_event_menu() {
 		'type' => MENU_CALLBACK,
 	);
 
+	$items['cmtls/%node/%node/event/%node/send_mail'] = array(
+		'title' => t('Send e-mail to participants'),
+		'page callback' => 'cmtls_event_send_email_page',
+		'page arguments' => array(4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+
     $items['cmtls/%node/%node/event/%node/add_to_calendar.ics'] = array(
        'title' => 'Add to calendar',
        'page callback' => 'cmtls_event_ics_download',
@@ -133,16 +142,15 @@ function cmtls_event_menu() {
        'access arguments' => array('view', 4),
        'type' => MENU_CALLBACK,
     );
-
-	$items['cmtls/%node/%node/event/tag/%'] = array(
-		'title callback' => 'cmtls_page_title',
-		'title arguments' => array(2),
-		'page callback' => 'cmtls_event_page_taxonomy',
-		'page arguments' => array(1, 2, 5),
-		'access callback' => 'node_access',
-		'access arguments' => array('view', 2),
-		'type' => MENU_CALLBACK,
-	);
+    
+    $items['cmtls/%node/%node/calendar/ajax'] = array(
+       'title' => 'Add to calendar',
+       'page callback' => 'cmtls_event_calendar_ajax_repsonse',
+       'page arguments' => array(2),
+       'access callback' => 'node_access',
+       'access arguments' => array('view', 2),
+       'type' => MENU_CALLBACK,
+    );
 
 	return $items;
 }
@@ -161,18 +169,6 @@ function cmtls_event_page($group, $app, $event) {
 	}
 
 	return views_embed_view('cmtls_events', 'default', $app->nid, $event->nid);
-}
-
-/**
- * Events filtered by taxonomy term/tag view
- *
- * @param node $group
- * @param node $app
- * @param string $taxonomy
- * @return string
- */
-function cmtls_event_page_taxonomy($group, $app, $taxonomy) {
-	return views_embed_view('cmtls_events', 'default', $app->nid, 'all', $taxonomy);
 }
 
 /**
@@ -226,6 +222,12 @@ function cmtls_event_form_after_build($form, &$form_state)
  */
 function cmtls_event_theme($existing) {
 	return array(
+		// events page
+		'cmtls_events_horizontal_calendar' => array (
+			'arguments' => array('current_date' => NULL, 'selected_date' => NULL, 'days' => NULL),
+			'template' => 'cmtls-events-horizontal-calendar',
+			'path' => drupal_get_path('module', 'cmtls_event').'/theme',
+		),
 		// events page
 		'cmtls_events_content' => array (
 			'arguments' => array('app_id' => NULL),
@@ -445,7 +447,7 @@ function cmtls_event_cmtls_filter_info()
 				array(
 					'title' => t('Most commented'),
 					'default values' => array(
-						'sort' => 2,
+						'sort' => 3,
 					),
 				),
 			), // filter predefined options
@@ -453,14 +455,25 @@ function cmtls_event_cmtls_filter_info()
 			'filter fields' => array(
 				'tag' => TRUE,
 				'search' => TRUE,
-				'date from' => array('UNIX_TIMESTAMP(node_data_field_cmtls_event_date.field_cmtls_event_date_value) >= %d'),
-				'date to' => array('UNIX_TIMESTAMP(node_data_field_cmtls_event_date.field_cmtls_event_date_value) <= %d'),
+				'date from' => array(
+					'node_data_field_cmtls_event_date.field_cmtls_event_date_value2 >= FROM_UNIXTIME(%d)',
+					//'UNIX_TIMESTAMP(node_data_field_cmtls_event_date.field_cmtls_event_date_value2) >= %d',
+				),
+				'date to' => array(
+					'node_data_field_cmtls_event_date.field_cmtls_event_date_value <= FROM_UNIXTIME(%d)',
+					//'UNIX_TIMESTAMP(node_data_field_cmtls_event_date.field_cmtls_event_date_value) <= %d',
+				),
 				'sort' => TRUE,
 			), // filter fields
 
 			'taxonomy dictionary id' => NULL,
 
 			'sort options' => array(
+				array(
+					'field' => 'node_data_field_cmtls_event_date.field_cmtls_event_date_value',
+					'direction' => 'ASC',
+					'title' => t('Event date'),
+				),
 				array(
 					'field' => 'node_created',
 					'direction' => 'DESC',
@@ -503,6 +516,103 @@ function cmtls_event_preprocess_cmtls_stance(&$vars)
 		if(strtotime($vars['node']->field_cmtls_registration_open[0]['value']) < time())
 		$vars['form'] = t('Registration is now closed');
 	}
+}
+
+function cmtls_event_calendar_ajax_repsonse($app)
+{
+	cmtls_ajax_response(cmtls_event_horizontal_calendar($app->nid));
+}
+
+function cmtls_event_preprocess_cmtls_events_content(&$vars)
+{
+	$vars['calendar'] = cmtls_event_horizontal_calendar($vars['app_id']);
+}
+
+function cmtls_event_horizontal_calendar($app_id)
+{
+	$current_year = date('Y');
+	$current_month = date('n');
+	
+	$current_date = array(
+		'year' => $current_year,
+		'month' => date('F'),
+		'month_title' => $current_month,
+		'day' => date('j'),
+	);
+	
+	$today = strtotime('today');
+	
+	$selected_year = (int)$_GET['year'] ? (int)$_GET['year'] : ((int)$_GET['date_from'] ? date('Y', $_GET['date_from']) : $current_year);
+	$selected_month = (int)$_GET['month'] ? (int)$_GET['month'] : ((int)$_GET['date_from'] ? date('n', $_GET['date_from']) : $current_month);
+	
+	$selected_date = array(
+		'year' => $selected_year,
+		'month' => $selected_month,
+		'month_title' => date('F', strtotime($selected_year.'-'.$selected_month.'-01')),
+		'day' => (int)$_GET['date_from'] ? date('j', (int)$_GET['date_from']) : NULL,
+	);
+	
+	$days_in_selected_month = date('t', strtotime($selected_year.'-'.$selected_month.'-01'));
+	
+	$selected_month_time = strtotime($selected_year.'-'.$selected_month.'-01 00:00:00');
+	
+	for ($i = 1; $i <= $days_in_selected_month; $i++)
+	{
+		$day_time = $selected_month_time + (($i - 1) * 24 * 60 * 60);
+		
+		$selected_month_days[$i] = array(
+			'weekday' => date('N', $day_time),
+			'weekday_title' => date('l', $day_time),
+			'is_today' => $day_time == $today ? TRUE : FALSE,
+			'has_events' => FALSE,
+		);
+	}
+	
+	//printr($selected_month_days); exit;
+	
+	// no node access is checked, because if user has access to the app then all it's children should be accessible as well
+	$sql = "SELECT DAY(content_type_cmtls_event.field_cmtls_event_date_value) AS start_day, MONTH(content_type_cmtls_event.field_cmtls_event_date_value) AS start_month, DAY(content_type_cmtls_event.field_cmtls_event_date_value2) AS end_day, MONTH(content_type_cmtls_event.field_cmtls_event_date_value2) AS end_month
+	FROM {content_type_cmtls_event} AS content_type_cmtls_event
+	LEFT JOIN {nodehierarchy} AS nodehierarchy ON content_type_cmtls_event.nid = nodehierarchy.nid
+	WHERE
+		(MONTH(content_type_cmtls_event.field_cmtls_event_date_value) = %d
+			AND YEAR(content_type_cmtls_event.field_cmtls_event_date_value) = %d)
+		OR
+		(MONTH(content_type_cmtls_event.field_cmtls_event_date_value2) = %d
+			AND YEAR(content_type_cmtls_event.field_cmtls_event_date_value2) = %d)
+		AND nodehierarchy.parent = %d";
+	
+	$result = db_query($sql, $selected_month, $selected_year, $selected_month, $selected_year, $app_id);
+	
+	while ($row = db_fetch_array($result))
+	{
+		if($row['end_month'] != $selected_month)
+		{
+			$row['end_day'] = $days_in_selected_month;
+		}
+		
+		if($row['start_month'] != $selected_month)
+		{
+			$row['start_day'] = 1;
+		}
+		
+		for ($i = $row['start_day']; $i <= $row['end_day']; $i++)
+		{
+			$selected_month_days[$i]['has_events'] = TRUE;
+			
+			$day_time = $selected_month_time + (($i - 1) * 24 * 60 * 60);
+			
+			$selected_month_days[$i]['query'] = array(
+					'action' => 'search',
+					'date_from' => $day_time,
+					'date_to' => $day_time,
+			);
+		}
+	}
+	
+	//printr($current_month_days); exit;
+	
+	return theme('cmtls_events_horizontal_calendar', $current_date, $selected_date, $selected_month_days);
 }
 
 function cmtls_event_cmtls_group_overview($app)
@@ -555,4 +665,51 @@ function cmtls_event_cmtls_group_overview($app)
 	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;	
 	
 	return $return;
+}
+
+function cmtls_event_views_query_alter(&$view, &$query)
+{
+	if($view->name == 'cmtls_events')
+	{
+		// do not filter based on date in detail view
+		if(isset($view->args[1]))
+		{
+			unset($view->query->where['date']);
+		}
+		
+		// if filter module is being used do not filter based on date
+		if(isset($_GET['date_from']))
+		{
+			unset($view->query->where['date']);
+		}
+	}
+}
+
+function cmtls_event_send_email_page($event)
+{
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+	
+	global $user;
+	
+	if(!$user->uid) return FALSE;
+	
+	$to = array();
+		
+	$sql = "SELECT uid FROM {cmtls_member_stance} WHERE parent = %d AND stance = 1";
+	$result = db_query($sql, $event->nid);
+	
+	while ($uid = db_fetch_array($result))
+	{
+		$to[] = $uid;
+	}
+	
+	$settings = array(
+		'from' => $user->uid,
+		'to' => $to,
+	);
+	
+	$output = drupal_get_form('cmtls_member_send_email_form', $settings);
+	
+	return $output;
 }

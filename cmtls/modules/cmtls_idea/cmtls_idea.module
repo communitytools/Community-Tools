@@ -228,26 +228,6 @@ function cmtls_idea_form_cmtls_idea_node_form_alter(&$form, &$form_state)
 
 		$form['buttons']['submit']['#submit'][] = 'cmtls_idea_prevent_redirect';
 	}
-
-	$form['#after_build'][] = 'cmtls_idea_node_form_after_build';
-}
-
-/**
- * Clean up and defaults for idea node
- *
- * @param unknown_type $form
- * @param unknown_type $form_state
- * @return unknown
- */
-function cmtls_idea_node_form_after_build($form, &$form_state)
-{
-	global $user;
-
-	foreach ($form['taxonomy']['tags'] as $t_id => $taxonomy) if ($taxonomy['#title']) {
-		$form['taxonomy']['tags'][$t_id]['#title'] = t('Tags');
-	}
-
-	return $form;
 }
 
 /**

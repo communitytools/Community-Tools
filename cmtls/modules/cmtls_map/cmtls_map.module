@@ -33,6 +33,13 @@ function cmtls_map_cmtls_app_general_config($node_type, $node_config)
 			$map_default_state_options[$map_view] = $translations[$map_view];
 		}
 		
+		$form['cmtls_map'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Map settings'),
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
+		);
+		
 		$form['cmtls_map']['map_default_state'] = array(
 			'#type' => 'radios',
 			'#title' => t('Default map state'),
@@ -170,7 +177,6 @@ function cmtls_map_preprocess_page(&$vars)
 					$map = cmtls_map_openlayers_presets();
 					$map = openlayers_render_map($map['cmtls_map']->data, 'cmtls_map');
 					
-					
 					// rewrite the $scripts
 					$vars['scripts'] = drupal_get_js();
 					
@@ -186,13 +192,45 @@ function cmtls_map_preprocess_page(&$vars)
 					default: $map_class = 'text-only'; break;
 				}
 				
+				// map layers
+				$features = _cmtls_map_features('get');
+				
+				$taxonomy_output = array();
+				$apps_output = array();
+				
+				$layers_output = '<div id="cmtls-map-layer-switcher" class="hidden">';
+				
+				foreach ($features as &$feature)
+				{
+					if($feature->taxonomy) foreach ($feature->taxonomy as $tid => $tag) if(!$taxonomy_output[$feature->app_nid][$tid])
+					{
+						$taxonomy_output[$feature->app_nid][$tid] = '<li><label><input class="cmtls-layer-switch-tag" type="checkbox" data-tid="'.$tid.'" data-aid="'.$feature->app_nid.'" checked="checked"> '.check_plain($tag).'</label></li>';
+					}
+					
+					if(!$apps_output[$feature->app_nid] && ($feature->app_type != 'cmtls_group' || $feature->app_type == 'cmtls_group' && arg(1) == 'list'))
+					{
+						$apps_output[$feature->app_nid] = '<label><input class="cmtls-layer-switch-app" type="checkbox" data-aid="'.$feature->app_nid.'" checked="checked"> '.$feature->app_title.'</label>';
+					}
+				}
+				
+				foreach ($apps_output as $aid => &$app_output)
+				{
+					$app_output = '<li>'.$app_output.($taxonomy_output[$aid] ? '<ul class="cmtls-map-taxonomy-layers">'.implode('', $taxonomy_output[$aid]).'</ul>' : NULL).'</li>';
+				}
+				
+				$apps_output = '<ul class="cmtls-map-apps-layers">'.implode('', $apps_output).'</ul>';
+				
+				$layers_output .= $apps_output.'</div>';
+				
 				$vars['cmtls'] += $cache = array(
 					'map' => array(
 						'app_config' => $map_config,
 						'class' => $map_class,
 						'output' => $map,
+						'layer_switcher' => $layers_output,
 					),
 				);
+				
 			}
 		}
 	}
@@ -299,52 +337,18 @@ function cmtls_map_openlayers_presets()
 		'google_hybrid' => 'google_hybrid',
 		'google_normal' => 'google_normal',
 		'google_physical' => 'google_physical',
+		'cmtls_features' => 'cmtls_features',
  	);
 	
-	$layer_activated = array();
+	$layer_activated = array('cmtls_features' => 'cmtls_features');
+	$layer_switcher = array('cmtls_features' => 'cmtls_features');
 	
-	$layer_switcher = array();
-	
-	$features = _cmtls_map_features('get');
-	
-	$layer_styles = array();
-	
-	$default_styles = cmtls_map_default_styles();
-	
-	if(sizeof($features)) foreach ($features as &$feature)
-	{
-		if(!isset($layers[$feature->app_title]))
-		{
-			$layers[$feature->app_title] = $feature->app_title;
-			$layer_activated[$feature->app_title] = $feature->app_title;
-			$layer_switcher[$feature->app_title] = $feature->app_title;
-			
-			$config = module_invoke($feature->app_type, 'cmtls_map_config');
-			
-			if($config && $config[$feature->app_type] && $config[$feature->app_type]['default map styles'])
-			{
-				if($feature->style)
-				{
-					$styles = array(
-						'default' => $feature->style,
-						'select' => $feature->style.'-hover',
-						'temporary' => $feature->style,
-					);
-				}
-				else 
-				{
-					$styles = array_merge($default_styles, $config[$feature->app_type]['default map styles']);
-				}
-				
-				$layer_styles[$feature->app_title] = $styles;
-			}
-		}
-	}
+	//$features = _cmtls_map_features('get');
 	
 	$centerpoint = variable_get('cmtls_map_default_centerpoint', '24.734559058178, 59.424735894784');
 	$zoom = variable_get('cmtls_map_default_zoom', '14');
 	$default_layer = variable_get('cmtls_map_default_layer', 'osm_mapnik');
-	
+	$default_styles = $layer_styles = cmtls_map_default_styles();
 	$restrict_extent = variable_get('cmtls_map_restrict_extent', NULL);
 	
 	$openlayers_presets = new stdClass;
@@ -450,7 +454,7 @@ function cmtls_map_openlayers_presets()
 		}
 		
 		$centerpoint = cmtls_map_parse_wkt($centerfeature->wkt);
-		$centerpoint = $centerpoint['lat'].', '.$centerpoint['lon'];
+		$centerpoint = $centerpoint['lon'].', '.$centerpoint['lat'];
 		
 		$zoom = 14;
 	}
@@ -503,7 +507,7 @@ function _cmtls_map_features($op = 'set', $feature = NULL)
 	
 	if($op == 'get')
 	{
-		return $features;
+		return (array)$features;
 	}
 }
 
@@ -539,7 +543,7 @@ function cmtls_map_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
 			$node->parent = db_fetch_array(db_query('SELECT parent FROM {nodehierarchy} WHERE nid = %d', $node->nid));
 			$node->parent = $node->parent['parent'];
 			
-			if(!isset($parents[$node->parent]))
+			if($node->parent && !isset($parents[$node->parent]))
 			{
 				// load parent
 				$parent = db_fetch_object(db_query('SELECT node.nid, type, title, parent, field_cmtls_app_type_value AS app_type, field_cmtls_app_config_value AS cmtls_app_config FROM {node} AS node LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid LEFT JOIN {content_type_cmtls_app} AS content_type_cmtls_app ON node.nid = content_type_cmtls_app.nid WHERE node.nid = %d', $node->nid));
@@ -566,15 +570,22 @@ function cmtls_map_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
 			
 		}
 		
+		$taxonomy = taxonomy_node_get_terms($node);
+		foreach ($taxonomy as &$tag)
+		{
+			$tag = $tag->name;
+		}
+		
 		$feature = (object)array(
 			'nid' => $node->nid,
 			'title' => $node->title,
 			'body' => strip_tags($node->body),
 			'wkt' => $wkt,
-			'app_type' => $parents[$node->parent]->app_type,
-			'app_title' => $parents[$node->parent]->title,
+			'taxonomy' => $taxonomy,
+			'app_type' => $parents[$node->parent]->app_type ? $parents[$node->parent]->app_type : $node->type,
+			'app_title' => $parents[$node->parent]->title ? $parents[$node->parent]->title : t('Groups'),
 			'app_nid' => $parents[$node->parent]->nid,
-			'style' => $parent->style,
+			'style' => $parents[$node->parent]->style,
 		);
 		
 		_cmtls_map_features('set', $feature);
@@ -589,32 +600,30 @@ function cmtls_map_openlayers_layers()
 {
 	$layers = array();
 
+	$layer = new stdClass();
+	$layer->api_version = 1;
+	$layer->name = 'cmtls_features';
+	$layer->title = 'cmtls_features';
+	$layer->description = t('Features');
+	$layer->data = array(
+		'layer_type' => 'cmtls_map_vector',
+		'projection' => array('4326'),
+		'baselayer' => FALSE,
+		'type' => 'Vector',
+		'url' => array(),
+		'options' => array(),
+		'events' => array(),
+	);
+	
+	$layers[$layer->name] = $layer;
+	
 	$features = _cmtls_map_features('get');
-	//$features = array();
 	
 	if(sizeof($features)) foreach ($features as &$feature)
 	{
-		if(!isset($layers[$feature->app_title]))
-		{
-	        $layer = new stdClass();
-	        $layer->api_version = 1;
-	        $layer->name = $feature->app_title;
-	        $layer->title = $feature->app_title;
-	        $layer->description = $feature->app_title;
-	        $layer->data = array(
-	          'layer_type' => 'cmtls_map_vector',
-	          'projection' => array('4326'),
-	          'baselayer' => FALSE,
-	          'type' => 'Vector',
-	          'url' => array(),
-	          'options' => array(),
-	          'events' => array(),
-	        );
-	        $layers[$layer->name] = $layer;
-		}
+		if($feature->app_type == 'cmtls_group' && arg(1) != 'list') continue;
 		
-		
-		$layers[$feature->app_title]->data['features'][$feature->nid] = cmtls_map_format_feature($feature);
+		$layers[$layer->name]->data['features'][$feature->nid] = cmtls_map_format_feature($feature);
 	}
 	
 	//printr($layers); exit;
@@ -625,7 +634,16 @@ function cmtls_map_format_features($features)
 {
 	foreach ($features as $key => $feature)
 	{
-		if($key != $feature->nid) unset($features[$key]);
+		if($feature->app_type == 'cmtls_group' && arg(1) != 'list')
+		{
+			unset($features[$key]);
+			continue;
+		}
+		
+		if($key != $feature->nid)
+		{
+			unset($features[$key]);
+		}
 		
 		$features[$feature->nid] = cmtls_map_format_feature($feature);
 	}
@@ -635,10 +653,18 @@ function cmtls_map_format_features($features)
 
 function cmtls_map_format_feature($feature)
 {
+	static $feature_styles;
+	static $default_styles;
+	static $styles;
+	
+	if(!$default_styles) $default_styles = cmtls_map_default_styles();
+	if(!$styles) $styles = cmtls_map_openlayers_styles();
+	
 	$attributes = array(
 		'id' => $feature->nid,
 		'title' => $feature->title,
-		'layer' => $feature->app_title,
+		'aid' => $feature->app_nid,
+		'taxonomy' => $feature->taxonomy,
 	);
 	
 	$content = module_invoke($feature->app_type, 'cmtls_map_popup_content', $feature);
@@ -648,10 +674,46 @@ function cmtls_map_format_feature($feature)
 		$attributes['content'] = '<div id="cmtls-map-popup-content-'.$feature->nid.'" class="cmtls-map-popup-content hidden '.$feature->app_type.'">'.$content.'</div>';
 	}
 	
+	if($feature_styles[$feature->style])
+	{
+		$feature->style = $feature_styles[$feature->style];
+	}
+	else 
+	{
+		$config = module_invoke($feature->app_type, 'cmtls_map_config');
+		
+		if($config && $config[$feature->app_type] && $config[$feature->app_type]['default map styles'])
+		{
+			if($feature->style)
+			{
+				$style = array(
+					'default' => $feature->style,
+					'select' => $feature->style.'-hover',
+					'temporary' => $feature->style,
+				);
+			}
+			else 
+			{
+				$style = array_merge($default_styles, $config[$feature->app_type]['default map styles']);
+			}
+			
+			foreach($style as &$st)
+			{
+				$st = $styles[$st];
+			}
+			
+			$feature->style = $feature_styles[$feature->style] = $style['default']->data;
+		}
+	}
+	
+	$feature->style['graphicTitle'] = $feature->title;
+	
 	$feature = array(
 		'wkt' => $feature->wkt,
 		'projection' => '4326',
 		'attributes' => $attributes,
+		'style' => $feature->style,
+		'id' => $feature->nid,
 	);
 	
 	return $feature;
@@ -821,8 +883,8 @@ function cmtls_map_parse_wkt($wkt)
 		
 		$wkt = explode(' ', $wkt);
 		$wkt = array(
-			'lat' => $wkt[0],
-			'lon' => $wkt[1],
+			'lon' => $wkt[0],
+			'lat' => $wkt[1],
 		);
 	}
 	

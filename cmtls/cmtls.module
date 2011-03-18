@@ -17,6 +17,8 @@ function printr($var)
  */
 function cmtls_init()
 {
+	global $language;
+	
 	// context menu
 	drupal_add_css(drupal_get_path('module', 'cmtls').'/css/context_menu.css');
 	drupal_add_js(drupal_get_path('module', 'cmtls') .'/js/jquery.contextMenu.js');
@@ -30,11 +32,11 @@ function cmtls_init()
 	drupal_set_html_head('<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js"></script>');
 	
 	drupal_add_js('var addthis_config = {
-	ui_language: "en",
+	ui_language: "'.$language->language.'",
 	ui_cobrand: "Community Tools",
 	ui_click: true,
-	services_compact: "facebook,twitter,linkedin,orkut,tumblr,email,blogger,delicious,digg,menu",
-	ui_use_css: false // doesnt seem to work?
+	username: "communitytools",
+	services_compact: "email, facebook, twitter, linkedin, orkut, tumblr, blogger, delicious, digg, more"
 };', 'inline');
 }
 
@@ -588,19 +590,15 @@ function cmtls_cron()
 {
 	if(!variable_get('cmtls_daily_digest', '1')) return;
 	
-	//variable_set('cmtls_daily_digest_send', 1);
-	$last_daily_send = variable_get('cmtls_daily_digest_send', 1);
+	$today = strtotime('today');
+	// send @ 12:00
+	$send_time = $today + 12 * 60 * 60;
+	$last_send = variable_get('cmtls_daily_digest_send', 1);
 	
-	$daily_interval = time() - (60 * 60 * 23.5);
-	//printr($last_daily_send);
-	//printr($daily_interval);
-	
-	if($last_daily_send > $daily_interval) return;
-	
-	//$daily_interval = strtotime('today');
-	//$daily_interval = strtotime('2010-10-01');
-	
-	//printr($daily_interval);
+	if(!($today > $last_send && $send_time < time()))
+	{
+		return;
+	}
 	
 	$mail_contents = array(
 		'new_groups' => array(),
@@ -613,7 +611,7 @@ function cmtls_cron()
 	
 	$users_sent = 0;
 	
-	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, users.data, (SELECT group_concat(sub_og_uid.nid) FROM {og_uid} AS sub_og_uid WHERE sub_og_uid.uid = users.uid) AS groups FROM {users} AS users LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2";
+	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, users.data, users.language, (SELECT GROUP_CONCAT(sub_og_uid.nid) FROM {og_uid} AS sub_og_uid WHERE sub_og_uid.uid = users.uid) AS groups FROM {users} AS users LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2";
 	$result = db_query($sql);
 	while ($user = db_fetch_object($result))
 	{
@@ -622,7 +620,6 @@ function cmtls_cron()
 		
 		$users[$user->uid] = $user;
 	}
-	
 	//printr($users); exit;
 	
 	// get all the groups
@@ -632,7 +629,7 @@ function cmtls_cron()
 	$result = db_query($sql);
 	while ($group = db_fetch_object($result))
 	{
-		if($group->created > $daily_interval)
+		if($group->created > $last_send)
 		{
 			$group->new = 1;
 			
@@ -650,32 +647,33 @@ function cmtls_cron()
 	
 	// get all the apps
 	$sql = "SELECT * FROM {node} AS node LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid WHERE node.type = 'cmtls_app' AND node.status = 1 AND nodehierarchy.parent <> 0";
-	$result = db_query($sql, $daily_interval);
+	$result = db_query($sql);
 	while ($app = db_fetch_object($result))
 	{
 		$groups[$app->parent]->apps[$app->nid] = $app;
 	}
 	
 	// get fresh content
-	$sql = "SELECT * FROM
+	$sql = "SELECT node.nid, node.title, node.created, node_revisions.body AS body, nodehierarchy.parent, node_comment_statistics.comment_count, node_comment_statistics.last_comment_timestamp FROM
 	{node} AS node
 	LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid
+	LEFT JOIN {node_revisions} AS node_revisions ON node.vid = node_revisions.vid
 	LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON node.nid = node_comment_statistics.nid
 	WHERE
 	node.type NOT IN ('cmtls_group', 'cmtls_app')
 	AND node.type LIKE 'cmtls_%'
 	AND node.status = 1
 	AND nodehierarchy.parent <> 0
-	AND (node.created > %d OR (node_comment_statistics.comment_count > 0 AND node_comment_statistics.last_comment_timestamp > %d))
-	";
+	AND (node.created > %d OR (node_comment_statistics.comment_count > 0 AND node_comment_statistics.last_comment_timestamp > %d))";
 	
 	//printr($sql);
 	$new_content_group_ids = array();
 	$new_content_app_ids = array();
 	
-	$result = db_query($sql, $daily_interval, $daily_interval);
+	$result = db_query($sql, $last_send, $last_send);
 	while ($content = db_fetch_object($result))
 	{
+		//printr($content);
 		foreach ($groups as $group_id => &$group)
 		{
 			if(in_array($content->parent, array_keys($group->apps)))
@@ -696,9 +694,13 @@ function cmtls_cron()
 			}
 		}
 		
-		if($content->created > $daily_interval)
+		if($content->created > $last_send)
 		{
-			$mail_contents['new_content'][$content->parent][$content->nid] = '- '.$group->apps[$content->parent]->title.' > '.$content->title.($content->comment_count && $content->last_comment_timestamp > $a_interval ? ' ('.$content->comment_count.') ' : ' ').url(cmtls_path_to_node($content->nid, $group), array('absolute' => TRUE));
+			$htmltotext = drupal_html_to_text($content->body);
+			$teaser = drupal_html_to_text(node_teaser($content->body, NULL, 200));
+			$teaser .= strlen($htmltotext) > strlen($teaser) ? '...' : NULL;
+			
+			$mail_contents['new_content'][$content->parent][$content->nid] = '- '.$group->apps[$content->parent]->title.' > '.$content->title.($content->comment_count && $content->last_comment_timestamp > $a_interval ? ' ('.$content->comment_count.') ' : NULL).($teaser ? ':'."\n".$teaser."\n" : ' ').url(cmtls_path_to_node($content->nid, $group), array('absolute' => TRUE))."\n";
 		}
 		else 
 		{
@@ -712,8 +714,10 @@ function cmtls_cron()
 		$main_group = _cmtls_group_get_main();
 		$profile_link = url('cmtls/'.$main_group->nid.'/member/', array('absolute' => TRUE));
 		
-		foreach($users as $user_id => &$user) if($user_id == 1 && !isset($user->data['cmtls']['notifications']['group']) || $user->data['cmtls']['notifications']['group'])
+		foreach($users as &$user) if(!isset($user->data['cmtls']['notifications']['group']) || $user->data['cmtls']['notifications']['group'])
 		{
+			$user_lang = user_preferred_language($user);
+			
 			// if any users groups has new content
 			$user_new_content_group_ids = array_intersect($user->groups, $new_content_group_ids);
 			
@@ -740,7 +744,7 @@ function cmtls_cron()
 						
 					if($i > 0)
 					{
-						$content_body = t('New content in !groupname', array('!groupname' => $groups[$group_id]->title))."\n".$content_body."\n";
+						$content_body = t('New content in !groupname', array('!groupname' => $groups[$group_id]->title), $user_lang->language)."\n".$content_body."\n";
 					}
 					
 					$i = 0;
@@ -755,7 +759,7 @@ function cmtls_cron()
 					
 					if($i > 0)
 					{
-						$comments_body = t('New comments have been posted in !groupname', array('!groupname' => $groups[$group_id]->title))."\n".$comments_body."\n";
+						$comments_body = t('New comments have been posted in !groupname', array('!groupname' => $groups[$group_id]->title), $user_lang->language)."\n".$comments_body."\n";
 					}
 					
 					$body .= $content_body.$comments_body;
@@ -763,7 +767,7 @@ function cmtls_cron()
 				
 				if(!empty($mail_contents['new_groups']))
 				{
-					$body .= t('The following new groups have been created')."\n\n";
+					$body .= t('The following new groups have been created', NULL, $user_lang->language)."\n\n";
 					$body .= implode("\n", $mail_contents['new_groups'])."\n";
 					$body .= url('cmtls/list', array('absolute' => TRUE));
 				}
@@ -771,17 +775,17 @@ function cmtls_cron()
 				if($body)
 				{
 					$message = array(
-						'subject' => t('!sitename daily summary', array('!sitename' => $site_name)),
+						'subject' => t('!sitename daily summary', array('!sitename' => $site_name), $user_lang->language),
 						'body' =>
-							t('Hello !username', array('!username' => $user->name)).','."\n\n".
-							t('Here\'s a summary of !sitename daily changes', array('!sitename' => $site_name)).':'."\n\n".
+							t('Hello !username', array('!username' => $user->name), $user_lang->language).','."\n\n".
+							t('Here\'s a summary of !sitename daily changes', array('!sitename' => $site_name), $user_lang->language).':'."\n\n".
 							$body.
 							"\n"."\n".'---'."\n".
-							$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$user->uid))."\n"
+							$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$user->uid), $user_lang->language)."\n"
 						,
 					);
 					
-					drupal_mail('cmtls', 'cmtls_mail', $user->mail, language_default(), $message);
+					drupal_mail('cmtls', 'cmtls_mail', $user->mail, $user_lang, $message);
 					//printr($message);
 					
 					$users_sent++;
@@ -792,7 +796,7 @@ function cmtls_cron()
 	
 	watchdog('cmtls', 'Daily digest sent to '.$users_sent.' members.');
 	
-	variable_set('cmtls_daily_digest_send', time());
+	variable_set('cmtls_daily_digest_send', $today);
 }
 
 /**
@@ -964,7 +968,7 @@ function cmtls_forms_alter($form, $form_state)
 		'#title' => t('Geolocation'),
 		'#tree' => TRUE,
 		'#collapsible' => TRUE,
-		'#collapsed' => TRUE,    
+		'#collapsed' => FALSE,
 	);
 	
 	if ($form['#node'] && $form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] && ($form['#node']->field_cmtls_geoinfo[0]['openlayers_wkt'] != 'GEOMETRYCOLLECTION()'))
@@ -1068,6 +1072,12 @@ function cmtls_forms_after_build($form, &$form_state)
 	{
 		$form['geolocation'] = NULL;
 	}
+	
+	if($form['taxonomy']['tags']) foreach ($form['taxonomy']['tags'] as $t_id => $taxonomy) if ($taxonomy['#title'])
+	{
+		$form['taxonomy']['tags'][$t_id]['#title'] = t('Tags');
+	}
+
 
 	return $form;
 }
@@ -1141,12 +1151,12 @@ function cmtls_notify_action($node, $context = array())
 	
 	if(!$group && !$group->nid) return;
 	
-	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, users.data FROM {users} AS users LEFT JOIN {og_uid} AS og_uid ON users.uid = og_uid.uid LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2 AND og_uid.nid = %d AND users.uid != %d AND users.status = 1 AND users.data LIKE '%s' AND users.data LIKE '%s'";
+	$sql = "SELECT users.uid, users.name as username, users.mail, profile_values.value AS name, users.language, users.data FROM {users} AS users LEFT JOIN {og_uid} AS og_uid ON users.uid = og_uid.uid LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE profile_values.fid = 2 AND og_uid.nid = %d AND users.uid != %d AND users.status = 1 AND users.data LIKE '%s' AND users.data LIKE '%s'";
 	$result = db_query($sql, $group->nid, $node->uid, '%"group";i:1;%', '%i:'.$node->parent.';i:1;%');
 	
 	$users = array();
 	
-	$body = '"'.$node->title.'" '.url(cmtls_path_to_node($node, $group), array('absolute' => TRUE));
+	$body = $node->title."\n\n".'"'.drupal_html_to_text($node->body).'"'."\n\n".url(cmtls_path_to_node($node, $group), array('absolute' => TRUE));
 	
 	$site_name = variable_get('site_name', 'CT');
 	
@@ -1156,21 +1166,23 @@ function cmtls_notify_action($node, $context = array())
 	while ($user = db_fetch_object($result))
 	{
 		$user->data = unserialize($user->data);
+    	$user_lang = user_preferred_language($user);
+		
 		if($user->data['cmtls']['notifications']['group'] && $user->data['cmtls']['notifications']['apps']['instant'][$node->parent])
 		{
 			$message = array(
-				'subject' => t('!sitename has new post', array('!sitename' => $site_name)),
+				'subject' => t('!sitename has new post', array('!sitename' => $site_name), $user_lang->language),
 				'body' =>
-					t('Hello !username', array('!username' => $user->name)).','."\n\n".
-					t('!sitename has new post', array('!sitename' => $site_name)).':'."\n\n".
+					t('Hello !username', array('!username' => $user->name), $user_lang->language).','."\n\n".
+					t('!sitename has new post', array('!sitename' => $site_name), $user_lang->language).':'."\n\n".
 					$body.
 					"\n"."\n".'---'."\n".
-					$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$user->uid))."\n"
+					$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$user->uid), $user_lang->language)."\n"
 				,
 			);
 			
 			//printr($message);
-			drupal_mail('cmtls', 'cmtls_mail', $user->mail, language_default(), $message);
+			drupal_mail('cmtls', 'cmtls_mail', $user->mail, user_preferred_language($user), $message);
 		}
 	}
 }
@@ -1207,26 +1219,27 @@ function cmtls_notify_comment_action($comment, $context = array())
 		if($user->uid != $node->uid)
 		{
 			$author = user_load($node->uid);
+			$author_lang = user_preferred_language($author);
 			
 			if(!isset($author->cmtls['notifications']['group']) || $author->cmtls['notifications']['comments'])
 			{
-		    	profile_load_profile($author);
-		    	
+				profile_load_profile($author);
+				
 				$message = array(
-					'subject' => $site_name.' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
-					'body' =>
-						t('User !username commented on !nodetitle:'."\n\n".'"'.check_plain($comment->comment).'"'."\n\n".'!nodelink',
-							array(
-								'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
-								'!nodetitle' => $node->title,
-								'!nodelink' => $node_link,
-							)
-						).
-						"\n".'---'."\n".
-						$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$author->uid))."\n",
+					'subject' => $site_name.' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on', NULL, $author_lang->language).': '.$node->title,
+					'body' => t('User !username commented on "!nodetitle"',
+						array(
+							'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
+							'!nodetitle' => $node->title,
+						),
+						$author_lang->language
+					).
+					":\n\n".check_plain($comment->comment)."\n\n".$node_link.
+					"\n\n".'---'."\n".
+					$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$author->uid), $author_lang->language)."\n",
 				);
 				
-				drupal_mail('cmtls', 'cmtls_mail', $author->mail, language_default(), $message);
+				drupal_mail('cmtls', 'cmtls_mail', $author->mail, user_preferred_language($author), $message);
 			}
 		}
 		
@@ -1234,28 +1247,29 @@ function cmtls_notify_comment_action($comment, $context = array())
 		// todo: select query users to avoid user_load()
 		$result = db_query('SELECT DISTINCT uid FROM {comments} WHERE nid = %d AND uid NOT IN (0, %d, %d)', $node->nid, $user->uid, $node->uid);
 		while ($commenter_uid = db_fetch_array($result))
-	    {
-	    	$commenter = user_load($commenter_uid);
+		{
+			$commenter = user_load($commenter_uid);
+			$commenter_lang = user_preferred_language($commenter);
 	    	
 			if(!isset($commenter->cmtls['notifications']['group']) || $commenter->cmtls['notifications']['comments'])
 			{
-		    	profile_load_profile($commenter);
+				profile_load_profile($commenter);
 		    	
 				$message = array(
-					'subject' => $site_name.' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on').': '.$node->title,
-					'body' =>
-						t('User !username commented on !nodetitle:'."\n\n".'"'.check_plain($comment->comment).'"'."\n\n".'!nodelink',
-							array(
-								'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
-								'!nodetitle' => $node->title,
-								'!nodelink' => $node_link,
-							)
-						).
-						"\n".'---'."\n".
-						$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$commenter->uid))."\n",
+					'subject' => $site_name.' - '._cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))).' '.t('has commented on', NULL, $commenter_lang->language).': '.$node->title,
+					'body' => t('User !username commented on "!nodetitle"',
+						array(
+							'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
+							'!nodetitle' => $node->title,
+						),
+						$commenter_lang->language
+					).
+					":\n\n".check_plain($comment->comment)."\n\n".$node_link.
+					"\n\n".'---'."\n".
+					$site_name.'. '.t('You can change your notification settings at !link', array('!link' => $profile_link.$commenter->uid), $commenter_lang->language)."\n",
 				);
 				
-				drupal_mail('cmtls', 'cmtls_mail', $commenter->mail, language_default(), $message);
+				drupal_mail('cmtls', 'cmtls_mail', $commenter->mail, $commenter_lang, $message);
 			}
 	    }
 	}

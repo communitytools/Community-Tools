@@ -722,9 +722,9 @@ function cmtls_event_views_default_views() {
     'date_filter' => array(
       'operator' => '>=',
       'value' => array(
-        'value' => NULL,
         'min' => NULL,
         'max' => NULL,
+        'value' => NULL,
         'default_date' => 'now',
         'default_to_date' => '',
       ),
@@ -736,6 +736,7 @@ function cmtls_event_views_default_views() {
       ),
       'date_fields' => array(
         'node_data_field_cmtls_event_date.field_cmtls_event_date_value' => 'node_data_field_cmtls_event_date.field_cmtls_event_date_value',
+        'node_data_field_cmtls_event_date.field_cmtls_event_date_value2' => 'node_data_field_cmtls_event_date.field_cmtls_event_date_value2',
       ),
       'date_method' => 'OR',
       'granularity' => 'minute',

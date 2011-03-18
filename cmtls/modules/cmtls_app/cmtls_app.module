@@ -288,6 +288,8 @@ function cmtls_app_form_cmtls_app_node_form_alter(&$form, &$form_state)
 		$app_type = NULL;
 	}
 	
+	$form['#node']->app_type = $app_type;
+	
 	$form['cmtls_app_config'] = array(
 		'#type' => 'markup',
 		'#title' => t('Configuration'),
@@ -301,6 +303,8 @@ function cmtls_app_form_cmtls_app_node_form_alter(&$form, &$form_state)
 		// get other app's config hooks
 		if($app_config = module_invoke_all('cmtls_app_general_config', $app_type, $current_config))
 		{
+			//printr($app_config); exit;
+			
 			$form['cmtls_app_config'] += $app_config;
 		}
 		
@@ -341,6 +345,9 @@ function cmtls_app_node_form_after_build($form, &$form_state)
 		);
 		
 		$form['field_cmtls_app_type']['value'][$option] = form_expand_ahah($form['field_cmtls_app_type']['value'][$option]);
+		
+		// this is needed for ahah, else the collapsible behavior does not get attached
+		drupal_add_js('misc/collapse.js');
 	}
 	
 	$form['field_cmtls_app_config']['#type'] = 'hidden';
@@ -583,39 +590,23 @@ function cmtls_app_rss_page($group, $app)
 	
 	$rss_items = '';
 
-	foreach ($items as &$item) if($item['wkt'])
+	foreach ($items as &$item)
 	{
-		$point = cmtls_map_parse_wkt($item['wkt']);
-		
-		if($point)
-		{
-			$point = array(
-				'geo:lat' => $point['lat'],
-				'geo:lon' => $point['lon'],
-			);
-			
-			if($item['args'])
-			{
-				$item['args'] = array_merge($item['args'], $point);
-			}
-			else 
-			{
-				$item['args'] = $point;
-			}
-		}
-		else 
-		{
-			$item['args'] = array();
-		}
+		//printr($item);
 		
 		$rss_items .= format_rss_item($item['title'], $item['link'], $item['description'], $item['args']);
 	}
 	
 	//printr($rss_items); exit;
 	
+	$channel_args = array(
+		'pubDate' => $items[0]['args']['pubDate'],
+		'lastBuildDate' => $items[0]['args']['pubDate'],
+	);
+	
 	$output = '<?xml version="1.0" encoding="utf-8"?>'."\n";
 	$output .= '<rss version="2.0" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">'."\n";
-	$output .= format_rss_channel(variable_get('site_name', 'Community Tools').' - '.$group->title.': '.$app->title, $base_url.'/cmtls/'.$group->nid.'/'.$app->nid, '', $rss_items, $language->language);
+	$output .= format_rss_channel(variable_get('site_name', 'Community Tools').' - '.$group->title.': '.$app->title, $base_url.'/cmtls/'.$group->nid.'/'.$app->nid, '', $rss_items, $language->language, $channel_args);
 	
 	$output .= '</rss>'."\n";
 	
@@ -628,7 +619,14 @@ function cmtls_app_default_rss_items($app)
 {
 	$items = array();
 	
-	$result = db_query("SELECT node.nid FROM {node} LEFT JOIN {nodehierarchy} ON node.nid = nodehierarchy.nid WHERE nodehierarchy.parent = %d AND node.type = '%s' ORDER BY created DESC LIMIT 100", $app->nid, $app->field_cmtls_app_type[0]['value']);
+	$result = db_query("SELECT node.nid
+		FROM {node}
+		LEFT JOIN {nodehierarchy} ON node.nid = nodehierarchy.nid
+		WHERE nodehierarchy.parent = %d AND node.type = '%s'
+		ORDER BY created DESC
+		LIMIT 100",
+		$app->nid, $app->field_cmtls_app_type[0]['value']
+	);
 	
 	while ($nid = db_fetch_array($result))
 	{
@@ -657,12 +655,50 @@ function cmtls_app_default_rss_item($node)
 {
 	global $base_url;
 	
-	return array(
+	$item = array(
 		'title' => $node->title,
 		'link' => $base_url.'/'.cmtls_path_to_node($node->nid),
 		'description' => $node->body,
-		'wkt' => $node->field_cmtls_geoinfo[0]['openlayers_wkt'],
+		'args' => array(),
 	);
+	
+	$item['args'][] = array(
+		'key' => 'guid',
+		'value' => $node->nid,
+		'attributes' => array(
+			'isPermaLink' => 'false',
+		),
+	);
+	
+	$item['args']['pubDate'] = date('r', $node->created);
+	
+	if($node->field_cmtls_geoinfo[0]['openlayers_wkt'])
+	{
+		$point = cmtls_map_parse_wkt($node->field_cmtls_geoinfo[0]['openlayers_wkt']);
+		
+		if($point)
+		{
+			$item['args']['geo:lat'] = $point['lat'];
+			$item['args']['geo:lon'] = $point['lon'];
+		}
+	}
+	
+	if(!empty($node->taxonomy))
+	{
+		$tags = array();
+		foreach ($node->taxonomy as &$tag)
+		{
+			$item['args'][] = array(
+				'key' => 'category',
+				'value' => $tag->name,
+			);
+			//$tags[] = $tag->name;
+		}
+		
+		//$item['args']['category'] = implode(', ', $tags);
+	}
+	
+	return $item;
 }
 
 /**

@@ -42,7 +42,7 @@ function cmtls_place_init()
 		drupal_add_feed(url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/rss', array('absolute' => TRUE)), $app->title);
 	}
 
-	//drupal_add_js(drupal_get_path('module', 'cmtls_place') .'/js/app.js');
+	drupal_add_js(drupal_get_path('module', 'cmtls_place') .'/js/cmtls_place.js');
 }
 
 function cmtls_place_cmtls_app()
@@ -51,7 +51,7 @@ function cmtls_place_cmtls_app()
 		'cmtls_place' => array(
 			'title' => t('Places'),
 			'callback' => 'cmtls_places_page',
-			'node type title' => t('place'),
+			'node type title' => t('Place'),
 		),
 	);
 }
@@ -66,7 +66,7 @@ function cmtls_place_cmtls_map_config()
 				CMTLS_MAP_VIEW_HALF_PAGE,
 				CMTLS_MAP_VIEW_FULL_PAGE,
 			),
-			'default map view' => CMTLS_MAP_VIEW_FULL_PAGE,
+			'default map view' => CMTLS_MAP_VIEW_HALF_PAGE,
 			'map view changable' => TRUE,
 			'default map styles' => array(
 				'default' => 'cmtls-location-white',
@@ -82,8 +82,8 @@ function cmtls_place_cmtls_map_config()
 function cmtls_place_cmtls_app_config_defaults()
 {
 	return array(
-		'sorting_field' => 'node_created',
-		'sorting_dir' => 'DESC'
+		'sorting_field' => 'node_title',
+		'sorting_dir' => 'ASC'
 	);
 }
 
@@ -91,7 +91,12 @@ function cmtls_place_cmtls_app_config($config)
 {
 	$settings = array_merge(cmtls_place_cmtls_app_config_defaults(), (array)$config['cmtls_place']);
 
-	//printr($settings);
+	$form['cmtls_place'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Sorting settings'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
 
 	$form['cmtls_place']['sorting_field'] = array(
 		'#type' => 'radios',
@@ -99,7 +104,7 @@ function cmtls_place_cmtls_app_config($config)
 		'#default_value' => $settings['sorting_field'],
 		'#options' => array(
 			'node_created' => t('Created date'),
-			'node_title' => t('place title'),
+			'node_title' => t('Place title'),
 		),
 	);
 
@@ -247,6 +252,32 @@ function cmtls_place_theme($existing)
 		'cmtls_places_content' => array (
 			'arguments' => array('app_id' => NULL),
 			'template' => 'cmtls-places-content',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'cmtls_places_tags' => array (
+			'arguments' => array('tags' => NULL),
+			'template' => 'cmtls-places-tags',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		// place contact
+		'cmtls_place_contact' => array (
+			'arguments' => array('node' => NULL),
+			'template' => 'cmtls-place-contact',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'cmtls_place_website' => array (
+			'arguments' => array('node' => NULL),
+			'template' => 'cmtls-place-website',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'cmtls_place_email' => array (
+			'arguments' => array('node' => NULL),
+			'template' => 'cmtls-place-email',
+			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
+		),
+		'cmtls_place_phone' => array (
+			'arguments' => array('node' => NULL),
+			'template' => 'cmtls-place-phone',
 			'path' => drupal_get_path('module', 'cmtls_place').'/theme',
 		),
 		// places view
@@ -405,4 +436,47 @@ function cmtls_place_cmtls_app_links($node = NULL)
 			'delete' => 'place/'.$node->nid.'/delete',
 		),
 	);
+}
+
+function cmtls_place_preprocess_cmtls_places_content(&$vars)
+{
+	$vars['tags'] = cmtls_places_tags($vars['app_id']);
+}
+
+function cmtls_places_tags($app_id)
+{
+	$tags = array();
+	
+	$sql = 'SELECT term_data.tid, term_data.name, COUNT(term_data.tid) AS count FROM {term_data} AS term_data LEFT JOIN {term_node} AS term_node ON term_data.tid = term_node.tid LEFT JOIN {nodehierarchy} AS nodehierarchy ON term_node.nid = nodehierarchy.nid WHERE nodehierarchy.parent = %d GROUP BY term_data.tid ORDER BY count DESC';
+	$result = db_query($sql, $app_id);
+	
+	$group = _cmtls_group_get_current();
+	$app_link = 'cmtls/'.$group->nid.'/'.$app_id;
+	
+	while ($row = db_fetch_array($result))
+	{
+		$tags[$row['tid']] = $row;
+		$tags[$row['tid']]['link'] = l($row['name'], $app_link, array('query' => array('tag' => $row['tid'])));
+	}
+	
+	return theme('cmtls_places_tags', $tags);
+}
+
+function cmtls_place_cmtls_feed_config()
+{
+	return array(
+		'cmtls_feed' => array(
+			'importer_id' => 'cmtls_places_rss_feed',
+		),
+	);
+}
+
+function cmtls_place_feeds_get_importer_id_from_node(&$node)
+{
+	if($node->type == 'cmtls_app' && $node->field_cmtls_app_type[0]['value'] == 'cmtls_place')
+	{
+		return 'cmtls_places_rss_feed';
+	}
+	
+	return NULL;
 }

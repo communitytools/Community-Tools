@@ -6,7 +6,8 @@ Drupal.behaviors.cmtls_stance = function(context)
 		// Toggle Stance
 		$('.stance-button').click(function()
 		{
-			$(this).nextAll('.stance-container').slideToggle('slow,');
+			$($(this).attr('rel')).slideToggle('slow,');
+			
 			return false;
 		});
 

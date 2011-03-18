@@ -13,11 +13,15 @@
   <?php print $scripts; ?>
 </head>
 <body<?php $cmtls['current_group_properties']['background_image'] ? print ' style="background-image: url('.$cmtls['current_group_properties']['background_image'].'"' : NULL; ?>>
+	
 	<div class="filters">
 			<a href="javascript:void(0);" onclick="mapLocationSwitcer('map-only');"><?php print t('Map'); ?></a> |
 			<a href="javascript:void(0);" onclick="mapLocationSwitcer('text-map');"><?php print t('Map and Text'); ?></a> |
 			<a href="javascript:void(0);" onclick="mapLocationSwitcer('text-only');"><?php print t('Text'); ?></a>
 	</div>
+	
+	<?php print $cmtls['map']['layer_switcher']; ?>
+
 	<div id="header">
 		<div class="header-container">
 

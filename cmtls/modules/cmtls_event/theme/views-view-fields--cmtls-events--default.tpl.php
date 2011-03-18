@@ -41,30 +41,30 @@ $current_app = _cmtls_app_get_current($current_group);
 <?php /* Node detail view */ ?>
 <?php if (isset($view->args[1])): ?>
 
-
-		<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php print check_plain($fields['title']->raw); ?>
-
-			<span class="date">
-				&middot;
-			<?php if ($fields['field_cmtls_event_lasts_all_day_value']->raw): ?>
-				<?php print t('Whole day'); ?>
-			<?php else: ?>
-				<?php print $start_time; ?> -
-
-				<?php if($start_date != $end_date): ?>
-					<?php print $end_date; ?>
-				<?php endif; ?>
-
-				<?php if ($end_time != $start_time): ?>
-					<?php print $end_time; ?>
-				<?php endif; ?>
-
+	<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><?php print check_plain($fields['title']->raw); ?>
+	
+		<span class="date">
+			&middot;
+		<?php if ($fields['field_cmtls_event_lasts_all_day_value']->raw): ?>
+			<?php print t('Whole day'); ?>
+		<?php else: ?>
+			<?php print $start_time; ?> -
+	
+			<?php if($start_date != $end_date): ?>
+				<?php print $end_date; ?>
 			<?php endif; ?>
-
-			<?php if($fields['field_cmtls_address_value']->raw) print ' &middot; '.check_plain($fields['field_cmtls_address_value']->raw); ?>
-
-			</span>
-		</h1>
+	
+			<?php if ($end_time != $start_time): ?>
+				<?php print $end_time; ?>
+			<?php endif; ?>
+	
+		<?php endif; ?>
+	
+		<?php if($fields['field_cmtls_address_value']->raw) print ' &middot; '.check_plain($fields['field_cmtls_address_value']->raw); ?>
+	
+		</span>
+	</h1>
+	
 	<div class="node-head">
 
 		<div class="meta-author">
@@ -106,9 +106,8 @@ $current_app = _cmtls_app_get_current($current_group);
 		<?php if (is_array($node->taxonomy)): ?>
 			<?php if (count($node->taxonomy) > 0): ?>
 				<div class="meta-tags">
-					<?php print t('Tagged').': '; ?>
 					<?php foreach ($node->taxonomy as $term): ?>
-						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php if ($i < count($node->taxonomy) - 1) print ', '; $i++; ?>
+						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php $i++; ?>
 					<?php endforeach; ?>
 				</div> <!-- meta-tags -->
 				&middot;
@@ -116,12 +115,18 @@ $current_app = _cmtls_app_get_current($current_group);
 		<?php endif; ?>
 
 		<?php print l($fields['comment_count']->raw ? format_plural($fields['comment_count']->raw,'1 comment','@count comments') : t('Comment'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/article/'.$fields['nid']->raw, array('attributes' => array('class' => 'comments-button cmtls-comment-toggle-button', 'id' => 'cmtls-comments-toggle-button-'.$fields['nid']->raw))); ?>
+		
 		&middot;
 
-		<a class="stance-button" href=""><?php print ($node->stances->sorted_count[1] > 0 ? format_plural($node->stances->sorted_count[1],'1 attending','@count attending') : t('Attend')); ?></a>
+		<?php print l(($node->stances->sorted_count[1] > 0 ? format_plural($node->stances->sorted_count[1],'1 attending','@count attending') : t('Attend')), '', array('attributes' => array('class' => 'stance-button', 'rel' => '#stance-container-'.$fields['nid']->raw))); ?>
 
 		&middot;
-		<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid . '/event/' . $node->nid . '/add_to_calendar.ics', array('absolute' => TRUE)); ?>"><?php print t('Add to calendar'); ?></a>
+		
+		<?php print l(t('Add to calendar'), 'cmtls/' . $current_group->nid . '/' . $current_app->nid . '/event/' . $node->nid . '/add_to_calendar.ics'); ?>
+		<?php if(node_access('update', $node, $user)): ?>
+			&middot;
+			<?php print l(t('Send email to participants'), 'cmtls/' . $current_group->nid . '/' . $current_app->nid . '/event/' . $node->nid . '/send_mail', array('attributes' => array('class' => 'modalframe-child'))); ?> 
+		<?php endif; ?>
 
 		&middot; <div class="meta-share"><?php print $sm_share_buttons; ?></div>
 
@@ -164,7 +169,7 @@ $current_app = _cmtls_app_get_current($current_group);
 				<div class="meta-tags">
 					<?php /* print t('Tagged').': '; */ ?>
 					<?php foreach ($node->taxonomy as $term): ?>
-						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php if ($i < count($node->taxonomy) - 1) print ', '; $i++; ?>
+						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php $i++; ?>
 					<?php endforeach; ?>
 				</div> <!-- meta-tags -->
 				<?php ($fields['comment_count']->raw || $node->stances->sorted_count[1] > 0) ? print ' &middot; ' : NULL; ?>
@@ -188,6 +193,6 @@ $current_app = _cmtls_app_get_current($current_group);
 
 		 <a href="<?php print base_path().cmtls_event_path($node); ?>" title="<?php print t('Read more'); ?>"><?php print t('Read more'); ?></a>
 
-        </div> <!-- /text-node-list-item -->
+	</div> <!-- /text-node-list-item -->
 
 <?php endif; ?>

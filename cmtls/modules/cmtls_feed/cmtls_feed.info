@@ -1,0 +1,8 @@
+core = "6.x"
+dependencies[] = "cmtls"
+dependencies[] = "feeds"
+description = "Community Tools: Feeds"
+name = "Community Tools: Feed"
+package = "Community Tools"
+project = "cmtls_feed"
+version = "6.x-0.4-dev"

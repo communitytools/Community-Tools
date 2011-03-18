@@ -101,12 +101,19 @@ input.form-submit {
 		.form-item .form-radios .form-item,
 		.form-item .form-checkboxes .form-item {
 			display: inline-block;
+			margin: 0.6em 0 0 !important;
 		}
 
-fieldset.collapsible legend a {
-	font-weight: bold;
+/* Fieldsets / Field groups
+-------------------------------------------------------------- */
+fieldset.collapsible {
+	border-top: 1px solid #ccc;
 }
 
+	fieldset.collapsible legend a {
+		font-weight: bold;
+		padding: 0 5px;
+	}
 
 
 /* Specific form elements

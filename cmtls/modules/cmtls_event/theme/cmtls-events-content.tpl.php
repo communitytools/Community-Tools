@@ -23,6 +23,10 @@
 		</div>
 
 		<?php print $filter; ?>
+		
+		<div id="cmtls-horizontal-calendar-container">
+			<?php print $calendar; ?>
+		</div>
 
 	</div> <!-- content-toolbar -->
 

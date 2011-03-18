@@ -78,8 +78,8 @@ function cmtls_filter_answer_form(&$form_state, $node)
 
 	if (is_numeric($_GET['date_to']))
 	{
-		// add 24hrs to user given date else the selected day will be excluded
-		$user_date_to = $_GET['date_to'] + 60 * 60 * 24;
+		// add 23:59:59 hrs to user given date else the selected day will be excluded
+		$user_date_to = $_GET['date_to'] + 60 * 60 * 24 - 1;
 	}
 	
 	// If user has chosen a predefined option, set the values of $_GET array

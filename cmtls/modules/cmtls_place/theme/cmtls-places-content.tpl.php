@@ -24,6 +24,8 @@
 		</div>
 	
 		<?php print $filter; ?>
+		
+		<?php print $tags; ?>
 
 	</div> <!-- content-toolbar -->
    

@@ -114,7 +114,9 @@ function cmtls_user_default_permissions() {
   // Exported permission: administer google analytics
   $permissions['administer google analytics'] = array(
     'name' => 'administer google analytics',
-    'roles' => array(),
+    'roles' => array(
+      '0' => 'admin',
+    ),
   );
 
   // Exported permission: administer hierarchy
@@ -240,7 +242,8 @@ function cmtls_user_default_permissions() {
     'name' => 'create child nodes',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
+      '1' => 'anonymous user',
+      '2' => 'authenticated user',
     ),
   );
 
@@ -343,7 +346,8 @@ function cmtls_user_default_permissions() {
     'name' => 'edit own node parents',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
+      '1' => 'anonymous user',
+      '2' => 'authenticated user',
     ),
   );
 

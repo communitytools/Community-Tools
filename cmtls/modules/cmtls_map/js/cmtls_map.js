@@ -17,37 +17,32 @@ Drupal.behaviors.cmtls_map = function(context)
 			{
 				var map = data.openlayers;
 				var hoverControl = null
+				var layer = map.getLayersByName('cmtls_features')[0];
 				
-				for(var i in map.layers)
+				for(var j in layer.features)
 				{
-					if(map.layers[i].drupalID)
+					if(layer.features[j].cluster)
 					{
-						for(var j in map.layers[i].features)
+						if(layer.features[j].cluster)
 						{
-							if(map.layers[i].features[j].cluster)
+							for(var k = 0; k < layer.features[j].cluster.length; k++)
 							{
-								if(map.layers[i].features[j].cluster)
+								if(layer.features[j].cluster[k].drupalFID && layer.features[j].cluster[k].drupalFID == id)
 								{
-									for(var k = 0; k < map.layers[i].features[j].cluster.length; k++)
-									{
-										if(map.layers[i].features[j].cluster[k].drupalFID && map.layers[i].features[j].cluster[k].drupalFID == id)
-										{
-											hoverControl = map.getControl('cmtls_map_feature_hover_control');
-										}										
-									}
-								}
-							}
-							else if(map.layers[i].features[j].drupalFID && map.layers[i].features[j].drupalFID == id)
-							{
-								hoverControl = map.getControl('cmtls_map_feature_hover_control');
-							}
-							
-							if(hoverControl)
-							{
-								hoverControl.select(map.layers[i].features[j]);
-								return false;
+									hoverControl = map.getControl('cmtls_map_feature_hover_control');
+								}										
 							}
 						}
+					}
+					else if(layer.features[j].drupalFID && layer.features[j].drupalFID == id)
+					{
+						hoverControl = map.getControl('cmtls_map_feature_hover_control');
+					}
+					
+					if(hoverControl)
+					{
+						hoverControl.select(layer.features[j]);
+						return false;
 					}
 				}
 			}
@@ -63,37 +58,32 @@ Drupal.behaviors.cmtls_map = function(context)
 			{
 				var map = data.openlayers;
 				var hoverControl = null
+				var layer = map.getLayersByName('cmtls_features')[0];
 				
-				for(var i in map.layers)
+				for(var j in layer.features)
 				{
-					if(map.layers[i].drupalID)
+					if(layer.features[j].cluster)
 					{
-						for(var j in map.layers[i].features)
+						if(layer.features[j].cluster)
 						{
-							if(map.layers[i].features[j].cluster)
+							for(var k = 0; k < layer.features[j].cluster.length; k++)
 							{
-								if(map.layers[i].features[j].cluster)
+								if(layer.features[j].cluster[k].drupalFID && layer.features[j].cluster[k].drupalFID == id)
 								{
-									for(var k = 0; k < map.layers[i].features[j].cluster.length; k++)
-									{
-										if(map.layers[i].features[j].cluster[k].drupalFID && map.layers[i].features[j].cluster[k].drupalFID == id)
-										{
-											hoverControl = map.getControl('cmtls_map_feature_hover_control');
-										}										
-									}
-								}
-							}
-							else if(map.layers[i].features[j].drupalFID && map.layers[i].features[j].drupalFID == id)
-							{
-								hoverControl = map.getControl('cmtls_map_feature_hover_control');
-							}
-							
-							if(hoverControl)
-							{
-								hoverControl.unselect(map.layers[i].features[j]);
-								return false;
+									hoverControl = map.getControl('cmtls_map_feature_hover_control');
+								}										
 							}
 						}
+					}
+					else if(layer.features[j].drupalFID && layer.features[j].drupalFID == id)
+					{
+						hoverControl = map.getControl('cmtls_map_feature_hover_control');
+					}
+					
+					if(hoverControl)
+					{
+						hoverControl.unselect(layer.features[j]);
+						return false;
 					}
 				}
 			}
@@ -109,49 +99,44 @@ Drupal.behaviors.cmtls_map = function(context)
 			{
 				var map = data.openlayers;
 				var popupControl = null
+				var layer = map.getLayersByName('cmtls_features')[0];
 				
-				for(var i in map.layers)
+				for(var j in layer.features)
 				{
-					if(map.layers[i].drupalID)
+					var k = 0;
+					
+					if(layer.features[j].cluster)
 					{
-						for(var j in map.layers[i].features)
+						if(layer.features[j].cluster)
 						{
-							var k = 0;
-							
-							if(map.layers[i].features[j].cluster)
+							for(k = 0; k < layer.features[j].cluster.length; k++)
 							{
-								if(map.layers[i].features[j].cluster)
+								if(layer.features[j].cluster[k].drupalFID && layer.features[j].cluster[k].drupalFID == id)
 								{
-									for(k = 0; k < map.layers[i].features[j].cluster.length; k++)
-									{
-										if(map.layers[i].features[j].cluster[k].drupalFID && map.layers[i].features[j].cluster[k].drupalFID == id)
-										{
-											popupControl = map.getControl('cmtls_map_pop_control');
-											break;
-										}										
-									}
-								}
-							}
-							else if(map.layers[i].features[j].drupalFID && map.layers[i].features[j].drupalFID == id)
-							{
-								popupControl = map.getControl('cmtls_map_pop_control');
-							}
-							
-							if(popupControl)
-							{
-								popupControl.select(map.layers[i].features[j]);
-								
-								if(map.layers[i].features[j].cluster)
-								{
-									$('.cmtls-map-popup-content').addClass('hidden');
-									$('#cmtls-map-popup-content-' + id).removeClass('hidden');
-									
-									$('#cmtls-map-popup-pager-' + map.layers[i].features[j].id.replace(/\./g, '-')).children('.cmtls-map-popup-pager-current').text(k + 1);
-								}
-								
-								return false;
+									popupControl = map.getControl('cmtls_map_pop_control');
+									break;
+								}										
 							}
 						}
+					}
+					else if(layer.features[j].drupalFID && layer.features[j].drupalFID == id)
+					{
+						popupControl = map.getControl('cmtls_map_pop_control');
+					}
+					
+					if(popupControl)
+					{
+						popupControl.select(layer.features[j]);
+						
+						if(layer.features[j].cluster)
+						{
+							$('.cmtls-map-popup-content').addClass('hidden');
+							$('#cmtls-map-popup-content-' + id).removeClass('hidden');
+							
+							$('#cmtls-map-popup-pager-' + layer.features[j].id.replace(/\./g, '-')).children('.cmtls-map-popup-pager-current').text(k + 1);
+						}
+						
+						return false;
 					}
 				}
 			}
@@ -169,8 +154,55 @@ Drupal.behaviors.cmtls_map_behavior_add_object = function (context)
 		
 		if (data && data.map.behaviors['cmtls_map_behavior_add_object'])
 		{
+			// OL control class for cmtls map tools
+			OpenLayers.Control.Panel.CMTLSPanel = OpenLayers.Class(OpenLayers.Control.Panel,
+			{
+		    	autoActivate: true,
+				redrawi: 0,
+				redraw: function()
+				{
+					this.redrawi++;
+					
+					var $div = $(this.div);
+					
+					if (this.active)
+					{
+						for (var i = 0, len = this.controls.length; i < len; i++)
+						{
+							var control = this.controls[i];
+							var $element = $(control.panel_div);
+							
+							if(this.redrawi == 1)
+							{
+								$element.text($element.attr('title'));
+								
+								if(control.ui_button_options)
+								{
+									$element.button(control.ui_button_options);
+								}
+								
+								$div.append($element);
+								$div.buttonset();
+							}
+						
+							if (this.controls[i].active)
+							{
+								$element.addClass('selected');
+							}
+							else
+							{
+								$element.removeClass('selected');
+							}    
+						}
+					}
+				},
+				
+				CLASS_NAME: 'OpenLayers.Control.Panel.CMTLSPanel'
+			});
+			
 			var map = data.openlayers;
 			
+			// layer to add features
 			var layer = new OpenLayers.Layer.Vector(
 				Drupal.t('Temporary Features Layer'),
 				{
@@ -179,64 +211,222 @@ Drupal.behaviors.cmtls_map_behavior_add_object = function (context)
 				}
 			);
 			
-			data.openlayers.addLayer(layer);
+			// add the feature adding layer to the map
+			map.addLayer(layer);
 			
+			// event for adding a feature on the map
+			layer.events.register('featureadded', this, function(args)
+			{
+				$('#cmtls-map-tooltip').remove();
+				
+				var coords = args.feature.geometry.getBounds().getCenterLonLat();
+				var layer = args.object;
+			
+				coords.transform(
+					layer.map.getProjectionObject(),
+					new OpenLayers.Projection('EPSG:4326')
+				);
+				
+				var $button = $('#add-node-button');
+				
+				if($button.length > 0)
+				{
+					var href = $button.attr('href');
+					
+					$button.attr('href', href + '?lat=' + coords.lat + '&lon=' + coords.lon);
+					$button.click();
+					
+					$button.attr('href', href);
+					
+					//args.feature.destroyMarker();
+					args.feature.destroy();
+				}
+			});
+			
+			// button for adding features
 			var drawfeature_control = new OpenLayers.Control.DrawFeature(
 				layer,
 				OpenLayers.Handler.Point,
 				{
-					'displayClass': 'olControlDrawFeaturePoint',
-					'title': '+ '+Drupal.t('Add point')
+					displayClass: 'olControlDrawFeaturePoint',
+					title: Drupal.t('Add point'),
+					ui_button_options: {icons: {primary:'ui-icon-plus'}},
 				}
 			);
 			
-			var panel = new OpenLayers.Control.Panel();
-			
-			panel.addControls([new OpenLayers.Control.Navigation(
-				{'title': Drupal.t('Move map')}),
-				drawfeature_control
-			]);
-			
-			panel.defaultControl=panel.controls[0];
-			
-			for (var i = 0; i < panel.controls.length; i++)
+			// when the add feature becomes active show tooltip
+			drawfeature_control.events.register('activate', this, function (args)
 			{
-				$(panel.controls[i].panel_div).text(panel.controls[i].title);
-			}
+				$('div.olMapViewport').append('<div id="cmtls-map-tooltip">' + Drupal.t('Click on the map to add new point') + '</div>');
+			});
 			
-			layer.events.register('featureadded', this, addNode);
+			drawfeature_control.events.register('deactivate', this, function (args)
+			{
+				$('#cmtls-map-tooltip').remove();
+			});
+			
+			// button to show the layer switcher
+			var layersButton = new OpenLayers.Control(
+			{
+				type: OpenLayers.Control.TYPE_TOGGLE,
+				title: Drupal.t('Layers'),
+				ui_button_options: {icons: {primary:'ui-icon-grip-dotted-horizontal'}},
+				displayClass: 'something-something',
+				autoActivate: false,
+				activate: function ()
+				{
+					//console.log('activate');
+					$('#cmtls-map-layer-switcher').removeClass('hidden');
+			        return OpenLayers.Control.prototype.activate.apply(this, arguments);
+					
+				},
+				deactivate: function ()
+				{
+					//console.log('deactivate');
+					$('#cmtls-map-layer-switcher').addClass('hidden');
+			        return OpenLayers.Control.prototype.deactivate.apply(this, arguments);
+				}
+			});
+			
+			// the cmtls tools instance
+			var panel = new OpenLayers.Control.Panel.CMTLSPanel();
+			
+			panel.addControls([new OpenLayers.Control.Navigation({title: Drupal.t('Move'), ui_button_options: {icons: {primary:'ui-icon-arrow-4'}}}), drawfeature_control, layersButton]);
+			panel.defaultControl = panel.controls[0];
 			
 			data.openlayers.addControl(panel);
-			panel.activate();
-			panel.redraw();
 			
+			// layer switcher tags toggle
+			$('.cmtls-layer-switch-tag').live('change', function ()
+			{
+				var $this = $(this);
+				var checked = $this.attr('checked');
+				
+				var data = $('#openlayers-map-auto-id-0').data('openlayers');
+				
+				if (data && data.map.behaviors['cmtls_map_behavior_popup'])
+				{
+					var map = data.openlayers;
+					
+					var layer = map.getLayersByName('cmtls_features')[0];
+					
+					if(layer.features)
+					{
+						var aid = $(this).attr('data-aid');
+						var $tags = $('.cmtls-layer-switch-tag[data-aid="' + aid + '"][data-tid]');
+						
+						for(var i in layer.features)
+						{
+							var feature = layer.features[i];
+							
+							if(feature.attributes && feature.attributes.aid && feature.attributes.aid == aid && feature.attributes.taxonomy)
+							{
+								var taxonomy = feature.attributes.taxonomy;
+								
+								var show = true;
+								
+								for(var j in taxonomy)
+								{
+									if($tags.filter('[data-tid="' + j + '"]').attr('checked'))
+									{
+										show = true;
+										break;
+									}
+									else
+									{
+										show = false;
+									}
+								}
+								
+								if(show && (feature.style.display != 'none' || feature.style.display != 'undefined'))
+								{
+									feature.style.display = 'block';
+									layer.drawFeature(feature);
+								}
+								else if(feature.style.display == 'block' || feature.style.display != 'undefined')
+								{
+									feature.style.display = 'none';
+									layer.drawFeature(feature);
+								}
+							}
+						}
+							
+					}
+				}
+				
+				return false;
+			});
+			
+			// layer switcher app toggle
+			$('.cmtls-layer-switch-app').live('change', function ()
+			{
+				var $this = $(this);
+				var checked = $this.attr('checked');
+				
+				var data = $('#openlayers-map-auto-id-0').data('openlayers');
+				
+				if (data && data.map.behaviors['cmtls_map_behavior_popup'])
+				{
+					var map = data.openlayers;
+					
+					var layer = map.getLayersByName('cmtls_features')[0];
+					
+					if(layer.features)
+					{
+						var aid = $this.attr('data-aid');
+						var $tags = $('.cmtls-layer-switch-tag[data-aid="' + aid + '"][data-tid]');
+						
+						for(var i in layer.features)
+						{
+							var feature = layer.features[i]
+							if(feature.attributes && feature.attributes.aid && feature.attributes.aid == aid)
+							{
+								var show = true;
+								
+								if(checked && feature.attributes.taxonomy)
+								{
+									var taxonomy = feature.attributes.taxonomy;
+									
+									for(var j in taxonomy)
+									{
+										if($tags.filter('[data-tid="' + j + '"]').attr('checked'))
+										{
+											show = true;
+											break;
+										}
+										else
+										{
+											show = false;
+										}
+									}
+								}
+								
+								if(checked)
+								{
+									$tags.attr('disabled', false);
+									if(show && (feature.style.display != 'none' || feature.style.display != 'undefined'))
+									{
+										feature.style.display = 'block';
+										layer.drawFeature(feature);
+									}
+								}
+								else
+								{
+									$tags.attr('disabled', true);
+									if(feature.style.display == 'block' || feature.style.display != 'undefined')
+									{
+										feature.style.display = 'none';
+										layer.drawFeature(feature);
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				return false;
+			});
 		}
-	}
-}
-
-function addNode(args)
-{
-	var coords = args.feature.geometry.getBounds().getCenterLonLat();
-	var layer = args.object;
-
-	coords.transform(
-		layer.map.getProjectionObject(),
-		new OpenLayers.Projection('EPSG:4326')
-	);
-	
-	var $button = $('#add-node-button');
-	
-	if($button.length > 0)
-	{
-		var href = $button.attr('href');
-		
-		$button.attr('href', href + '?lat=' + coords.lat + '&lon=' + coords.lon);
-		$button.click();
-		
-		$button.attr('href', href);
-		
-		args.feature.destroyMarker();
-		args.feature.destroy();
 	}
 }
 
@@ -348,3 +538,5 @@ function mapResize()
 		$('#openlayers-map-auto-id-0').width(olmap_width).height(olmap_height);
 	}
 }
+
+

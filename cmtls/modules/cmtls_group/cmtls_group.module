@@ -397,22 +397,23 @@ function cmtls_group_join_confirm_submit($form, &$form_state)
         while ($admin = db_fetch_object($res))
         {
         	profile_load_profile($admin);
+	    	$admin_lang = user_preferred_language($admin);
 
 			$message = array(
 				'subject' => variable_get('site_name', 'CT').' - '.t('Application to join group').': '.$group->title,
 				'body' =>
-					t('User !username (!profilelink) requested to join group !groupname (!grouplink)',array(
+					t('User !username (!profilelink) requested to join group !groupname (!grouplink)', array(
 						'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $user->name), 'value' => (object)array('raw' => $user->profile_cmtls_member_name), 'uid' => (object)array('raw' => $user->uid))),
 						'!userlink' => url('cmtls/'.$main_group->nid.'/member/'.$user->uid, array('absolute' => TRUE)),
 						'!group' => $group->title,
 						'!grouplink' => url('cmtls/'.$group->nid, array('absolute' => TRUE)),
-					))."\n".
-					t('Approve').': '.url('cmtls/'.$group->nid.'/join/'.$user->uid.'/approve', array('absolute' => TRUE))."\n".
-					t('Deny').': '.url('cmtls/'.$group->nid.'/join/'.$user->uid.'/deny', array('absolute' => TRUE))."\n".
-					t('In self defence wrote').': '.$form_state['values']['request']."\n",
+					), $admin_lang->language)."\n".
+					t('Approve').': '.url('cmtls/'.$group->nid.'/join/'.$user->uid.'/approve', array('absolute' => TRUE), $admin_lang->language)."\n".
+					t('Deny').': '.url('cmtls/'.$group->nid.'/join/'.$user->uid.'/deny', array('absolute' => TRUE), $admin_lang->language)."\n".
+					t('In self defence wrote', NULL, $admin_lang->language).': '.$form_state['values']['request']."\n",
 			);
 
-			drupal_mail('cmtls', 'cmtls_mail', $admin->mail, user_preferred_language($admin), $message);
+			drupal_mail('cmtls', 'cmtls_mail', $admin->mail, $admin_lang, $message);
         }
 
 		modalframe_close_dialog(array(
@@ -633,23 +634,24 @@ function cmtls_group_og_approve($group, $account)
         while ($admin = db_fetch_object($res)) if($admin->uid != $user->uid)
         {
         	profile_load_profile($admin);
+	    	$admin_lang = user_preferred_language($admin);
 
 			$message = array(
 				'subject' => t('!sitename - Application to join group !groupname approved',array(
 					'!sitename' => variable_get('site_name','CT'),
 					'!groupname' => $group->title,
-				)),
-				'body' => t("Admin !adminname (!admin_profilelink) approved user's !username (!user_profilelink) request to join group !groupname (!grouplink)",array(
+				), $admin_lang->language),
+				'body' => t("Admin !adminname (!admin_profilelink) approved user's !username (!user_profilelink) request to join group !groupname (!grouplink)", array(
 					'!adminname' => _cmtls_member_name(array('name' => (object)array('raw' => $admin->name), 'value' => (object)array('raw' => $admin->profile_cmtls_member_name), 'uid' => (object)array('raw' => $admin->uid))),
 					'!admin_profilelink' => url('cmtls/'.$main_group->nid.'/member/'.$admin->uid, array('absolute' => TRUE)),
 					'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid))),
 					'!user_profilelink' => url('cmtls/'.$main_group->nid.'/member/'.$account->uid, array('absolute' => TRUE)),
 					'!groupname' => $group->title,
 					'!grouplink' => url('cmtls/'.$group->nid.'/', array('absolute' => TRUE)),
-				))."\n",
+				), $admin_lang->language)."\n",
 			);
 
-			drupal_mail('cmtls', 'cmtls_mail', $admin->mail, user_preferred_language($admin), $message);
+			drupal_mail('cmtls', 'cmtls_mail', $admin->mail, $admin_lang, $message);
         }
 
         // notify member about approval
@@ -688,40 +690,43 @@ function cmtls_group_og_deny($group, $account)
     while ($admin = db_fetch_object($res)) if($admin->uid != $user->uid)
     {
     	profile_load_profile($admin);
+    	$admin_lang = user_preferred_language($admin);
 
 		$message = array(
 			'subject' => t('!sitename - Application to join group !groupname rejected',array(
 				'!sitename' => variable_get('site_name','CT'),
 				'!groupname' => $group->title,
-			)),
-			'body' => t("Admin !adminname (!admin_profilelink) rejected user's !username (!user_profilelink) request to join group !groupname (!grouplink)",array(
+			), $admin_lang->language),
+			'body' => t("Admin !adminname (!admin_profilelink) rejected user's !username (!user_profilelink) request to join group !groupname (!grouplink)", array(
 				'!adminname' => _cmtls_member_name(array('name' => (object)array('raw' => $admin->name), 'value' => (object)array('raw' => $admin->profile_cmtls_member_name), 'uid' => (object)array('raw' => $admin->uid))),
 				'!admin_profilelink' => url('cmtls/'.$main_group->nid.'/member/'.$admin->uid, array('absolute' => TRUE)),
 				'!username' => _cmtls_member_name(array('name' => (object)array('raw' => $account->name), 'value' => (object)array('raw' => $account->profile_cmtls_member_name), 'uid' => (object)array('raw' => $account->uid))),
 				'!user_profilelink' => url('cmtls/'.$main_group->nid.'/member/'.$account->uid, array('absolute' => TRUE)),
 				'!groupname' => $group->title,
 				'!grouplink' => url('cmtls/'.$group->nid.'/', array('absolute' => TRUE)),
-			))."\n",
+			), $admin_lang->language)."\n",
 		);
 
-		drupal_mail('cmtls', 'cmtls_mail', $admin->mail, user_preferred_language($admin), $message);
+		drupal_mail('cmtls', 'cmtls_mail', $admin->mail, $admin_lang, $message);
     }
 
     // notify member about denial
+   	$account_lang = user_preferred_language($account);
+   	
 	$message = array(
 		'subject' => t('!sitename - Application to join group !groupname rejected',array(
 			'!sitename' => variable_get('site_name','CT'),
 			'!groupname' => $group->title,
-		)),
+		), $account_lang->language),
 		'body' => t("Admin !adminname (!admin_profilelink) rejected your request to join group !groupname (!grouplink)",array(
 			'!adminname' => _cmtls_member_name(array('name' => (object)array('raw' => $admin->name), 'value' => (object)array('raw' => $admin->profile_cmtls_member_name), 'uid' => (object)array('raw' => $admin->uid))),
 			'!admin_profilelink' => url('cmtls/'.$main_group->nid.'/member/'.$admin->uid, array('absolute' => TRUE)),
 			'!groupname' => $group->title,
 			'!grouplink' => url('cmtls/'.$group->nid.'/', array('absolute' => TRUE)),
-		))."\n",
+		), $account_lang->language)."\n",
 	);
 
-	drupal_mail('cmtls', 'cmtls_mail', $account->mail, user_preferred_language($account), $message);
+	drupal_mail('cmtls', 'cmtls_mail', $account->mail, $account_lang, $message);
 
 	drupal_goto('cmtls/'.$group->nid.'/members');
 }

@@ -283,7 +283,7 @@ function cmtls_gallery_views_default_views() {
       'breadcrumb' => '',
       'default_argument_type' => 'fixed',
       'default_argument' => '',
-      'validate_type' => 'node',
+      'validate_type' => 'none',
       'validate_fail' => 'not found',
       'break_phrase' => 1,
       'not' => 0,
@@ -305,18 +305,27 @@ function cmtls_gallery_views_default_views() {
         'cmtls_article' => 0,
         'cmtls_dashboard' => 0,
         'cmtls_event' => 0,
-        'cmtls_forum' => 0,
-        'cmtls_thread' => 0,
         'cmtls_album' => 0,
         'cmtls_album_object' => 0,
         'cmtls_group' => 0,
+        'cmtls_idea' => 0,
         'cmtls_member' => 0,
+        'cmtls_place' => 0,
+        'cmtls_problem' => 0,
+        'cmtls_forum' => 0,
+        'cmtls_thread' => 0,
         'page' => 0,
         'story' => 0,
       ),
       'validate_argument_node_access' => 0,
       'validate_argument_nid_type' => 'nid',
-      'validate_argument_vocabulary' => array(),
+      'validate_argument_vocabulary' => array(
+        '2' => 0,
+        '1' => 0,
+        '3' => 0,
+        '5' => 0,
+        '4' => 0,
+      ),
       'validate_argument_type' => 'tid',
       'validate_argument_transform' => 0,
       'validate_user_restrict_roles' => 0,
@@ -330,7 +339,7 @@ function cmtls_gallery_views_default_views() {
       ),
     ),
   ));
-  $handler->override_option('items_per_page', 10);
+  $handler->override_option('items_per_page', 14);
   $handler->override_option('block_description', '');
   $handler->override_option('block_caching', -1);
 

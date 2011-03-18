@@ -157,10 +157,6 @@ Drupal.cmtls = function ()
 								// init the context menus
 								$('.context_anchor').contextMenu();
 								
-								// init addthis buttons
-								addthis.button('.addthis_button');
-								addthis.toolbox('#text-container');
-
 								nextPage++;
 
 								if(nextPage < Drupal.settings.cmtls.pager.totalPages)
@@ -173,16 +169,23 @@ Drupal.cmtls = function ()
 								{
 									$('#cmtls-pager').addClass('hidden');
 								}
+								
+								// init addthis buttons
+								addthis.button('.addthis_button');
+								addthis.toolbox('#text-container');
 							}
 
 							// TODO: this function should be in cmtls_map module
 							if(data.features)
 							{
 								var map = $('#openlayers-map-auto-id-0').data('openlayers');
-
+								
 								if(map)
 								{
 									map = map.openlayers;
+									
+									var layer = map.getLayersByName('cmtls_features');
+									layer = layer[0];
 
 									var features = [];
 
@@ -194,25 +197,9 @@ Drupal.cmtls = function ()
 										features[layerKey][i] = data.features[i];
 									}
 
-									for(var i in map.layers)
-									{
-										if(map.layers[i].drupalID && features[map.layers[i].drupalID])
-										{
-											//console.log(map.layers[i].strategies);
-											//var cluster = map.layers[i].strategies[0];
-
-											//cluster.deactivate();
-											//map.layers[i].redraw(true);
-											//cluster.clearCache();
-
-											Drupal.openlayers.addFeatures(map, map.layers[i], features[map.layers[i].drupalID]);
-											Drupal.behaviors.openlayers_zoomtolayer($('#openlayers-map-auto-id-0'));
-
-											//cluster.features = map.layers[i].features.slice();
-											//cluster.activate();
-											//cluster.cluster();
-										}
-									}
+									Drupal.openlayers.addFeatures(map, layer, data.features);
+									
+									if(Drupal.behaviors.openlayers_zoomtolayer) Drupal.behaviors.openlayers_zoomtolayer($('#openlayers-map-auto-id-0'));
 								}
 							}
 

@@ -60,9 +60,8 @@ $current_app = _cmtls_app_get_current($current_group);
 		<?php if (is_array($node->taxonomy)): ?>
 			<?php if (count($node->taxonomy) > 0): ?>
 				<div class="meta-tags">
-					<?php print t('Tagged').': '; ?>
 					<?php foreach ($node->taxonomy as $term): ?>
-						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' .  $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php if ($i < count($node->taxonomy) - 1) print ', '; $i++; ?>
+						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' .  $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php $i++; ?>
 					<?php endforeach; ?>
 				</div> <!-- meta-tags -->
 				&middot;
@@ -71,7 +70,9 @@ $current_app = _cmtls_app_get_current($current_group);
 
 		<?php print l($fields['comment_count']->raw ? format_plural($fields['comment_count']->raw,'1 comment','@count comments') : t('Comment'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/article/'.$fields['nid']->raw, array('attributes' => array('class' => 'comments-button cmtls-comment-toggle-button', 'id' => 'cmtls-comments-toggle-button-'.$fields['nid']->raw))); ?>
 
-		&middot; <a class="stance-button" href=""><?php print $node->stances->sorted_count[1] + $node->stances->sorted_count[2] ? $node->stances->sorted_count[1] . ' ' . t('for') . ' / ' . $node->stances->sorted_count[2] . ' ' . t('against') :  t('Vote'); ?></a>
+		&middot;
+		
+		<?php print l($node->stances->sorted_count[1] + $node->stances->sorted_count[2] ? $node->stances->sorted_count[1] . ' ' . t('for') . ' / ' . $node->stances->sorted_count[2] . ' ' . t('against') :  t('Vote'), '', array('attributes' => array('class' => 'stance-button', 'rel' => '#stance-container-'.$fields['nid']->raw))); ?>
 
 		&middot; <div class="meta-share"><?php print $sm_share_buttons; ?></div>
 
@@ -91,9 +92,8 @@ $current_app = _cmtls_app_get_current($current_group);
 		<?php if (is_array($node->taxonomy)): ?>
 			<?php if (count($node->taxonomy) > 0): ?>
 				<div class="meta-tags">
-					<?php /* print t('Tagged').': '; */ ?>
 					<?php foreach ($node->taxonomy as $term): ?>
-						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php if ($i < count($node->taxonomy) - 1) print ', '; $i++; ?>
+						<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php $i++; ?>
 					<?php endforeach; ?>
 				</div> <!-- meta-tags -->
 			<?php endif; ?>

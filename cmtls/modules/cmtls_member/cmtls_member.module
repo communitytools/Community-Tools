@@ -232,7 +232,7 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 			$form['picture'] = NULL;
 			$form['account'] = NULL;
 			$form['theme_select'] = NULL;
-			$form['locale'] = NULL;
+			//$form['locale'] = NULL;
 
 			$form['profile_cmtls_member_address']['#title'] = t('Address');
 			$form['profile_cmtls_member_phone']['#title'] = t('Phone');
@@ -441,6 +441,42 @@ function _cmtls_member_name($fields, $link_to_member = FALSE, $shorten = FALSE)
 	{
 		$current_group = _cmtls_group_get_current();
 		$name = l($name, 'cmtls/'.$current_group->nid.'/member/'.$fields['uid']->raw);
+	}
+
+	return $name;
+}
+
+function cmtls_member_name($account, $link_to_member = FALSE, $shorten = FALSE)
+{
+	if($account->profile_cmtls_member_name)
+	{
+		$name = $account->profile_cmtls_member_name;
+	}
+	else 
+	{
+		$name = $account->name;
+	}
+	
+	if($shorten)
+	{
+		$name = explode(' ', $name);
+		if(sizeof($name) > 1)
+		{
+			$last_fragment = array_pop($name);
+			$name = implode(' ', $name).' '.$last_fragment[0].'.';
+		}
+		else
+		{
+			$name = $fields['value']->raw;
+		}
+	}
+	
+	$name = check_plain($name);
+
+	if($link_to_member)
+	{
+		$current_group = _cmtls_group_get_current();
+		$name = l($name, 'cmtls/'.$current_group->nid.'/member/'.$account->uid);
 	}
 
 	return $name;
@@ -756,5 +792,67 @@ function cmtls_member_preprocess_cmtls_members_content(&$vars)
 		}
 		
 		$vars['member_filter_letters'] = $letters;
+	}
+}
+
+function cmtls_member_send_email_form(&$form_state, $settings = array())
+{
+	$form['from_uid'] = array(
+		'#type' => 'value',
+		'#value' => $settings['from'],
+	);
+	
+	$form['to_uids'] = array(
+		'#type' => 'value',
+		'#value' => $settings['to'],
+	);
+	
+	$form['subject'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Subject'),
+		'#required' => TRUE,
+	);
+	
+	$form['content'] = array(
+		'#type' => 'textarea',
+		'#title' => t('Content'),
+		'#required' => TRUE,
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Send'),
+	);
+
+	$form['#submit'] = array(
+		'cmtls_member_send_email_form_submit',
+		'cmtls_forms_submit', // closes the modalframe
+	);
+	
+	return $form;
+}
+
+function cmtls_member_send_email_form_submit($form, &$form_state)
+{
+	$account = user_load($form_state['values']['from_uid']);
+	$from = $account->mail;
+	
+	$site_name = variable_get('site_name', 'CT');
+    	
+	foreach ($form_state['values']['to_uids'] as $uid)
+	{
+		$to = user_load($uid);
+		
+		if($to->uid && $to->uid != $account->uid)
+		{
+			$message = array(
+				'subject' => $site_name.' - '. $form_state['values']['subject'],
+				'body' => $form_state['values']['content'].
+					"\n".'---'."\n".
+					$site_name."\n",
+			);
+			
+			drupal_mail('cmtls', 'cmtls_mail', $to->mail, user_preferred_language($to), $message, $from);
+		}
 	}
 }

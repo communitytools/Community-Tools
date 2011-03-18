@@ -103,6 +103,10 @@ function cmtls_profile_modules()
 		// CAPTCHA
 		'captcha',
 		'image_captcha',
+		
+		// Feeds
+		'feeds',
+		'job_scheduler'
 
 		// Things general user never sees.
 		//'admin_menu',
@@ -144,6 +148,7 @@ function _cmtls_additional_modules()
 		'cmtls_comment',
 		'cmtls_stance',
 		'cmtls_filter',
+		'cmtls_feed',
 
 		// cmtls apps
 		'cmtls_dashboard',
@@ -153,6 +158,7 @@ function _cmtls_additional_modules()
 		'cmtls_gallery',
 		'cmtls_idea',
 		'cmtls_problem',
+		'cmtls_place',
 	);
 }
 
@@ -319,7 +325,8 @@ function cmtls_profile_tasks(&$task, $url)
 		db_query("INSERT INTO {nodehierarchy} VALUES (1, 0, 0)");
 		db_query("INSERT INTO {og} VALUES (1, 0, 'Main group', '', 0, 0, '', 0)");
 		db_query("INSERT INTO {og_uid} VALUES (1, 0, 1, 1, 1, NOW(), NOW())");
-
+		
+	    file_create_path(variable_get('user_picture_path', 'pictures'));
 	}
 	return $output;
 }

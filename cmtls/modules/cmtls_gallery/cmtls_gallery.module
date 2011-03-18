@@ -444,16 +444,17 @@ function cmtls_gallery_folder_preprocess_fields_vars($vars)
 		default:
 			$icon_name = (isset($file_types[$file_extension]) and isset($file_types[$file_extension]['icon'])) ? $file_types[$file_extension]['icon'] : strtolower($file_extension).'.png';
 
+			global $base_url; // cant use url() because the language prefix
 			// Try to get icon for the file
 			if(file_exists(dirname(__FILE__).'/icons/'.$icon_name)){
-				$icon = url(drupal_get_path('module','cmtls_gallery').'/icons/'.$icon_name);
+				$icon = $base_url.'/'.drupal_get_path('module','cmtls_gallery').'/icons/'.$icon_name;
 			}else{
 				// Try to get generic icon for file type
 				if(file_exists(dirname(__FILE__).'/icons/'.$file_types[$file_extension]['type'].'.png')){
-					$icon = url(drupal_get_path('module','cmtls_gallery').'/icons/'.$file_types[$file_extension]['type'].'.png');
+					$icon = $base_url.'/'.drupal_get_path('module','cmtls_gallery').'/icons/'.$file_types[$file_extension]['type'].'.png';
 				// Use default icon for file
 				}else{
-					$icon = url(drupal_get_path('module','cmtls_gallery').'/icons/default.png');
+					$icon = $base_url.'/'.drupal_get_path('module','cmtls_gallery').'/icons/default.png';
 				}
 			}
 
@@ -756,7 +757,20 @@ function cmtls_gallery_cmtls_dashboard_block_content($group, $app)
 	$result = db_query('SELECT nodehierarchy.nid FROM {nodehierarchy} nodehierarchy WHERE nodehierarchy.parent = %d ORDER BY order_by', $app->nid);
 	while($row = db_fetch_array($result))
 	{
-		$folders[] = $row['nid'];
+		$node = node_load($row['nid']);
+		if($node->nid)
+		{
+			$folders[] = $row['nid'];
+		}
+	}
+	
+	if(sizeof($folders))
+	{
+		return views_embed_view('cmtls_album', 'block_1', implode('+', $folders));
+	}
+	else 
+	{
+		return '';
 	}
 	
 	$arguments = array(

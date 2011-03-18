@@ -91,7 +91,12 @@ function cmtls_article_cmtls_app_config($config)
 {
 	$settings = array_merge(cmtls_article_cmtls_app_config_defaults(), (array)$config['cmtls_article']);
 
-	//printr($settings);
+	$form['cmtls_article'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Sorting settings'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
 
 	$form['cmtls_article']['sorting_field'] = array(
 		'#type' => 'radios',
@@ -457,4 +462,23 @@ function cmtls_article_cmtls_group_overview($app)
 	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;	
 	
 	return $return;
+}
+
+function cmtls_article_cmtls_feed_config()
+{
+	return array(
+		'cmtls_article' => array(
+			'importer_id' => 'cmtls_articles_rss_feed',
+		),
+	);
+}
+
+function cmtls_article_feeds_get_importer_id_from_node(&$node)
+{
+	if($node->type == 'cmtls_app' && ($node->field_cmtls_app_type[0]['value'] == 'cmtls_article' || $node->app_type == 'cmtls_article'))
+	{
+		return 'cmtls_articles_rss_feed';
+	}
+	
+	return NULL;
 }

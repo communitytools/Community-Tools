@@ -5,8 +5,7 @@
 }
 
 	.cmtls-dashboard-container .text-node {
-		border-top: 1px solid #E7E7E7;
-		border-bottom: none;
+		border: none;
 		min-width: 500px;
 	}
 
