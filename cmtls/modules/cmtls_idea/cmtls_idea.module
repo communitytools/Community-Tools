@@ -139,16 +139,6 @@ function cmtls_idea_menu()
 		'type' => MENU_CALLBACK,
 	);
 
-	$items['cmtls/%node/%node/idea/tag/%'] = array(
-		'title callback' => 'cmtls_page_title',
-		'title arguments' => array(2),
-		'page callback' => 'cmtls_idea_page_taxonomy',
-		'page arguments' => array(1, 2, 5),
-		'access callback' => 'node_access',
-		'access arguments' => array('view', 2),
-		'type' => MENU_CALLBACK,
-	);
-
 	return $items;
 }
 
@@ -160,18 +150,6 @@ function cmtls_ideas_page($app_id)
 	}
 
 	return theme('cmtls_ideas_content', $app_id);
-}
-
-/**
- * ideas filtered by taxonomy term/tag view
- *
- * @param node $group
- * @param node $app
- * @param string $taxonomy
- * @return string
- */
-function cmtls_idea_page_taxonomy($group, $app, $taxonomy) {
-	return views_embed_view('cmtls_ideas', 'default', $app->nid, 'all', $taxonomy);
 }
 
 /**
@@ -524,15 +502,13 @@ function cmtls_idea_cmtls_group_overview($app)
 
 	$sql = "SELECT node.created FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_idea' ORDER BY node.nid DESC LIMIT 1";
 	$result = db_fetch_array(db_query($sql, $app->nid));
-	$time_diff = time() - $result['created'];
-	$last_posted = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	$last_posted = cmtls_format_date_ago($result['created']);
 
 	$return['posts column'] = $return['total posts'] ? format_plural($return['total posts'],'1 post','@count posts').' &middot; '.t('last').' '.$last_posted : t('No posts yet');
 
 	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
 	$result = db_fetch_array(db_query($sql, $app->nid));
-	$time_diff = time() - $result['last_comment_timestamp'];
-	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	$last_commented = cmtls_format_date_ago($result['last_comment_timestamp']);
 
 	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;
 	return $return;

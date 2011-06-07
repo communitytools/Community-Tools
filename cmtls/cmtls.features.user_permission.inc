@@ -26,6 +26,15 @@ function cmtls_user_default_permissions() {
     'roles' => array(),
   );
 
+  // Exported permission: access ckeditor
+  $permissions['access ckeditor'] = array(
+    'name' => 'access ckeditor',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'authenticated user',
+    ),
+  );
+
   // Exported permission: access comments
   $permissions['access comments'] = array(
     'name' => 'access comments',
@@ -75,6 +84,14 @@ function cmtls_user_default_permissions() {
   $permissions['administer blocks'] = array(
     'name' => 'administer blocks',
     'roles' => array(),
+  );
+
+  // Exported permission: administer ckeditor
+  $permissions['administer ckeditor'] = array(
+    'name' => 'administer ckeditor',
+    'roles' => array(
+      '0' => 'admin',
+    ),
   );
 
   // Exported permission: administer cmtls
@@ -501,15 +518,6 @@ function cmtls_user_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported permission: use wysiwyg image upload
-  $permissions['use wysiwyg image upload'] = array(
-    'name' => 'use wysiwyg image upload',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'authenticated user',
-    ),
-  );
-
   // Exported permission: view date repeats
   $permissions['view date repeats'] = array(
     'name' => 'view date repeats',
@@ -539,16 +547,6 @@ function cmtls_user_default_permissions() {
   // Exported permission: view imagecache small
   $permissions['view imagecache small'] = array(
     'name' => 'view imagecache small',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'anonymous user',
-      '2' => 'authenticated user',
-    ),
-  );
-
-  // Exported permission: view imagecache wysiwyg_imageupload_preview
-  $permissions['view imagecache wysiwyg_imageupload_preview'] = array(
-    'name' => 'view imagecache wysiwyg_imageupload_preview',
     'roles' => array(
       '0' => 'admin',
       '1' => 'anonymous user',

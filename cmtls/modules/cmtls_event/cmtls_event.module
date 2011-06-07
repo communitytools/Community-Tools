@@ -234,6 +234,13 @@ function cmtls_event_theme($existing) {
 			'template' => 'cmtls-events-content',
 			'path' => drupal_get_path('module', 'cmtls_event').'/theme',
 		),
+		// events title
+		'cmtls_event_node_title' => array (
+			'arguments' => array('node' => NULL),
+			'template' => 'cmtls-event-node-title',
+			'original hook' => 'cmtls_node_title',
+			'path' => drupal_get_path('module', 'cmtls_event') . '/theme',
+		),
 		// events view
 		'views_view__cmtls_events__default' => array (
 			'arguments' => array('view' => NULL),
@@ -575,11 +582,12 @@ function cmtls_event_horizontal_calendar($app_id)
 	FROM {content_type_cmtls_event} AS content_type_cmtls_event
 	LEFT JOIN {nodehierarchy} AS nodehierarchy ON content_type_cmtls_event.nid = nodehierarchy.nid
 	WHERE
-		(MONTH(content_type_cmtls_event.field_cmtls_event_date_value) = %d
+		((MONTH(content_type_cmtls_event.field_cmtls_event_date_value) = %d
 			AND YEAR(content_type_cmtls_event.field_cmtls_event_date_value) = %d)
 		OR
 		(MONTH(content_type_cmtls_event.field_cmtls_event_date_value2) = %d
-			AND YEAR(content_type_cmtls_event.field_cmtls_event_date_value2) = %d)
+			AND YEAR(content_type_cmtls_event.field_cmtls_event_date_value2) = %d))
+			
 		AND nodehierarchy.parent = %d";
 	
 	$result = db_query($sql, $selected_month, $selected_year, $selected_month, $selected_year, $app_id);
@@ -659,8 +667,7 @@ function cmtls_event_cmtls_group_overview($app)
 	
 	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
 	$result = db_fetch_array(db_query($sql, $app->nid));
-	$time_diff = time() - $result['last_comment_timestamp'];
-	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	$last_commented = cmtls_format_date_ago($result['last_comment_timestamp']);
 	
 	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;	
 	
@@ -712,4 +719,28 @@ function cmtls_event_send_email_page($event)
 	$output = drupal_get_form('cmtls_member_send_email_form', $settings);
 	
 	return $output;
+}
+
+function cmtls_event_date_format(&$node)
+{
+	if ($node->field_cmtls_event_lasts_all_day['0']['value'])
+	{
+		return t('Whole day');
+	}
+	
+	$current_year = date('Y');
+	
+	$start_timestamp = strtotime($node->field_cmtls_event_date[0]['value']);
+	$start_year = date('Y', $start_timestamp);
+	$start_date = date('d.m', $start_timestamp) . ($current_year != $start_year ? '.' . $start_year : '');
+	$start_time = date('H:i', $start_timestamp);
+	
+	$end_timestamp = strtotime($node->field_cmtls_event_date[0]['value2']);
+	$end_year = date('Y', $end_timestamp);
+	$end_date = date('d.m', $end_timestamp).($current_year != $end_year ? '.' . $end_year : '');
+	$end_time = date('H:i', $end_timestamp);
+	
+	$date = $start_time.' -'.($start_date != $end_date ? ' '.$end_date : NULL).($end_time != $start_time ? ' '.$end_time : NULL);
+	
+	return $date;
 }

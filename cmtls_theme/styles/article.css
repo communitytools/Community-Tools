@@ -27,6 +27,10 @@
 	-webkit-column-rule: 1px solid #ccc;
 }
 
+.node-teaser {
+	margin-bottom: 15px;
+}
+
 .node-footer {
 	font-size: 12px;
 }
@@ -55,6 +59,13 @@
 	margin-right: 1px;
 }
 
+/* Online status */
+
+.cmtls-member-online {
+	padding-left: 15px;
+	background: url("../images/member-online.png") no-repeat scroll left center transparent;
+}
+
 /* Timestamp */
 .meta-time {
 	display: inline;
@@ -71,8 +82,8 @@
 	display: inline;
 	padding: 1px 4px 2px 4px;
 	color: #555;
-	border: 1px solid #E8E8E8;
-	background: #F3F3F3;
+	border: 1px solid #efefef;
+	background: #fbfbfb;
 	font-size: 10px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
@@ -90,7 +101,7 @@
 }
 	/* Facebook like */
 	.meta-share iframe {
-		margin-bottom: -6px;
+		margin-bottom: -3px;
 	}
 
 
@@ -141,8 +152,8 @@
 .meta-file {
     background: none repeat scroll 0 0 #f2f2f2;
     border: 1px solid #E2E2E2;
-    height: 52px;
-    width: 52px;
+    height: 55px;
+    width: 55px;
     padding: 4px;
     display: inline-block;
     margin: 0 5px 8px 0;
@@ -154,8 +165,8 @@
 	}
 
 		.meta-file a img {
-			height: 52px;
-			width: 52px;
+			height: 55px;
+			width: 55px;
 		}
 
 /* Comments
@@ -486,7 +497,7 @@ a.comments-button {
 	padding: 10px 25px;
 }
 
-	#text-container .text-node:last-child {
+	.text-node:last-child {
 		border-bottom: none;
 	}
 
@@ -710,6 +721,108 @@ h1 span.date {
 #cmtls-pager-more-button.hidden {
 	display: none;
 }
+
+/* Stuff
+------------------------------------------------------------------------------- */
+
+.cmtls-stuffs-container {}
+
+	.cmtls-stuffs-container .text-node-list-item {
+		width: 220px;
+		height: 55px;
+		margin: 0 10px 10px 0;
+		padding: 10px;
+		box-shadow: 2px 2px 7px #e2e2e2;
+		-webkit-box-shadow: 2px 2px 7px #e2e2e2;
+		-moz-box-shadow: 2px 2px 7px #e2e2e2;
+		float: left;
+
+	}
+
+		.cmtls-stuffs-container .text-node-list-item .meta-files,
+		.cmtls-stuffs-container .text-node-list-item .meta-file {
+			float: left;
+			background: #F2F2F2;
+			border: none;
+			margin: 0;
+			padding: 0;
+			height: 55px;
+			width: 55px;
+		}
+	
+		.cmtls-stuffs-container .text-node-list-item ul {
+			margin: 0;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	
+			.cmtls-stuffs-container .text-node-list-item li {
+				margin-left: 10px;
+				font-size: 12px;
+				list-style-type: none;
+				padding: 3px 0 0 0;
+	
+			}
+	
+			.cmtls-stuffs-container .text-node-list-item li h1 {
+				font-size: 14px;
+			}
+
+	.cmtls-stuffs-container .text-node h1 {
+	}
+
+	.cmtls-stuffs-container .text-node .meta-tags {
+	}
+
+	.cmtls-stuffs-container .node-head .cmtls-button {
+		font-size: 10px;
+	}
+
+#cmtls-stuff-letter-area {
+	border: 1px solid #ddd;
+	background: #fff;
+	padding: 15px;
+	margin-bottom: 15px;
+}
+
+
+/*
+.cmtls-members-container .profile {
+	width: 220px;
+	height: 55px;
+	margin: 0 10px 10px 0;
+	padding: 10px;
+	box-shadow: 2px 2px 7px #e2e2e2;
+	-webkit-box-shadow: 2px 2px 7px #e2e2e2;
+	-moz-box-shadow: 2px 2px 7px #e2e2e2;
+	float: left;
+
+}
+
+	.cmtls-members-container .profile img.avatar {
+		float: left;
+	}
+
+	.cmtls-members-container .profile ul {
+		overflow: hidden;
+	}
+
+		.cmtls-members-container .profile ul li {
+			margin-left: 10px;
+			font-size: 12px;
+			list-style-type: none;
+			padding: 3px 0 0 0;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.cmtls-members-container .profile ul li.member-name {
+			font-size: 14px;
+		}
+*/		
+
 
 /* Rich Text
 -------------------------------------------------------------- */

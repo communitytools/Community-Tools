@@ -6,7 +6,7 @@
 function cmtls_place_taxonomy_default_vocabularies() {
   return array(
     'cmtls_place_keywords' => array(
-      'name' => 'place keywords',
+      'name' => 'Place keywords',
       'description' => 'Community Tools: Place keywords',
       'help' => '',
       'relations' => '1',

@@ -865,7 +865,7 @@ function cmtls_group_overview($group, $page = 'group')
 {
 	if($page == 'members' && $_POST['ajax'] == 1)
 	{
-		cmtls_ajax_response(views_embed_view('cmtls_members', 'default', $group->nid, $_GET['letter']));
+		cmtls_ajax_response(views_embed_view('cmtls_members', 'default', $group->nid, ($_GET['letter'] != t('All') ? $_GET['letter'] : NULL)));
 	}
 	
 	// Send the Modal Frame javascript for parent windows to the page.

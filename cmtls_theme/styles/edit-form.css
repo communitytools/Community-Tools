@@ -10,7 +10,9 @@ input.form-submit {
 	#user-register input#edit-submit.form-submit,
 	#user-login input#edit-submit.form-submit,
 	#user-profile-form input#edit-submit.form-submit,
-	#cmtls-map-choose-app-form input#edit-submit.form-submit {
+	#cmtls-map-choose-app-form input#edit-submit.form-submit,
+	#cmtls-stuff-send-request-form input#edit-submit.form-submit,
+	#cmtls-member-send-email-form input#edit-submit.form-submit {
 		font-size: 15px;
 		background: url("jquery.ui/images/ui-bg_green.png") repeat-x scroll 50% 50% #4CA20B;
 		color: #fff;
@@ -149,6 +151,21 @@ fieldset.collapsible {
 	display: inline-block;
 	padding-right: 10px;
 }
+
+
+/* Stuffarium */
+
+#cmtls-stuff-send-request-form {}
+
+	#cmtls-stuff-send-request-form #edit-until-wrapper label {
+		display: inline;
+	}
+
+#cmtls-stuff-accept-request-form textarea,
+#cmtls-stuff-deny-request-form textarea {
+	height: auto;
+}
+
 
 /* reposition Drupal's default ajax gif for our input height */
 .form-item input.form-autocomplete {
@@ -354,4 +371,10 @@ fieldset.collapsible {
 
 #ui-datepicker-div, #ui-datepicker-div table, .ui-datepicker-div, .ui-datepicker-div table, .ui-datepicker-inline, .ui-datepicker-inline table {
     font-size: 11px !important;
+}
+
+/* Hide CKEditor's technical notice for superuser
+-------------------------------------------------------------- */
+.textarea-identifier.description {
+	display: none;
 }

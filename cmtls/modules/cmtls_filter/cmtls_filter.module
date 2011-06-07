@@ -72,7 +72,7 @@ function cmtls_filter_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL)
 function cmtls_filter_answer_form(&$form_state, $node)
 {
 	global $user;
-
+	
 	$from_date = $node->filters->info['default values']['date from'] ? strtotime($node->filters->info['default values']['date from']) : NULL;
 	$from_to = $node->filters->info['default values']['date to'] ? strtotime($node->filters->info['default values']['date to']) : NULL;
 

@@ -250,7 +250,7 @@ Drupal.behaviors.cmtls_map_behavior_add_object = function (context)
 				{
 					displayClass: 'olControlDrawFeaturePoint',
 					title: Drupal.t('Add point'),
-					ui_button_options: {icons: {primary:'ui-icon-plus'}},
+					ui_button_options: {icons: {primary:'ui-icon-plus'}}
 				}
 			);
 			

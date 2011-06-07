@@ -4,93 +4,15 @@
  * Implements hook_install()
  * Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
  * Adds the custom menu
- * Adds wysiwyg settings
  *
  */
 function cmtls_install()
 {
-	// enable user selected translations
-	variable_set('language_negotiation', 2);
-
 	// Sets the weigth below the Views module, so the preprocessors can kick in for the views templates
 	db_query("UPDATE {system} SET weight = 11 WHERE type = 'module' AND name = '%s'", 'cmtls');
 	
 	// cmtls site menu
 	db_query("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('cmtls-site-menu', 'Community Tools: menu', 'Community Tools: menu')");
-	
-	// wysiwyg
-	$wysiwyg_settings = array(
-		1 => array(
-			'default' => '1',
-		    'user_choose' => '0',
-		    'show_toggle' => '0',
-		    'theme' => 'advanced',
-		    'language' => 'en',
-		    'buttons' => array(),
-		    'toolbar_loc' => 'top',
-		    'toolbar_align' => 'left',
-		    'path_loc' => 'bottom',
-		    'resizing' => '1',
-		    'verify_html' => '1',
-		    'preformatted' => '0',
-		    'convert_fonts_to_spans' => '1',
-		    'remove_linebreaks' => '1',
-		    'apply_source_formatting' => '0',
-		    'paste_auto_cleanup_on_paste' => '0',
-		    'block_formats' => 'p,address,pre,h2,h3,h4,h5,h6,div',
-		    'css_setting' => 'theme',
-		    'css_path' => '',
-		    'css_classes' => '',
-		),
-		2 => array(
-			'default' => '1',
-			'user_choose' => '0',
-			'show_toggle' => '0',
-			'theme' => 'advanced',
-			'language' => 'en',
-			'buttons' => array(
-				'default' => array(
-					'Bold' => '1',
-					'Italic' => '1',
-					'Strike' => '1',
-					'BulletedList' => '1',
-					'NumberedList' => '1',
-					'Outdent' => '1',
-					'Indent' => '1',
-					'Link' => '1',
-					'Source' => '1',
-					'PasteFromWord' => '1',
-					'ShowBlocks' => '1',
-					'RemoveFormat' => '1',
-					'Format' => '1',
-					'Table' => '1',
-				),
-				'drupal' => array(
-					'imgupload' => '1',
-				),
-			),
-			'toolbar_loc' => 'top',
-			'toolbar_align' => 'left',
-			'path_loc' => 'bottom',
-			'resizing' => '1',
-			'verify_html' => '1',
-			'preformatted' => '0',
-			'convert_fonts_to_spans' => '1',
-			'remove_linebreaks' => '1',
-			'apply_source_formatting' => '0',
-			'paste_auto_cleanup_on_paste' => '1',
-			'block_formats' => 'p,h2,h3,h4,h5,address,pre',
-			'css_setting' => 'theme',
-			'css_path' => '',
-			'css_classes' => '',
-		),
-	);
-	
-	db_query("INSERT INTO {wysiwyg} (format, editor, settings) VALUES ('1', 'ckeditor', '%s')", serialize($wysiwyg_settings[1]));
-	db_query("INSERT INTO {wysiwyg} (format, editor, settings) VALUES ('2', 'ckeditor', '%s')", serialize($wysiwyg_settings[2]));
-	
-	// wysiwyg image upload filter
-	db_query("INSERT INTO {filters} (format, module,delta, weight) VALUES (2, 'wysiwyg_imageupload', 0 , 10)");
 	
 	// sections
 	db_query("TRUNCATE {sections_data}");
@@ -104,6 +26,8 @@ function cmtls_install()
 	// add trigger events
 	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('nodeapi', 'insert', 'cmtls_notify_action', 2)");
 	db_query("INSERT INTO {trigger_assignments} (hook, op, aid, weight) VALUES ('comment', 'insert', 'cmtls_notify_comment_action', 2)");
+	
+	cmtls_install_wysiwyg_settings();
 }
 
 /**
@@ -117,9 +41,6 @@ function cmtls_uninstall()
 {
 	// remove site menu
 	db_query("DELETE FROM {menu_custom} WHERE menu_name = 'cmtls-site-menu'");
-	
-	// wysiwyg
-	db_query("DELETE FROM {wysiwyg} WHERE format IN ('1', '2')");
 	
 	// sections
 	db_query("DELETE FROM {sections_data} WHERE sid IN ('1', '2')");
@@ -167,4 +88,211 @@ function cmtls_update_6004(&$sandbox)
 	);
 
 	return $ret;
+}
+
+function cmtls_update_6005(&$sandbox)
+{
+	locale_system_update(array('cmtls'));
+	
+	// convert drupalwiki images to real images
+	module_load_include('inc', 'wysiwyg_imageupload', 'wysiwyg_imageupload.filter');
+	module_load_include('inc', 'wysiwyg_imageupload', 'wysiwyg_imageupload.file');
+	
+	$sql = "SELECT nid, body, teaser FROM {node_revisions} WHERE body LIKE '%[[wysiwyg_imageupload:%' OR teaser LIKE '%[[wysiwyg_imageupload:%'";
+	$result = db_query($sql);
+	while ($node = db_fetch_object($result))
+	{
+		// _wysiwyg_imageupload_filter_process
+		$node->body = _wysiwyg_imageupload_filter_process($node->body);
+		$node->teaser = _wysiwyg_imageupload_filter_process($node->teaser);
+		$sql = "UPDATE {node_revisions} SET body = '%s', teaser = '%s' WHERE nid = %d";
+		db_query($sql, $node->body,  $node->teaser, $node->nid);
+	}
+
+	$modules_uninstall = array('wysiwyg_imageupload', 'wysiwyg', 'drupalwiki_imageselect_element');
+	$modules = array('cmtls_stuff', 'ckeditor', 'imce');
+
+	// disable user selected translations
+	variable_set('language_negotiation', 0);
+	
+	// Disable modules.
+	module_disable($modules_uninstall);
+	foreach ($modules_uninstall as $module)
+	{
+		drupal_uninstall_module($module);
+	}
+
+	module_rebuild_cache();
+	
+	// Enable much of the architecture via features.
+	foreach ($modules as $module)
+	{
+		_drupal_install_module($module);
+		module_enable(array($module));  
+	}
+	
+	module_rebuild_cache();
+	
+	cmtls_install_wysiwyg_settings();
+	
+	// Add simple note
+	$ret[] = array(
+		'success' => TRUE,
+		'query' => 'Enabled stuffarium, switched wysiwyg.',
+	);
+
+	return $ret;
+}
+
+
+function cmtls_install_wysiwyg_settings()
+{
+	db_query('TRUNCATE {ckeditor_role}');
+	db_query('TRUNCATE {ckeditor_settings}');
+	
+	db_query("INSERT INTO `ckeditor_role` (`name`, `rid`) VALUES ('Advanced', 2)");
+	db_query("INSERT INTO `ckeditor_role` (`name`, `rid`) VALUES ('Advanced', 3)");
+	db_query("INSERT INTO `ckeditor_role` (`name`, `rid`) VALUES ('Default', 1)");
+	
+	$sql = "INSERT INTO `ckeditor_settings` (`name`, `settings`) VALUES ('Default', '%s')";
+	db_query($sql, serialize(array (
+  'allow_user_conf' => 'f',
+  'min_rows' => 1,
+  'excl_mode' => 0,
+  'filebrowser' => 'none',
+  'quickupload' => 'f',
+  'excl' => '',
+  'simple_incl' => '',
+  'ss' => '2',
+  'filters' => 
+  array (
+    'filter/0' => 1,
+  ),
+  'default' => 't',
+  'show_toggle' => 't',
+  'popup' => 'f',
+  'skin' => 'kama',
+  'toolbar' => 'DrupalBasic',
+  'expand' => 't',
+  'width' => '100%',
+  'lang' => 'en',
+  'auto_lang' => 't',
+  'language_direction' => 'default',
+  'enter_mode' => 'p',
+  'shift_enter_mode' => 'br',
+  'font_format' => 'p;div;pre;address;h1;h2;h3;h4;h5;h6',
+  'format_source' => 't',
+  'format_output' => 't',
+  'custom_formatting' => 'f',
+  'formatting' => 
+  array (
+    'custom_formatting_options' => 
+    array (
+      'indent' => 'indent',
+      'breakBeforeOpen' => 'breakBeforeOpen',
+      'breakAfterOpen' => 'breakAfterOpen',
+      'breakAfterClose' => 'breakAfterClose',
+    ),
+  ),
+  'css_mode' => 'theme',
+  'css_path' => '',
+  'user_choose' => 'f',
+  'show_fieldnamehint' => 't',
+  'ckeditor_load_method' => 'ckeditor.js',
+  'ckeditor_load_time_out' => 0,
+  'scayt_autoStartup' => 'f',
+  'excl_regex' => '',
+  'simple_incl_regex' => '',
+)));
+	
+	$sql = "INSERT INTO `ckeditor_settings` (`name`, `settings`) VALUES ('CKEditor Global Profile', '%s')";
+	db_query($sql, serialize(array (
+  'rank' => 
+  array (
+    0 => '3',
+    1 => '2',
+  ),
+  'excl_mode' => '1',
+  'excl' => '*@cmtls/*/edit.edit-body
+cmtls/*/add.edit-body
+*@node/add/*.edit-body
+*@node/*/edit.edit-body
+',
+  'simple_incl' => '*.edit-signature
+admin/settings/site-information.*
+admin/settings/site-maintenance.*
+*.edit-page-help
+*.edit-user-registration-help
+*.edit-user-picture-guidelines
+',
+  'ckeditor_path' => '%m/ckeditor',
+  'ckeditor_local_path' => '',
+  'show_fieldnamehint' => 't',
+  'excl_regex' => '#(?:^.*@cmtls/.*/edit\\.edit-body$)|(?:^.*@cmtls/.*/add\\.edit-body$)|(?:^.*@node/add/.*\\.edit-body$)|(?:^.*@node/.*/edit\\.edit-body$)#',
+  'simple_incl_regex' => '#(?:^.*@.*\\.edit-signature$)|(?:^.*@admin/settings/site-information\\..*$)|(?:^.*@admin/settings/site-maintenance\\..*$)|(?:^.*@.*\\.edit-page-help$)|(?:^.*@.*\\.edit-user-registration-help$)|(?:^.*@.*\\.edit-user-picture-guidelines$)#',
+)));
+	
+	$sql = "INSERT INTO `ckeditor_settings` (`name`, `settings`) VALUES ('Advanced', '%s');";
+	db_query($sql, serialize(array (
+  'allow_user_conf' => 'f',
+  'filters' => 
+  array (
+    'filter/3' => 1,
+    'filter/0' => 1,
+    'openlayers_filters/0' => 0,
+  ),
+  'ss' => '2',
+  'min_rows' => '1',
+  'excl_mode' => '0',
+  'excl' => '',
+  'simple_incl' => '',
+  'default' => 't',
+  'show_toggle' => 'f',
+  'popup' => 'f',
+  'skin' => 'kama',
+  'uicolor' => 'default',
+  'uicolor_textarea' => '<p>
+	Click on the <strong>UI Color Picker</strong> button to set your color preferences.</p>
+',
+  'uicolor_user' => 'default',
+  'toolbar' => 'DrupalFiltered',
+  'expand' => 't',
+  'width' => '100%',
+  'lang' => 'en',
+  'auto_lang' => 't',
+  'language_direction' => 'default',
+  'enter_mode' => 'p',
+  'shift_enter_mode' => 'br',
+  'font_format' => 'p;div;pre;address;h1;h2;h3;h4;h5;h6',
+  'custom_formatting' => 'f',
+  'formatting' => 
+  array (
+    'custom_formatting_options' => 
+    array (
+      'indent' => 'indent',
+      'breakBeforeOpen' => 'breakBeforeOpen',
+      'breakAfterOpen' => 'breakAfterOpen',
+      'breakAfterClose' => 'breakAfterClose',
+      'breakBeforeClose' => 0,
+      'pre_indent' => 0,
+    ),
+  ),
+  'css_mode' => 'theme',
+  'css_path' => '',
+  'css_style' => 'theme',
+  'styles_path' => '',
+  'filebrowser' => 'imce',
+  'filebrowser_image' => '',
+  'filebrowser_flash' => '',
+  'UserFilesPath' => '%b%f/',
+  'UserFilesAbsolutePath' => '%d%b%f/',
+  'ckeditor_load_method' => 'ckeditor.js',
+  'ckeditor_load_time_out' => '0',
+  'forcePasteAsPlainText' => 'f',
+  'scayt_autoStartup' => 'f',
+  'theme_config_js' => 'f',
+  'js_conf' => '',
+  'excl_regex' => '',
+  'simple_incl_regex' => '',
+)));
 }

@@ -27,6 +27,7 @@
 	<ul>
 		<li class="member-name"><?php print l(_cmtls_member_name($fields), 'cmtls/'.$cmtls['current_group']->nid.'/member/'.$fields['uid']->raw); ?></li>
 		<?php if(og_is_group_admin($cmtls['current_group'], $user->uid == $fields['uid']->raw ? $user : user_load($fields['uid']->raw))): ?><li class="admin-title"><?php print t('Group administrator') ?></li><?php endif; ?>
+		<?php if(cmtls_member_is_online($fields['uid']->raw)) print '<li class="cmtls-member-online">'.t('Online').'</li>'; ?>
 		<?php if($user->uid): ?>
 		<?php /*
 		<li><?php print $fields['mail']->content ;?></li>

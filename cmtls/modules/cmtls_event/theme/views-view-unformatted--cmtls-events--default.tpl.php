@@ -36,7 +36,6 @@ foreach($view->result as $id => $result)
 	else
 	{
 		$dividers[t(date('l', $start_timestamp)).' &middot; '.$start_date][] = $id;
-
 	}
 }
 

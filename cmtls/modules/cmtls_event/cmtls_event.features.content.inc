@@ -267,16 +267,6 @@ function cmtls_event_content_default_fields() {
     ),
     'widget' => array(
       'openlayers_cck_preset_map' => 'cmtls_node_map',
-      'openlayers_cck_show_empty_map' => 0,
-      'openlayers_cck_zoom_to_layer' => 0,
-      'openlayers_cck_zoom_to_layer_level' => '10',
-      'keep_points' => 0,
-      'default_value' => array(
-        '0' => array(
-          'openlayers_wkt' => '',
-        ),
-      ),
-      'default_value_php' => NULL,
       'openlayers_behaviors' => array(
         'openlayers_behavior_zoomtolayer' => array(
           'enabled' => 0,
@@ -286,11 +276,21 @@ function cmtls_event_content_default_fields() {
           ),
         ),
       ),
+      'keep_points' => 0,
+      'position' => '10',
+      'openlayers_cck_show_empty_map' => 0,
+      'openlayers_cck_zoom_to_layer' => 0,
+      'openlayers_cck_zoom_to_layer_level' => '10',
+      'default_value' => array(
+        '0' => array(
+          'openlayers_wkt' => '',
+        ),
+      ),
+      'default_value_php' => NULL,
       'autocompletion_field_cmtls_address_enable' => 1,
       'autocompletion_field_cmtls_address_override' => 1,
       'autocompletion_field_cmtls_address_content' => '[street_address]',
       'autocompletion_field_cmtls_address_type' => 'input',
-      'position' => '10',
       'label' => 'Geo info',
       'weight' => '9',
       'description' => '',

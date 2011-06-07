@@ -1255,7 +1255,7 @@ body {
 	width: 220px;
 	height: 55px;
 	margin: 0 10px 10px 0;
-	padding: 10px 10px 10px 10px;
+	padding: 10px;
 	box-shadow: 2px 2px 7px #e2e2e2;
 	-webkit-box-shadow: 2px 2px 7px #e2e2e2;
 	-moz-box-shadow: 2px 2px 7px #e2e2e2;
@@ -1275,9 +1275,9 @@ body {
 			margin-left: 10px;
 			font-size: 12px;
 			list-style-type: none;
-			padding: 3px 0 0 0;
 			white-space: nowrap;
 			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 
 		.cmtls-members-container .profile ul li.member-name {

@@ -183,8 +183,8 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 {
 	if(!_cmtls_is()){ return; }
 
-	switch($form_id){
-
+	switch($form_id)
+	{
 		/*
 		 * User profile form
 		 */
@@ -232,7 +232,7 @@ function cmtls_member_form_alter(&$form, &$form_state, $form_id)
 			$form['picture'] = NULL;
 			$form['account'] = NULL;
 			$form['theme_select'] = NULL;
-			//$form['locale'] = NULL;
+			$form['locale'] = NULL;
 
 			$form['profile_cmtls_member_address']['#title'] = t('Address');
 			$form['profile_cmtls_member_phone']['#title'] = t('Phone');
@@ -448,6 +448,16 @@ function _cmtls_member_name($fields, $link_to_member = FALSE, $shorten = FALSE)
 
 function cmtls_member_name($account, $link_to_member = FALSE, $shorten = FALSE)
 {
+	if(is_numeric($account))
+	{
+		$account = user_load($account);
+	}
+	
+	if(!$account->profile_cmtls_member_name)
+	{
+		$account = user_load($account->uid);
+	}
+	
 	if($account->profile_cmtls_member_name)
 	{
 		$name = $account->profile_cmtls_member_name;
@@ -462,18 +472,13 @@ function cmtls_member_name($account, $link_to_member = FALSE, $shorten = FALSE)
 		$name = explode(' ', $name);
 		if(sizeof($name) > 1)
 		{
-			$last_fragment = array_pop($name);
-			$name = implode(' ', $name).' '.$last_fragment[0].'.';
-		}
-		else
-		{
-			$name = $fields['value']->raw;
+			$name = $name[0];
 		}
 	}
 	
 	$name = check_plain($name);
 
-	if($link_to_member)
+	if ($link_to_member && $account->uid)
 	{
 		$current_group = _cmtls_group_get_current();
 		$name = l($name, 'cmtls/'.$current_group->nid.'/member/'.$account->uid);
@@ -494,21 +499,11 @@ function _cmtls_member_name_by_uid($uid) {
 	return $name;
 }
 
-function _cmtls_member_avatar($uid = NULL, $width = 100, $link_to_member = FALSE)
+function _cmtls_member_avatar($account, $width = 100, $link_to_member = FALSE)
 {
-	if(!$uid)
+	if(is_numeric($account))
 	{
-		global $user;
-		$account = $user;
-	}
-
-	if(is_numeric($uid))
-	{
-		$account = user_load($uid);
-	}
-	else
-	{
-		$account = $uid;
+		$account = user_load($account);
 	}
 
 	if($account->euid && $account->use_fb_avatar && $account->fb_avatar)
@@ -520,7 +515,8 @@ function _cmtls_member_avatar($uid = NULL, $width = 100, $link_to_member = FALSE
 		$output = '<img class="avatar" src="'.($account->picture ? file_create_url($account->picture) : _cmtls_get_default_avatar_url()).'" width="'.$width.'" height="'.$width.'" alt="">';
 	}
 
-	if ($link_to_member) {
+	if ($link_to_member && $account->uid)
+	{
 		$current_group = _cmtls_group_get_current();
 		$output = '<a class="avatar" href="'.base_path().'cmtls/'.$current_group->nid.'/member/'.$account->uid.'">'.$output.'</a>';
 	}
@@ -821,7 +817,7 @@ function cmtls_member_send_email_form(&$form_state, $settings = array())
 	
 	$form['submit'] = array(
 		'#type' => 'submit',
-		'#value' => t('Send'),
+		'#value' => t('Send e-mail'),
 	);
 
 	$form['#submit'] = array(
@@ -855,4 +851,69 @@ function cmtls_member_send_email_form_submit($form, &$form_state)
 			drupal_mail('cmtls', 'cmtls_mail', $to->mail, user_preferred_language($to), $message, $from);
 		}
 	}
+}
+
+/**
+ * 
+ *
+ * @param unknown_type $vars
+ */
+function cmtls_member_preprocess_views_view_fields__cmtls_members__default(&$vars)
+{
+	static $run_once;
+	
+	if(!$run_once)
+	{
+		$online = array();
+		
+		foreach ($vars['view']->result as $user)
+		{
+			$online[$user->uid] = FALSE;
+		}
+		
+		if(sizeof($online))
+		{
+			$timestamp = time() - 15 * 60; // 15 minutes
+			$result = db_query('SELECT uid FROM {sessions} WHERE uid IN ('.implode(',', array_keys($online)).') AND timestamp >= %d', $timestamp);
+			while($row = db_fetch_array($result))
+			{
+				$online[$row['uid']] = TRUE;
+			}
+		}
+		
+		cmtls_member_is_online(NULL, $online);
+		
+		$run_once = TRUE;
+	}
+}
+
+function cmtls_member_is_online($uid = NULL, $states = array())
+{
+	if(!isset($uid))
+	{
+		global $user;
+		$uid = $user->uid;
+	}
+
+	static $member_states;
+	
+	if(empty($member_states))
+	{
+		$member_states = array();
+	}
+	
+	if(!empty($states))
+	{
+		$member_states += $states;
+	}
+	
+	if(!isset($member_states[$uid]))
+	{
+		$timestamp = time() - 15 * 60; // 15 minutes
+		$result = db_query('SELECT uid FROM {sessions} WHERE uid = %d AND timestamp >= %d', $uid, $timestamp);
+		$row = db_fetch_array($result);
+		if(db_affected_rows($row)) $member_states[$uid] = TRUE; else $member_states[$uid] = FALSE;
+	}
+	
+	return $member_states[$uid];
 }

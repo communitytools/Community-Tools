@@ -178,7 +178,8 @@ if($user->uid == 1 || $user->uid == $fields['uid']->raw)
 
 			<?php if($user->uid): ?>
 			<li><?php print $fields['mail']->content ;?></li>
-
+			
+			<?php if(cmtls_member_is_online($fields['uid']->raw)) print '<li class="cmtls-member-online">'.t('Online').'</li>'; ?>
 
 			<?php if($fields['value_2']->raw): ?><li><?php print t('Address') ?>: <?php print check_plain($fields['value_2']->raw) ;?></li><?php endif; ?>
 			<?php if($fields['value_5']->raw): ?><li><?php print t('Phone') ?>: <a href="callto:<?php print check_plain($fields['value_5']->raw) ;?>"><?php print check_plain($fields['value_5']->raw) ;?></a></li><?php endif; ?>

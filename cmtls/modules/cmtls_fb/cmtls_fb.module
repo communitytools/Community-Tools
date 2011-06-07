@@ -174,8 +174,8 @@ function cmtls_fb_admin(){
 		'#title' => t('Application ID'),
 		'#default_value' => variable_get('fb_app_id', ''),
 		'#size' => 32,
-		'#description' => t('Your application\'s ID.'),
 		'#required' => TRUE,
+		'#description' => t('<a href="@href">Set up your site in Facebook</a>', array('@href' => 'http://www.facebook.com/developers/createapp.php')),
 	);
 	
 	$form['fb_secret_key'] = array(
@@ -183,7 +183,6 @@ function cmtls_fb_admin(){
 		'#title' => t('Application Secret'),
 		'#default_value' => variable_get('fb_secret_key', ''),
 		'#size' => 32,
-		'#description' => t('Your application\'s secret.'),
 		'#required' => TRUE,
 	);
 

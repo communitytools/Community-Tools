@@ -1,0 +1,1289 @@
+<?php
+
+include_once('cmtls_stuff.features.inc');
+
+/**
+ * Implements hook_cmtls_context()
+ *
+ * The edit button for stuffs
+ *
+ * @return unknown
+ */
+function cmtls_stuff_cmtls_context()
+{
+	return array(
+		'cmtls_stuff' => array(
+			'cmtls_stuff_edit' => array(
+				'title' => t('Edit stuff'),
+				'access callback' => 'node_access',
+				'access arguments' => array('update', 'node'),
+			),
+		),
+		'script' => drupal_get_path('module', 'cmtls_stuff').'/js/context_actions.js',
+	);
+}
+
+/**
+ * Implements of hook_cmtls_dashboard_block_content, creates the output for the dahsboard
+ *
+ * @param object $group
+ * @param object $app
+ * @return string
+ */
+function cmtls_stuff_cmtls_dashboard_block_content($group, $app)
+{
+	return views_embed_view('cmtls_stuffs', 'block_2', $app->nid);
+}
+
+/**
+ * Implements hook_init()
+ *
+ */
+function cmtls_stuff_init()
+{
+	/*
+	$current_group = _cmtls_group_get_current();
+	$current_app = _cmtls_app_get_current($current_group);
+
+	if($current_app->field_cmtls_app_type[0]['value'] == 'cmtls_stuff')
+	{
+		drupal_add_feed(url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/rss', array('absolute' => TRUE)), $app->title);
+	}
+
+	//drupal_add_js(drupal_get_path('module', 'cmtls_stuff') .'/js/app.js');
+	*/
+}
+
+/**
+ * Implements hook_cmtls_app, this is the app info
+ * 
+ * @see cmtls_stuffs_page()
+ *
+ * @return array
+ */
+function cmtls_stuff_cmtls_app()
+{
+	return array(
+		'cmtls_stuff' => array(
+			'title' => t('Stuff'),
+			'callback' => 'cmtls_stuffs_page',
+			'node type title' => t('stuff'),
+		),
+	);
+}
+
+/**
+ * Implements hook_cmtls_map_config, the configuration of this app's map
+ *
+ * @return array
+ */
+/*
+function cmtls_stuff_cmtls_map_config()
+{
+	return array(
+		'cmtls_stuff' => array(
+			'map views' => array(
+				CMTLS_MAP_NONE,
+				CMTLS_MAP_VIEW_HIDDEN,
+				CMTLS_MAP_VIEW_HALF_PAGE,
+				CMTLS_MAP_VIEW_FULL_PAGE,
+			),
+			'default map view' => CMTLS_MAP_NONE,
+			'map view changable' => FALSE,
+			'default map styles' => array(
+				'default' => 'cmtls-location-white',
+				'select' => 'cmtls-location-white-hover',
+				'temporary' => 'cmtls-location-white',
+			),
+			'add from map' => FALSE,
+			'is mappable' => FALSE,
+		),
+	);
+}
+*/
+
+/**
+ * This apps configuration default values
+ *
+ * @return array
+ */
+function cmtls_stuff_cmtls_app_config_defaults()
+{
+	return array(
+		'sorting_field' => 'node_title',
+		'sorting_dir' => 'ASC'
+	);
+}
+
+/**
+ * Implements hook_cmtls_app_config, creates the app specific configuration fields 
+ *
+ * @param array $config	the current configuration of the app
+ * @return array
+ */
+function cmtls_stuff_cmtls_app_config($config)
+{
+	$settings = array_merge(cmtls_stuff_cmtls_app_config_defaults(), (array)$config['cmtls_stuff']);
+
+	//printr($settings);
+
+	$form['cmtls_stuff'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Sorting settings'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+
+	$form['cmtls_stuff']['sorting_field'] = array(
+		'#type' => 'radios',
+		'#title' => t('Sorting field'),
+		'#default_value' => $settings['sorting_field'],
+		'#options' => array(
+			'node_created' => t('Created date'),
+			'node_title' => t('Name'),
+		),
+	);
+
+	$form['cmtls_stuff']['sorting_dir'] = array(
+		'#type' => 'radios',
+		'#title' => t('Sorting order'),
+		'#default_value' => $settings['sorting_dir'],
+		'#options' => array(
+			'ASC' => t('Ascending'),
+			'DESC' => t('Descending'),
+		),
+	);
+
+	return $form;
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array menu items
+ */
+function cmtls_stuff_menu()
+{
+	$items = array();
+
+	$items['cmtls/%node/%node/stuff/%node'] = array(
+		'title' => 'stuff',
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(4),
+		'page callback' => 'cmtls_stuff_page',
+		'page arguments' => array(1, 2, 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/stuff/%node/edit'] = array(
+		'title' => 'stuff',
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_stuff', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/stuff/%node/delete'] = array(
+		'title' => t('Delete item'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('node_delete_confirm', 4),
+		'access callback' => 'node_access',
+		'access arguments' => array('delete', 4),
+		'file' => 'node.pages.inc',
+		'file path' => drupal_get_path('module', 'node'),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/stuff/%node/request'] = array(
+		'title' => t('Request item'),
+		'page callback' => 'cmtls_stuff_request_item_page',
+		'page arguments' => array(4),
+		'access callback' => 'node_access',
+		'access arguments' => array('view', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/stuff/%node/returned'] = array(
+		'title' => t('Request item'),
+		'page callback' => 'cmtls_stuff_item_returned_page',
+		'page arguments' => array(4),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/stuff/%node/accept_request/%'] = array(
+		'title' => t('Accept loan request'),
+		'page callback' => 'cmtls_stuff_accept_request_page',
+		'page arguments' => array(4, 6),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/stuff/%node/deny_request/%'] = array(
+		'title' => t('Deny loan request'),
+		'page callback' => 'cmtls_stuff_deny_request_page',
+		'page arguments' => array(4, 6),
+		'access callback' => 'node_access',
+		'access arguments' => array('update', 4),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['cmtls/%node/%node/stuff/add'] = array(
+		'title callback' => 'cmtls_page_title',
+		'title arguments' => array(2),
+		'page callback' => 'cmtls_node_edit_page',
+		'page arguments' => array('cmtls_stuff'),
+		'access callback' => 'node_access',
+		'access arguments' => array('create', (object)array('type' => 'cmtls_stuff')),
+		'type' => MENU_CALLBACK,
+	);
+
+	return $items;
+}
+
+/**
+ * The main callback for displaying stuffarium items
+ *
+ * @param integer $app_id
+ * @return string
+ */
+function cmtls_stuffs_page($app_id)
+{
+	if($_POST['ajax'] == 1)
+	{
+		cmtls_ajax_response(views_embed_view('cmtls_stuffs', 'default', $app_id));
+	}
+
+	return theme('cmtls_stuffs_content', $app_id);
+}
+
+/**
+ * Single item view
+ * 
+ * @todo merge this with cmtls_stuffs_page()
+ *
+ * @param object $group
+ * @param object $app
+ * @param object $stuff
+ * @return string
+ */
+function cmtls_stuff_page($group, $app, $stuff)
+{
+	if($stuff->type != 'cmtls_stuff')
+	{
+		return t('This not a stuff.');
+	}
+
+	return views_embed_view('cmtls_stuffs', 'default', $app->nid, $stuff->nid);
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_stuff_form_cmtls_stuff_node_form_alter(&$form, &$form_state)
+{
+	if(!_cmtls_is()) return;
+
+	$form = cmtls_forms_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_theme()
+ * Adds the stuff view templates
+ *
+ * @param unknown_type $existing
+ * @return array
+ */
+function cmtls_stuff_theme($existing)
+{
+	return array(
+		// stuffs page
+		'cmtls_stuffs_content' => array (
+			'arguments' => array('app_id' => NULL),
+			'template' => 'cmtls-stuffs-content',
+			'path' => drupal_get_path('module', 'cmtls_stuff').'/theme',
+		),
+		// stuffs view
+		'views_view__cmtls_stuffs__default' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-stuffs--default',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_stuff').'/theme',
+		),
+		'views_view_unformatted__cmtls_stuffs__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-stuffs--default',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_stuff').'/theme',
+		),
+		'views_view_fields__cmtls_stuffs__default' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-stuffs--default',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_stuff').'/theme',
+		),
+		// stuffs dashboard view
+		'views_view__cmtls_stuffs__block_2' => array (
+			'arguments' => array('view' => NULL),
+			'template' => 'views-view--cmtls-stuffs--block-2',
+			'original hook' => 'views_view',
+			'path' => drupal_get_path('module', 'cmtls_stuff').'/theme',
+		),
+		'views_view_unformatted__cmtls_stuffs__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL),
+			'template' => 'views-view-unformatted--cmtls-stuffs--block-2',
+			'original hook' => 'views_view_unformatted',
+			'path' => drupal_get_path('module', 'cmtls_stuff').'/theme',
+		),
+		'views_view_fields__cmtls_stuffs__block_2' => array (
+			'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL),
+			'template' => 'views-view-fields--cmtls-stuffs--block-2',
+			'original hook' => 'views_view_fields',
+			'path' => drupal_get_path('module', 'cmtls_stuff').'/theme',
+		),
+	);
+}
+
+/**
+ * Creates the path to stuff view
+ *
+ * @param object $stuff
+ * @param object $group
+ * @return string
+ */
+function cmtls_stuff_path($stuff, $group = NULL)
+{
+	if(!$group) $group = _cmtls_group_get_current();
+
+	return 'cmtls/'.$group->nid.'/'.$stuff->parent.'/stuff/'.$stuff->nid;
+}
+
+/**
+ * Implements hook_cmtls_map_popup_content
+ * Output is displayed in the popup that opens when clicking a feature on the map
+ *
+ * @param object $feature
+ * @return string
+ */
+function cmtls_stuff_cmtls_map_popup_content($feature)
+{
+	$node = node_load($feature->nid);
+
+	$body = explode(' ', strip_tags(check_markup($node->body)));
+
+	if(sizeof($body) > 25)
+	{
+		$body = array_slice($body, 0, 25);
+		$body[] = '...';
+	}
+
+	$body = implode(' ', $body);
+
+	$output = '<h1>'.l($node->title, cmtls_stuff_path($node)).'</h1>';
+	$output .= '<div class="content">'.$body.'</div>';
+
+	return $output;
+}
+
+/**
+ * Implements hook_views_query_alter
+ * Changes the ordering in items view according to apps configuration
+ * 
+ * @see cmtls_stuff_cmtls_app_config()
+ *
+ * @param object $view
+ * @param object $query
+ */
+function cmtls_stuff_views_query_alter(&$view, &$query)
+{
+	if($view->name == 'cmtls_stuffs')
+	{
+		$config = (array)cmtls_app_get_config(node_load($view->args[0]));
+		$config = $config['cmtls_stuff'];
+
+		$settings = array_merge(cmtls_stuff_cmtls_app_config_defaults(), (array)$config);
+
+		$query->orderby = array($settings['sorting_field'].' '.$settings['sorting_dir']);
+	}
+}
+
+/**
+ * Implements hook_cmtls_filter_info()
+ * The info for the filter module, sets the search options
+ * 
+ * @return array
+ */
+function cmtls_stuff_cmtls_filter_info()
+{
+	return array(
+		'cmtls_stuff' => array(
+			'filter predefined options' => array(
+				array(
+					'title' => t('Latest additions'),
+					'default values' => array(
+						'sort' => 2,
+					),
+				),
+				array(
+					'title' => t('Most commented'),
+					'default values' => array(
+						'sort' => 1,
+					),
+				),
+			), // filter predefined options
+
+			'filter fields' => array(
+				'tag' => TRUE,
+				'search' => TRUE,
+				'sort' => TRUE,
+			), // filter fields
+
+			'taxonomy dictionary id' => NULL,
+
+			'sort options' => array(
+				array(
+					'field' => 'node_title',
+					'direction' => 'ASC',
+					'title' => t('Title'),
+				),
+				array(
+					'field' => 'node_comment_statistics_comment_count',
+					'direction' => 'DESC',
+					'title' => t('Most commented'),
+				),
+				array(
+					'field' => 'node_created',
+					'direction' => 'DESC',
+					'title' => t('Time added'),
+				),
+			), // sort options
+
+			'default values' => array(
+				'sort' => 0,
+			),
+		), // node type
+	);
+}
+
+/**
+ * Implements hook_cmtls_app_links()
+ * the CRUD links
+ *
+ * @param object $node
+ * @return array
+ */
+function cmtls_stuff_cmtls_app_links($node = NULL)
+{
+	return array(
+		'cmtls_stuff' => array(
+			'add' => 'stuff/add',
+			'delete' => 'stuff/'.$node->nid.'/delete',
+		),
+	);
+}
+
+/**
+ * Implements hook_cmtls_group_overview()
+ * The overview tab content for this app in the group info page
+ *
+ * @param object $app
+ * @return array
+ */
+function cmtls_stuff_cmtls_group_overview($app)
+{
+	$return = array(
+		'total comments' => 0,
+		'total posts' => 0,
+		'posts column' => NULL,
+		'comments column' => NULL,
+	);	
+	
+	$group_id = array_pop($app->og_groups);
+	
+	$sql = 'SELECT SUM(node_comment_statistics.comment_count) AS comments FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d AND node_comment_statistics.comment_count > 0';
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total comments'] = $result['comments'];
+	
+	$sql = "SELECT count(node.nid) AS posts FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_stuff'";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$return['total posts'] = $result['posts'];
+	
+	$sql = "SELECT node.created FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_stuff' ORDER BY node.nid DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$last_posted = cmtls_format_date_ago($result['created']);
+	
+	$return['posts column'] = $return['total posts'] ? format_plural($return['total posts'],'1 post','@count posts').' &middot; '.t('last').' '.$last_posted : t('No posts yet');
+	
+	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
+	$result = db_fetch_array(db_query($sql, $app->nid));
+	$time_diff = time() - $result['last_comment_timestamp'];
+	$last_commented = cmtls_format_date_ago($result['last_comment_timestamp']);
+	
+	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;	
+	
+	return $return;
+}
+
+/**
+ * CCK field loaned to all possible values
+ *
+ * @return array
+ */
+function cmtls_stuff_loaned_to_allowed_values()
+{
+	$current_group = _cmtls_group_get_current();
+	$members = array();
+	
+	$sql = 'SELECT og_uid.uid, profile_values.value AS name FROM og_uid AS og_uid LEFT JOIN profile_values AS profile_values ON profile_values.uid = og_uid.uid WHERE og_uid.nid = %d AND profile_values.fid = 2';
+	$result = db_query($sql, $current_group->nid);
+	while ($row = db_fetch_array($result)) if($row['uid'] != $GLOBALS['user']->uid)
+	{
+		$members[$row['uid']] = $row['name'];
+	}
+	
+	return $members;
+}
+
+/**
+ * The page for requesting an item
+ *
+ * @param object $node
+ * @return string
+ */
+function cmtls_stuff_request_item_page($node)
+{
+	// Send the Modal Frame javascript for child windows to the page.
+	modalframe_child_js();
+	
+	if($node->type != 'cmtls_stuff')
+	{
+		return FALSE;
+	}
+	
+	if($node->field_cmtls_stuff_loan_uid[0]['value'])
+	{
+		return FALSE;
+	}
+	
+	global $user;
+	
+	if($user->uid)
+	{
+		$output = drupal_get_form('cmtls_stuff_send_request_form', $node);
+	}
+	else 
+	{
+		$output = t('You must be logged in to borrow stuff');
+	}
+	
+	
+	return $output;
+}
+
+/**
+ * The request until possible option values
+ *
+ * @return array
+ */
+function cmtls_stuff_request_until_options()
+{
+	return array(
+		1 => t('a day'),
+		2 => t('two days'),
+		7 => t('a week'),
+		14 => t('two weeks'),
+		30 => t('a month'),
+		61 => t('two months'),
+	);
+}
+
+/**
+ * The request itme form
+ *
+ * @param array $form_state
+ * @param array $node
+ * @return array
+ */
+function cmtls_stuff_send_request_form(&$form_state, $node)
+{
+	global $user;
+	profile_load_profile($user);
+	$owner = user_load($node->uid);
+	
+	drupal_add_js(drupal_get_path('module', 'cmtls_stuff') .'/js/app.js');
+	
+	//printr($owner);
+	
+	$form['to_uid'] = array(
+		'#type' => 'value',
+		'#value' => $node->uid,
+	);
+	
+	$form['#node'] = $node;
+	
+	$until_options = cmtls_stuff_request_until_options();
+	
+	$form['until'] = array(
+		'#type' => 'select',
+		'#title' => t('Loan for'),
+		'#options' => $until_options,
+		'#attributes' => array(
+			'id' => 'cmtls-stuff-request-form-days-select',
+		),
+	);
+	
+	if(!empty($node->taxonomy))
+	{
+		$tags = array();
+		foreach ($node->taxonomy as &$tag)
+		{
+			$tags[] = $tag->name;
+		}
+	}
+	
+	$form['header'] = array(
+		'#type' => 'markup',
+		'#prefix' => '<div id="cmtls-stuff-letter-area">',
+		'#value' => '<div id="cmtls-stuff-request-form-text">'.t(
+			'Hello !owner<br><br>Would you please lend me the "!item_title (!item_tags)" (!item_url) for !loan_days?',
+			array(
+				'!owner' => cmtls_member_name($owner, FALSE, TRUE),
+				'!item_title' => check_plain($node->title),
+				'!item_tags' => implode(', ', $tags),
+				'!item_url' => url(cmtls_path_to_node($node), array('absolute' => TRUE)),
+				'!loan_days' => '<span id="cmtls-stuff-request-form-days">'.($form_state['values']['until'] ? $until_options[$form_state['values']['until']] : $until_options[1]).'</span>',
+			)
+		).'</div>',
+	);
+	
+	$current_group = _cmtls_group_get_current();
+	
+	$form['content'] = array(
+		'#type' => 'textarea',
+		'#title' => NULL,
+		'#required' => TRUE,
+		'#suffix' => '</div> <!-- cmtls-stuff-letter-area -->',
+		'#default_value' => t('Thank you').",\n\n".cmtls_member_name($user)."\n".$user->mail."\n".(($user->profile_cmtls_member_phone) ? $user->profile_cmtls_member_phone."\n" : '').url('cmtls/'.$current_group->nid.'/member/'.$user->uid, array('absolute' => TRUE))
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Send e-mail'),
+	);
+
+	$form['#submit'] = array(
+		'cmtls_stuff_send_request_form_submit',
+		'cmtls_forms_submit', // closes the modalframe
+	);
+	
+	return $form;
+}
+
+/**
+ * The request item for submit
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_stuff_send_request_form_submit($form, &$form_state)
+{
+	global $user;
+	
+	$owner = user_load($form_state['values']['to_uid']);
+	
+	$site_name = variable_get('site_name', 'CT');
+	
+	$node = $form['#node'];
+	$path_to_node = cmtls_path_to_node($node);
+	
+	$until_options = cmtls_stuff_request_until_options();
+	
+	if(!empty($node->taxonomy))
+	{
+		$tags = array();
+		foreach ($node->taxonomy as &$tag)
+		{
+			$tags[] = $tag->name;
+		}
+	}
+	
+	$message = str_replace('<br>', "\n", t(
+		'Hello !owner<br><br>Would you please lend me the "!item_title (!item_tags)" (!item_url) for !loan_days?',
+		array(
+			'!owner' => cmtls_member_name($owner, FALSE, TRUE),
+			'!item_title' => $node->title,
+			'!item_tags' => implode(', ', $tags),
+			'!item_url' => url($path_to_node, array('absolute' => TRUE)),
+			'!loan_days' => $until_options[$form_state['values']['until']],
+		),
+		$owner->language
+	));
+	
+	$message .= "\n\n".$form_state['values']['content'];
+	
+	$message .= "\n\n".t('You have two options:')."\n\n".'- '.t('Accept', NULL, $owner->language).' '.url($path_to_node.'/accept_request/'.$user->uid, array('query' => array('days' => $form_state['values']['until']), 'absolute' => TRUE));
+	
+	$message .= "\n".'- '.t('Deny', NULL, $owner->language).' '.url($path_to_node.'/deny_request/'.$user->uid, array('query' => array('days' => $form_state['values']['until']), 'absolute' => TRUE));
+	
+	$message = array(
+		'subject' => $site_name.' - '.t('loan request'),
+		'body' => $message.
+			"\n\n".'---'."\n".
+			$site_name."\n",
+	);
+	
+	drupal_mail('cmtls', 'cmtls_mail', $owner->mail, user_preferred_language($owner), $message);
+	
+	drupal_set_message(t('Your request has been sent'));
+}
+
+/**
+ * The page for accepting item request
+ *
+ * @param object $node	the item requested
+ * @param int $uid		the user ID of the member who sent the request
+ * @return string
+ */
+function cmtls_stuff_accept_request_page($node, $uid)
+{
+	if($node->type != 'cmtls_stuff')
+	{
+		return FALSE;
+	}
+	
+	$account = user_load($uid);
+	
+	if(!$account->uid)
+	{
+		return FALSE;
+	}
+	
+	if($node->field_cmtls_stuff_loan_uid[0]['value'])
+	{
+		$output = t(
+			'!item_title has already been loaned to !member_name.',
+			array(
+				'!item_title' => l($node->title, cmtls_path_to_node($node)),
+				'!member_name' => cmtls_member_name($account, TRUE),
+			)
+		);
+		
+		return $output;
+	}
+	
+	$output = drupal_get_form('cmtls_stuff_accept_request_form', $node, $account, (int)$_GET['days']);
+	
+	return $output;
+}
+
+/**
+ * The request accept form
+ *
+ * @param array $form_state
+ * @param object $node		the requested item
+ * @param object $account	the user who requested the item
+ * @param int $days			number of days of the request
+ * @return array
+ */
+function cmtls_stuff_accept_request_form(&$form_state, $node, $account, $days)
+{
+	global $user;
+	profile_load_profile($user);
+
+	if(!$days) $days = 1;
+	
+	$form['#node'] = $node;
+	$form['#account'] = $account;
+	
+	$form['days'] = array(
+		'#type' => 'value',
+		'#value' => $days,
+	);
+	
+	$current_group = _cmtls_group_get_current();
+	$until_options = cmtls_stuff_request_until_options();
+	$path_to_node = cmtls_path_to_node($node);
+	
+	$form['description_top'] = array(
+		'#type' => 'markup',
+		'#value' => '<h1>'.t('Accept loan request').'</h1><p>'.t(
+			'!user_name has requested to borrow "!item_title" for !days.',
+			array(
+				'!user_name' => cmtls_member_name($account, TRUE),
+				'!item_title' => l($node->title, $path_to_node),
+				'!days' => $until_options[$days],
+			)
+		).'</p>'.
+		'<p>'.t('By accepting, the item will be marked as lent. When the due date approaches, you both will be reminded via e-mail.').'</p>',
+	);
+	
+	$form['content'] = array(
+		'#type' => 'textarea',
+		'#rows' => 10,
+ 		'#title' => NULL,
+		'#required' => TRUE,
+		'#default_value' => t('Hello !user_name,',array('!user_name' => cmtls_member_name($account),))."\n\n".
+			t('Please contact me for borrowing !item_title.', array('!item_title' => $node->title)).
+			"\n\n".cmtls_member_name($user)."\n".$user->mail."\n".(($user->profile_cmtls_member_phone) ? $user->profile_cmtls_member_phone."\n" : '').url('cmtls/'.$current_group->nid.'/member/'.$user->uid, array('absolute' => TRUE)
+		),
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Accept and send e-mail'),
+	);
+	
+	$form['#submit'] = array(
+		'cmtls_stuff_accept_request_form_submit',
+		//'cmtls_forms_submit', // closes the modalframe
+	);
+	
+	$form['deny'] = array(
+		'#type' => 'markup',
+		'#value' => t('or <a href="@href">Deny</a>', array(
+				'@href' => base_path().$path_to_node.'/deny_request/'.$account->uid.'?days='.$days)),
+	);
+	
+	return $form;
+}
+
+/**
+ * The request accpet form submit
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_stuff_accept_request_form_submit($form, &$form_state)
+{
+	global $user;
+	
+	$account = $form['#account'];
+	$node = $form['#node'];
+
+	$site_name = variable_get('site_name', 'CT');
+	
+	$message = $form_state['values']['content'];
+	
+	$message = array(
+		'subject' => $site_name.' - '.t('about your loan request'),
+		'body' => $message.
+			"\n\n".'---'."\n".
+			$site_name."\n",
+	);
+	
+	drupal_mail('cmtls', 'cmtls_mail', $account->mail, user_preferred_language($account), $message, $user->mail);
+	
+	$sql = 'UPDATE {content_type_cmtls_stuff} SET field_cmtls_stuff_loan_uid_value = %d, field_cmtls_stuff_loan_date_value = DATE_ADD(NOW(), INTERVAL %d DAY) WHERE nid = %d';
+	db_query($sql, $account->uid, $form_state['values']['days'], $node->nid);	
+	
+	//cache_clear_all('content:'.$node->nid.':'.$node->nid, 'content');
+	db_query("DELETE FROM {cache_content} WHERE cid = 'content:".(int)$node->nid.":".(int)$node->nid."'");
+	
+	drupal_set_message(t('Your accept has been sent and the item has been marked as lent.'));
+	
+    $form_state['redirect'] = cmtls_path_to_node($node);
+}
+
+/**
+ * The request denial page
+ *
+ * @param object $node	the item that was request
+ * @param int $uid		the user ID who requested the item
+ * @return string
+ */
+function cmtls_stuff_deny_request_page($node, $uid)
+{
+	if($node->type != 'cmtls_stuff')
+	{
+		return FALSE;
+	}
+	
+	$account = user_load($uid);
+	
+	if(!$account->uid)
+	{
+		return FALSE;
+	}
+	
+	$output = drupal_get_form('cmtls_stuff_deny_request_form', $node, $account, (int)$_GET['days']);
+	
+	return $output;
+}
+
+/**
+ * The request denial form
+ *
+ * @param array $form_state
+ * @param object $node		the item requested
+ * @param object $account	the user who requested the item
+ * @param int $days			the number of days the item was requested
+ * @return array
+ */
+function cmtls_stuff_deny_request_form(&$form_state, $node, $account, $days)
+{
+	global $user;
+	profile_load_profile($user);
+	
+	if(!$days) $days = 1;
+	
+	$form['#node'] = $node;
+	$form['#account'] = $account;
+	
+	$form['days'] = array(
+		'#type' => 'value',
+		'#value' => $days,
+	);
+	
+	$current_group = _cmtls_group_get_current();
+	$until_options = cmtls_stuff_request_until_options();
+	$path_to_node = cmtls_path_to_node($node);
+	
+	$form['description'] = array(
+		'#type' => 'markup',
+		'#value' => '<h1>'.t('Deny loan request').'</h1><p>'.t(
+			'!user_name has requested to borrow "!item_title" for !days.',
+			array(
+				'!user_name' => cmtls_member_name($account, TRUE),
+				'!item_title' => l($node->title, $path_to_node),
+				'!days' => $until_options[$days],
+			)
+		).'</p>',
+	);
+	
+	$form['content'] = array(
+		'#type' => 'textarea',
+		'#rows' => 10,
+		'#title' => NULL,
+		'#required' => TRUE,
+		'#default_value' => t('Hello !user_name,',array('!user_name' => cmtls_member_name($account),))."\n\n".
+			t('Sorry, I can\'t lend you !item_title.', array('!item_title' => $node->title)).
+			"\n\n".cmtls_member_name($user)."\n".$user->mail."\n".(($user->profile_cmtls_member_phone) ? $user->profile_cmtls_member_phone."\n" : '').url('cmtls/'.$current_group->nid.'/member/'.$user->uid, array('absolute' => TRUE)
+		),		
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Deny and send e-mail'),
+	);
+	
+	$form['#submit'] = array(
+		'cmtls_stuff_deny_request_form_submit',
+		//'cmtls_forms_submit', // closes the modalframe
+	);
+	
+	$form['accept'] = array(
+		'#type' => 'markup',
+		'#value' => t('or <a href="@href">Accept</a>', array(
+				'@href' => base_path().$path_to_node.'/accept_request/'.$account->uid.'?days='.$days)),
+	);	
+	
+	return $form;
+}
+
+/**
+ * The request denial form submit
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function cmtls_stuff_deny_request_form_submit($form, &$form_state)
+{
+	global $user;
+	
+	$account = $form['#account'];
+	$node = $form['#node'];
+
+	$site_name = variable_get('site_name', 'CT');
+	
+	$message = $form_state['values']['content'];
+	
+	$message = array(
+		'subject' => $site_name.' - '.t('about your loan request'),
+		'body' => $message.
+			"\n\n".'---'."\n".
+			$site_name."\n",
+	);
+	
+	drupal_mail('cmtls', 'cmtls_mail', $account->mail, user_preferred_language($account), $message, $user->mail);
+	
+	drupal_set_message(t('Your denial has been sent.'));
+	
+    $form_state['redirect'] = cmtls_path_to_node($node);
+}
+
+/**
+ * Implements hook_corn()
+ * sends notifications to owners and requesters about the items loaned
+ *
+ */
+function cmtls_stuff_cron()
+{
+	//variable_set('cmtls_stuff_notifications', 1);
+
+	// run only once a day
+	$today = strtotime('today');
+	// send @ 11:00
+	$send_time = $today + 11 * 60 * 60;
+	$last_send = variable_get('cmtls_stuff_notifications', 1);
+	
+	if(!($today > $last_send && $send_time < time()))
+	{
+		return;
+	}
+	
+	$users = array();
+	$nodes = array();
+	
+	// notifications to requesters about their request ended
+	$sql = "SELECT nid, field_cmtls_stuff_loan_uid_value AS uid, field_cmtls_stuff_loan_date_value AS due_date, DATEDIFF(CURRENT_DATE(), field_cmtls_stuff_loan_date_value) AS due, IF(field_cmtls_stuff_loan_date_value < CURRENT_DATE(), 'past_due', IF(field_cmtls_stuff_loan_date_value = CURRENT_DATE(), 'today', IF(CURRENT_DATE() OR DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), 'tomorrow', NULL))) AS status FROM content_type_cmtls_stuff WHERE field_cmtls_stuff_loan_uid_value > 0 AND (field_cmtls_stuff_loan_date_value < CURRENT_DATE() OR field_cmtls_stuff_loan_date_value = CURRENT_DATE() OR DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY))";
+	$result = db_query($sql);
+	
+	while ($row = db_fetch_array($result))
+	{
+		$users[$row['uid']]['user'] = $row['uid'];
+		$users[$row['uid']]['loaned'][$row['status']][$row['nid']] = $row['nid'];
+		
+		$nodes[$row['nid']] = $row;
+	}
+	
+	// get the nodes in question
+	if(!sizeof($nodes)) return;
+	
+	$groups = array();
+	
+	$sql = 'SELECT node.nid, node.uid, node.title, og_ancestry.group_nid, nodehierarchy.parent FROM {node} AS node LEFT JOIN {og_ancestry} AS og_ancestry ON node.nid = og_ancestry.nid LEFT JOIN {nodehierarchy} AS nodehierarchy ON node.nid = nodehierarchy.nid WHERE node.nid IN ('.implode(', ', array_keys($nodes)).')';
+	$result = db_query($sql);
+	while ($node = db_fetch_object($result))
+	{
+		$node->due = $nodes[$node->nid]['due'];
+		$node->due_date = $nodes[$node->nid]['due_date'];
+		$node->loaned_to = $nodes[$node->nid]['uid'];
+		
+		$users[$node->uid]['user'] = $node->uid;
+		$users[$node->uid]['owned'][$nodes[$node->nid]['status']][$node->nid] = $node->nid;
+		
+		$nodes[$node->nid] = $node;
+	}
+	
+	// get the users and owners in question
+	$items = array_keys($users);
+	
+	if(!sizeof($items)) return;
+	
+	$sql = 'SELECT users.uid, users.mail, users.language, users.name, profile_values.value AS full_name FROM {users} AS users LEFT JOIN {profile_values} AS profile_values ON users.uid = profile_values.uid WHERE users.uid IN('.implode(', ', $items).') AND profile_values.fid = 2';
+	$result = db_query($sql);
+	while ($user = db_fetch_object($result))
+	{
+		$users[$user->uid]['user'] = $user;
+	}
+	
+	$site_name = variable_get('site_name', 'CT');
+	$main_group = _cmtls_group_get_main();
+	
+	// send 
+	foreach ($users as $uid => $messages) if(sizeof($messages['owned']['past_due']) || sizeof($messages['owned']['today']) || sizeof($messages['loaned']['past_due']) || sizeof($messages['loaned']['today']) || sizeof($messages['loaned']['tomorrow']))
+	{
+		$message = t('Hello !user_name,', array('!user_name' => ($users[$uid]['user']->full_name ? $users[$uid]['user']->full_name : $users[$uid]['user']->name)), $users[$uid]['user']->language);
+		
+		if(sizeof($messages['owned']['past_due']))
+		{
+			$message .= "\n\n".t('Your stuff that is lent out but has not been returned yet', array(), $users[$uid]['user']->language).':'."\n";
+			
+			foreach ($messages['owned']['past_due'] as $nid)
+			{
+				$message .= "\n- ".t(
+					'"!node_title" (!node_link) was due on !due_date (!due days ago)',
+					array(
+						'!node_title' => $nodes[$nid]->title,
+						'!node_link' => url('cmtls/'.$nodes[$nid]->group_nid.'/'.$nodes[$nid]->parent.'/stuff/'.$nodes[$nid]->nid, array('absolute' => TRUE)),
+						'!due_date' => date_format_date(date_make_date($nodes[$nid]->due_date), 'custom', 'j. F Y'),
+						'!due' => $nodes[$nid]->due,
+					),
+					$users[$uid]['user']->language
+				).':'."\n";
+				
+				$message .= "\t".t(
+					'lent to !user_name (!user_link).',
+					array(
+						'!user_name' => ($users[$nodes[$nid]->loaned_to]['user']->full_name ? $users[$nodes[$nid]->loaned_to]['user']->full_name : $users[$nodes[$nid]->loaned_to]['user']->name),
+						'!user_link' => url('cmtls/'.$main_group->nid.'/member/'.$nodes[$nid]->loaned_to, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+				
+				$message .= "\t".t(
+					'Mark this item as returned !returned_link.',
+					array(
+						'!returned_link' => url('cmtls/'.$nodes[$nid]->group_nid.'/'.$nodes[$nid]->parent.'/stuff/'.$nodes[$nid]->nid, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+			}
+			
+		}
+		
+		if(sizeof($messages['owned']['today']))
+		{
+			$message .= t('Items belonging to you that should be returned today', array(), $users[$uid]['user']->language).':'."\n";
+			
+			foreach ($messages['owned']['today'] as $nid)
+			{
+				$message .= "\n".t(
+					'- "!node_title" (!node_link)',
+					array(
+						'!node_title' => $nodes[$nid]->title,
+						'!node_link' => url('cmtls/'.$nodes[$nid]->group_nid.'/'.$nodes[$nid]->parent.'/stuff/'.$nodes[$nid]->nid, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+				
+				$message .= "\t".t(
+					'lent to !user_name (!user_link).',
+					array(
+						'!user_name' => ($users[$nodes[$nid]->loaned_to]['user']->full_name ? $users[$nodes[$nid]->loaned_to]['user']->full_name : $users[$nodes[$nid]->loaned_to]['user']->name),
+						'!user_link' => url('cmtls/'.$main_group->nid.'/member/'.$nodes[$nid]->loaned_to, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+				
+				$message .= "\t".t(
+					'Mark this item as returned !returned_link',
+					array(
+						'!returned_link' => url('cmtls/'.$nodes[$nid]->group_nid.'/'.$nodes[$nid]->parent.'/stuff/'.$nodes[$nid]->nid.'/returned', array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+			}
+		}
+		
+		if(sizeof($messages['loaned']['past_due']))
+		{
+			$message .= "\n\n".t('Items borrowed by you that have passed due date', array(), $users[$uid]['user']->language).':'."\n";
+			
+			foreach ($messages['loaned']['past_due'] as $nid)
+			{
+				$message .= "\n- ".t(
+					'"!node_title" (!node_link) was due on !due_date (!due days ago)',
+					array(
+						'!node_title' => $nodes[$nid]->title,
+						'!node_link' => url('cmtls/'.$nodes[$nid]->group_nid.'/'.$nodes[$nid]->parent.'/stuff/'.$nodes[$nid]->nid, array('absolute' => TRUE)),
+						'!due_date' => date_format_date(date_make_date($nodes[$nid]->due_date), 'custom', 'j. F Y'),
+						'!due' => $nodes[$nid]->due,
+					),
+					$users[$uid]['user']->language
+				).':'."\n";
+				
+				$message .= "\t".t(
+					'borrowed from !user_name (!user_link)',
+					array(
+						'!user_name' => ($users[$nodes[$nid]->uid]['user']->full_name ? $users[$nodes[$nid]->uid]['user']->full_name : $users[$nodes[$nid]->uid]['user']->name),
+						'!user_link' => url('cmtls/'.$main_group->nid.'/member/'.$nodes[$nid]->uid, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+			}
+		}
+		
+		if(sizeof($messages['loaned']['today']))
+		{
+			$message .= t('Items borrowed by you that should be returned today', array(), $users[$uid]['user']->language).':'."\n";
+			
+			foreach ($messages['loaned']['today'] as $nid)
+			{
+				$message .= "\n".t(
+					'- "!node_title" (!node_link)',
+					array(
+						'!node_title' => $nodes[$nid]->title,
+						'!node_link' => url('cmtls/'.$nodes[$nid]->group_nid.'/'.$nodes[$nid]->parent.'/stuff/'.$nodes[$nid]->nid, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+				
+				$message .= "\t".t(
+					'borrowed from !user_name (!user_link)',
+					array(
+						'!user_name' => ($users[$nodes[$nid]->uid]['user']->full_name ? $users[$nodes[$nid]->uid]['user']->full_name : $users[$nodes[$nid]->uid]['user']->name),
+						'!user_link' => url('cmtls/'.$main_group->nid.'/member/'.$nodes[$nid]->uid, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+			}
+		}
+		
+		if(sizeof($messages['loaned']['tomorrow']))
+		{
+			$message .= "\n\n".t('Items borrowed by you that should be returned tomorrow', array(), $users[$uid]['user']->language).':'."\n";
+			
+			foreach ($messages['loaned']['tomorrow'] as $nid)
+			{
+				$message .= "\n".t(
+					'- "!node_title" (!node_link)',
+					array(
+						'!node_title' => $nodes[$nid]->title,
+						'!node_link' => url('cmtls/'.$nodes[$nid]->group_nid.'/'.$nodes[$nid]->parent.'/stuff/'.$nodes[$nid]->nid, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+				
+				$message .= "\t".t(
+					'borrowed from !user_name (!user_link)',
+					array(
+						'!user_name' => ($users[$nodes[$nid]->uid]['user']->full_name ? $users[$nodes[$nid]->uid]['user']->full_name : $users[$nodes[$nid]->uid]['user']->name),
+						'!user_link' => url('cmtls/'.$main_group->nid.'/member/'.$nodes[$nid]->uid, array('absolute' => TRUE)),
+					),
+					$users[$uid]['user']->language
+				)."\n";
+			}
+		}
+		
+		$message .= "\n".'---'."\n".$site_name;
+		
+		$message = array(
+			'subject' => $site_name.' - '.t('loan reminder', NULL, $users[$uid]['user']->language),
+			'body' => $message,
+		);
+		
+		drupal_mail('cmtls', 'cmtls_mail', $users[$uid]['user']->mail, NULL, $message);
+		//printr($message);
+	}
+	
+	watchdog('cmtls_stuff', 'Daily stuffarium notifications sent');
+	variable_set('cmtls_stuff_notifications', time());
+}
+
+/**
+ * Page to make a item returned
+ *
+ * @param object $node	the item that was request
+ * @return string
+ */
+function cmtls_stuff_item_returned_page($node)
+{
+	if($node->type != 'cmtls_stuff')
+	{
+		return FALSE;
+	}
+	
+	$sql = 'UPDATE {content_type_cmtls_stuff} SET field_cmtls_stuff_loan_uid_value = %d WHERE nid = %d';
+	db_query($sql, 0, $node->nid);	
+	
+	//cache_clear_all('content:'.$node->nid.':'.$node->nid, 'content');
+	db_query("DELETE FROM {cache_content} WHERE cid = 'content:".(int)$node->nid.":".(int)$node->nid."'");
+	
+	drupal_set_message(t('Item has been marked as returned'));
+	
+    drupal_goto(cmtls_path_to_node($node));
+}
+
+function cmtls_stuff_preprocess_cmtls_stuffs_content(&$vars)
+{
+	$vars['tags'] = cmtls_places_tags($vars['app_id']);
+}

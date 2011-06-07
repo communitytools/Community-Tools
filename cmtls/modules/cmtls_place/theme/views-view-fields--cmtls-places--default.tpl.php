@@ -88,7 +88,7 @@ $phone = theme('cmtls_place_phone', $node);
 				<?php foreach ((array)$node->field_cmtls_files as $file): ?>
 					<?php if (is_array($file)): ?>
 						<div class="meta-file">
-							<a href="<?php print url($file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
+							<a href="<?php print $file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $base_url.'/'.$file['filepath']; ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
 								<?php print $file['imagecache_icon']; ?>
 							</a>
 						</div>
@@ -102,7 +102,7 @@ $phone = theme('cmtls_place_phone', $node);
 
 			<?php print l($fields['comment_count']->raw ? format_plural($fields['comment_count']->raw,'1 comment','@count comments') : t('Comment'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/place/'.$fields['nid']->raw, array('attributes' => array('class' => 'comments-button cmtls-comment-toggle-button', 'id' => 'cmtls-comments-toggle-button-'.$fields['nid']->raw))); ?>
 
-			&middot; <div class="meta-share"><?php print $sm_share_buttons; ?></div>
+			&middot; <?php print $sm_share_buttons; ?>
 
 			<?php print $comments; ?>
 

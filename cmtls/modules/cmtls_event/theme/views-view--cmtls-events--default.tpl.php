@@ -39,7 +39,9 @@
 <?php endif; ?>
 
 <?php if ($rows): ?>
+    <div class="cmtls-event-container">
         <?php print $rows; ?>
+    </div> <!-- cmtls-event-container -->
 <?php elseif ($empty): ?>
         <?php print $empty; ?>
 <?php endif; ?>

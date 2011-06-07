@@ -933,11 +933,11 @@ function cmtls_member_views_default_views() {
   ));
   $handler->override_option('cache', array(
     'type' => 'time',
-    'results_lifespan' => 3600,
-    'output_lifespan' => 3600,
+    'results_lifespan' => '3600',
+    'output_lifespan' => '-1',
   ));
   $handler->override_option('empty_format', '1');
-  $handler->override_option('items_per_page', 50);
+  $handler->override_option('items_per_page', 75);
   $handler->override_option('use_pager', '1');
   $handler->override_option('distinct', 0);
   $handler->override_option('style_options', array(

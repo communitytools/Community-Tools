@@ -45,7 +45,7 @@ $current_app = _cmtls_app_get_current($current_group);
 			<?php foreach ((array)$node->field_cmtls_files as $file): ?>
 				<?php if (is_array($file)): ?>
 					<div class="meta-file">
-						<a href="<?php print url($file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
+						<a href="<?php print $file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $base_url.'/'.$file['filepath']; ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
 							<?php print $file['imagecache_icon']; ?>
 						</a>
 					</div>
@@ -74,7 +74,7 @@ $current_app = _cmtls_app_get_current($current_group);
 		
 		<?php print l($node->stances->sorted_count[1] + $node->stances->sorted_count[2] ? $node->stances->sorted_count[1] . ' ' . t('for') . ' / ' . $node->stances->sorted_count[2] . ' ' . t('against') :  t('Vote'), '', array('attributes' => array('class' => 'stance-button', 'rel' => '#stance-container-'.$fields['nid']->raw))); ?>
 
-		&middot; <div class="meta-share"><?php print $sm_share_buttons; ?></div>
+		&middot; <?php print $sm_share_buttons; ?>
 
 		<?php print $stance; ?>
 

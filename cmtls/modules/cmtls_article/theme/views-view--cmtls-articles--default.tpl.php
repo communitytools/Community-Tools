@@ -39,7 +39,9 @@
 <?php endif; ?>
 
 <?php if ($rows): ?>
-	<?php print $rows; ?>
+    <div class="cmtls-article-container">
+   	<?php print $rows; ?>
+    </div> <!-- cmtls-article-container -->
 <?php elseif ($empty): ?>
 	<?php print $empty; ?>
 <?php endif; ?>

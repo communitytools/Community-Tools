@@ -42,8 +42,8 @@ function cmtls_imagecache_default_presets() {
           'module' => 'imagecache',
           'action' => 'imagecache_scale_and_crop',
           'data' => array(
-            'width' => '52',
-            'height' => '52',
+            'width' => '55',
+            'height' => '55',
           ),
         ),
       ),

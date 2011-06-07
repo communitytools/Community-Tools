@@ -797,7 +797,7 @@ function cmtls_problem_cmtls_group_overview($app)
 	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
 	$result = db_fetch_array(db_query($sql, $app->nid));
 	$time_diff = time() - $result['last_comment_timestamp'];
-	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	$last_commented = cmtls_format_date_ago($result['last_comment_timestamp']);
 	
 	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;
 	

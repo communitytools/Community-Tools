@@ -16,13 +16,13 @@ function cmtls_member_ctools_plugin_api() {
 function cmtls_member_node_info() {
   $items = array(
     'cmtls_member' => array(
-      'name' => t('Community Tools: Group Member'),
+      'name' => t('Community Tools: Grupi liige'),
       'module' => 'features',
       'description' => '',
       'has_title' => '1',
-      'title_label' => t('Title'),
+      'title_label' => t('Pealkiri'),
       'has_body' => '1',
-      'body_label' => t('Description'),
+      'body_label' => t('Kirjeldus'),
       'min_word_count' => '0',
       'help' => '',
     ),

@@ -467,9 +467,12 @@ function cmtls_map_openlayers_presets()
 	$openlayers_presets->title = 'Community Tools: Map (node edit)';
 	$openlayers_presets->description = 'Community Tools: Map for node edit';
 	$openlayers_presets->data = array(
+		'hide_empty_map' => 0,
 		'projection' => '900913',
 		'width' => '300px',
 		'height' => '300px',
+		'image_path' => 'sites/all/libraries/openlayers/img/',
+		'css_path' => 'sites/all/libraries/openlayers/theme/default/style.css',
 		'default_layer' => $default_layer,
 		'center' => array(
 			'initial' => array(
@@ -489,6 +492,7 @@ function cmtls_map_openlayers_presets()
 			'google_physical' => 'google_physical',
 		),
 		'preset_name' => 'cmtls_node_map',
+		'styles' => $default_styles,
 	);
 	
 	$items['cmtls_node_map'] = $openlayers_presets;

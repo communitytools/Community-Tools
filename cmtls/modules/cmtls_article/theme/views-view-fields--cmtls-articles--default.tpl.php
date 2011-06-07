@@ -23,67 +23,74 @@
 
 $node = node_load($fields['nid']->raw);
 
-$current_group = _cmtls_group_get_current();
-$current_app = _cmtls_app_get_current($current_group);
-$i = 0;
+$tags = theme('cmtls_node_tags', $node);
+$author = theme('cmtls_node_author', $node);
+$comment_links = theme('cmtls_node_comment_links', $node);
+$created = theme('cmtls_node_created_time', $node);
+$geolocation = theme('cmtls_node_geolocation', $node);
+$location = theme('cmtls_node_location', $node);
+$title = theme('cmtls_node_title', $node);
+$files = theme('cmtls_node_files', $node);
 
-?>
-<div class="node-head">
+$teaser = node_teaser($node->body, NULL, 500);
 
-	<h1><?php print _cmtls_edit_button($fields['nid']->raw); ?><a href="<?php print base_path().cmtls_article_path($node); ?>"><?php print $fields['title']->raw; ?></a></h1>
+?><div class="node-head">
 
-	<div class="meta-author">
-		<?php print _cmtls_member_avatar($user->uid == $fields['uid']->raw ? $user : $fields['uid']->raw, 16, TRUE); ?> <?php print _cmtls_member_name($fields, TRUE); ?>
-	</div>
+	<?php print $title; ?>
+	
+	<?php print $author; ?>
+	
+	<?php print $created; ?>
 
-	<div class="meta-time">
-		 <?php print ' '.t('wrote').' '; ?><?php print $fields['created']->content; ?>
-	</div>
-
-	<div class="meta-geo">
-		<?php if(($fields['field_cmtls_geoinfo_openlayers_wkt']->raw && $fields['field_cmtls_geoinfo_openlayers_wkt']->raw != 'GEOMETRYCOLLECTION()')): ?>
-			<a class="cmtls-map-popup" id="cmtls-map-feature-<?php print $fields['nid']->raw; ?>"><?php print cmtls_map_get_icon($view->args[0]); ?></a>
-		<?php endif; ?>
-	</div> <!-- meta-geo -->
-
-	<div class="meta-address"><?php print $fields['field_cmtls_address_value']->content; ?></div>
+	<?php print $geolocation; ?>
+	
+	<?php print $location; ?>
 
 </div> <!-- node-head -->
 
 <div class="node-content">
 
-	<?php print $fields['body']->content; ?>
+	<?php if (isset($view->args[1])): ?>
+	
+		<?php print check_markup($node->body, $node->format, FALSE); ?>
+	
+		<?php print $files; ?>
+		
+	<?php else: ?>
 
-	<div class="meta-files">
-		<?php foreach ((array)$node->field_cmtls_files as $file): ?>
-			<?php if (is_array($file)): ?>
-				<div class="meta-file">
-					<a href="<?php print url($file['imagecache_object_type'] == 'image' ? imagecache_create_url('full', $file['filepath']) : $file['filepath'], array('absolute' => TRUE)); ?>" title="<?php print $file['data']['description']; ?>" <?php print ($file['imagecache_object_type'] == 'image' ? 'rel="lightbox[' . $node->nid . ']"' : ''); ?>>
-						<?php print $file['imagecache_icon']; ?>
-					</a>
-				</div>
+		<div class="node-teaser" data-nid="<?php print $node->nid; ?>">
+		
+			<?php print $teaser; ?>
+			
+			<?php if(strlen($teaser) < strlen($node->body) || trim($files)): ?>
+
+				<?/* php print (strlen($teaser) > 0) ? '.. ': NULL ; */?> 
+				<?php print l(t('Read more'), cmtls_path_to_node($node), array('attributes' => array('class' => 'node-teaser-to-full', 'data-nid' => $node->nid))); ?>
+			
 			<?php endif; ?>
-		<?php endforeach; ?>
-	</div> <!-- meta-files -->
+			
+		</div>			
+	
+		<div class="node-full hidden" data-nid="<?php print $node->nid; ?>">
+		
+			<?php print check_markup($node->body, $node->format, FALSE); ?>
+			
+			<?php print $files; ?>
+			
+			<?php /*print l(t('See less'), 'cmtls/'.$current_group->nid.'/'.$current_app->nid, array('attributes' => array('class' => 'node-full-to-teaser', 'data-nid' => $node->nid))); */ ?>
+		</div>
+	
+	<?php endif; ?>
 
 </div> <!-- node-content -->
 
 <div class="node-footer">
 		
-	<?php if (is_array($node->taxonomy)): ?>
-		<?php if (count($node->taxonomy) > 0): ?>
-			<div class="meta-tags">
-				<?php foreach ($node->taxonomy as $term): ?>
-					<a href="<?php print url('cmtls/' . $current_group->nid . '/' . $current_app->nid, array('absolute' => TRUE)) . '?tag=' . $term->tid; ?>" class="category"><?php print check_plain($term->name); ?></a><?php $i++; ?>
-				<?php endforeach; ?>
-			</div> <!-- meta-tags -->
-			&middot;
-		<?php endif; ?>
-	<?php endif; ?>
+	<?php print $tags; if (trim($tags)) print '&middot;'; ?>
 
-	<?php print l($fields['comment_count']->raw ? format_plural($fields['comment_count']->raw,'1 comment','@count comments') : t('Comment'), 'cmtls/'.$cmtls['current_group']->nid.'/'.$cmtls['current_app']->nid.'/article/'.$fields['nid']->raw, array('attributes' => array('class' => 'comments-button cmtls-comment-toggle-button', 'id' => 'cmtls-comments-toggle-button-'.$fields['nid']->raw))); ?>
+	<?php print $comment_links; ?>
 
-	&middot; <div class="meta-share"><?php print $sm_share_buttons; ?></div>
+	&middot; <?php print $sm_share_buttons; ?>
 
 	<?php print $comments; ?>
 

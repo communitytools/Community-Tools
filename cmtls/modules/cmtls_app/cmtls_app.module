@@ -685,17 +685,13 @@ function cmtls_app_default_rss_item($node)
 	
 	if(!empty($node->taxonomy))
 	{
-		$tags = array();
 		foreach ($node->taxonomy as &$tag)
 		{
 			$item['args'][] = array(
 				'key' => 'category',
 				'value' => $tag->name,
 			);
-			//$tags[] = $tag->name;
 		}
-		
-		//$item['args']['category'] = implode(', ', $tags);
 	}
 	
 	return $item;

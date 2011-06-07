@@ -74,15 +74,16 @@ function cmtls_article_strongarm() {
   $strongarm->name = 'content_extra_weights_cmtls_article';
   $strongarm->value = array(
     'title' => '-5',
-    'body_field' => '-3',
-    'revision_information' => '-1',
-    'author' => '0',
-    'options' => '1',
-    'comment_settings' => '3',
-    'menu' => '-4',
-    'path' => '2',
-    'attachments' => '30',
-    'og_nodeapi' => '-2',
+    'body_field' => '-2',
+    'revision_information' => '0',
+    'author' => '1',
+    'options' => '2',
+    'comment_settings' => '4',
+    'menu' => '-3',
+    'taxonomy' => '-4',
+    'path' => '3',
+    'attachments' => '8',
+    'og_nodeapi' => '-1',
   );
 
   $export['content_extra_weights_cmtls_article'] = $strongarm;

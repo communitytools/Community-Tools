@@ -22,7 +22,7 @@ function cmtls_event_node_info() {
       'has_title' => '1',
       'title_label' => t('Pealkiri'),
       'has_body' => '1',
-      'body_label' => t('Kirjeldus'),
+      'body_label' => t('Tekst'),
       'min_word_count' => '0',
       'help' => '',
     ),

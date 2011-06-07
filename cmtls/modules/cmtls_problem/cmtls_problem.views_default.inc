@@ -626,6 +626,7 @@ function cmtls_problem_views_default_views() {
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
+  $handler->override_option('items_per_page', 25);
   $handler->override_option('use_pager', 'mini');
   $handler->override_option('style_options', array(
     'grouping' => '',

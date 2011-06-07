@@ -9,7 +9,9 @@
 
 
 <?php if ($rows): ?>
+    <div class="cmtls-idea-container">
 	<?php print $rows; ?>
+    </div> <!-- cmtls-idea-container -->
 <?php elseif ($empty): ?>
 	<?php print $empty; ?>
 <?php endif; ?>

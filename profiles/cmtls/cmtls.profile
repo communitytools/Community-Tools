@@ -86,8 +86,8 @@ function cmtls_profile_modules()
 		'og_views',
 
 		// WYSIWYG
-		'wysiwyg',
-		'wysiwyg_imageupload',
+		'ckeditor',
+		'imce',
 
 		// Outgoing communications.
 		'googleanalytics',
@@ -159,6 +159,7 @@ function _cmtls_additional_modules()
 		'cmtls_idea',
 		'cmtls_problem',
 		'cmtls_place',
+		'cmtls_stuff',
 	);
 }
 
@@ -177,7 +178,6 @@ function cmtls_profile_tasks(&$task, $url)
 
 	if ($task == 'profile')
 	{
-
 		// Install the base module set.
 		install_include(cmtls_profile_modules());
 
@@ -327,6 +327,8 @@ function cmtls_profile_tasks(&$task, $url)
 		db_query("INSERT INTO {og_uid} VALUES (1, 0, 1, 1, 1, NOW(), NOW())");
 		
 	    file_create_path(variable_get('user_picture_path', 'pictures'));
+	    
+    	cmtls_install_wysiwyg_settings();
 	}
 	return $output;
 }

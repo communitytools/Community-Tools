@@ -42,7 +42,7 @@ function cmtls_article_init()
 		drupal_add_feed(url('cmtls/'.$current_group->nid.'/'.$current_app->nid.'/rss', array('absolute' => TRUE)), $app->title);
 	}
 
-	//drupal_add_js(drupal_get_path('module', 'cmtls_article') .'/js/app.js');
+	drupal_add_js(drupal_get_path('module', 'cmtls_article') .'/js/app.js');
 }
 
 function cmtls_article_cmtls_app()
@@ -105,9 +105,10 @@ function cmtls_article_cmtls_app_config($config)
 		'#options' => array(
 			'node_created' => t('Created date'),
 			'node_title' => t('Article title'),
+			'node_comment_statistics_last_comment_timestamp' => t('Last comment time'),
 		),
 	);
-
+	
 	$form['cmtls_article']['sorting_dir'] = array(
 		'#type' => 'radios',
 		'#title' => t('Sorting order'),
@@ -171,16 +172,6 @@ function cmtls_article_menu()
 		'type' => MENU_CALLBACK,
 	);
 
-	$items['cmtls/%node/%node/article/tag/%'] = array(
-		'title callback' => 'cmtls_page_title',
-		'title arguments' => array(2),
-		'page callback' => 'cmtls_article_page_taxonomy',
-		'page arguments' => array(1, 2, 5),
-		'access callback' => 'node_access',
-		'access arguments' => array('view', 2),
-		'type' => MENU_CALLBACK,
-	);
-
 	return $items;
 }
 
@@ -210,19 +201,6 @@ function cmtls_article_page($group, $app, $article)
 	}
 
 	return views_embed_view('cmtls_articles', 'default', $app->nid, $article->nid);
-}
-
-/**
- * articles filtered by taxonomy term/tag view
- *
- * @param node $group
- * @param node $app
- * @param string $taxonomy
- * @return string
- */
-function cmtls_article_page_taxonomy($group, $app, $taxonomy)
-{
-	return views_embed_view('cmtls_articles', 'default', $app->nid, 'all', $taxonomy);
 }
 
 /**
@@ -374,11 +352,16 @@ function cmtls_article_cmtls_filter_info()
 						'sort' => 0,
 					),
 				),
-
 				array(
 					'title' => t('Most commented'),
 					'default values' => array(
 						'sort' => 2,
+					),
+				),
+				array(
+					'title' => t('Last commented'),
+					'default values' => array(
+						'sort' => 3,
 					),
 				),
 			), // filter predefined options
@@ -408,6 +391,11 @@ function cmtls_article_cmtls_filter_info()
 					'field' => 'node_comment_statistics_comment_count',
 					'direction' => 'DESC',
 					'title' => t('Most commented'),
+				),
+				array(
+					'field' => 'node_comment_statistics_last_comment_timestamp',
+					'direction' => 'DESC',
+					'title' => t('Last commented'),
 				),
 			), // sort options
 
@@ -449,15 +437,13 @@ function cmtls_article_cmtls_group_overview($app)
 	
 	$sql = "SELECT node.created FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node} AS node ON nodehierarchy.nid = node.nid WHERE nodehierarchy.parent = %d AND node.type = 'cmtls_article' ORDER BY node.nid DESC LIMIT 1";
 	$result = db_fetch_array(db_query($sql, $app->nid));
-	$time_diff = time() - $result['created'];
-	$last_posted = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	$last_posted = cmtls_format_date_ago($result['created']);
 	
 	$return['posts column'] = $return['total posts'] ? format_plural($return['total posts'],'1 post','@count posts').' &middot; '.t('last').' '.$last_posted : t('No posts yet');
 	
 	$sql = "SELECT node_comment_statistics.nid, node_comment_statistics.last_comment_timestamp FROM {nodehierarchy} AS nodehierarchy LEFT JOIN {node_comment_statistics} AS node_comment_statistics ON nodehierarchy.nid = node_comment_statistics.nid WHERE nodehierarchy.parent = %d ORDER BY node_comment_statistics.last_comment_timestamp DESC LIMIT 1";
 	$result = db_fetch_array(db_query($sql, $app->nid));
-	$time_diff = time() - $result['last_comment_timestamp'];
-	$last_commented = t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), 1)));
+	$last_commented = cmtls_format_date_ago($result['last_comment_timestamp']);
 	
 	$return['comments column'] = $return['total comments'] ? format_plural($return['total comments'],'1 comment','@count comments').' &middot; '.t('last').' '.$last_commented : NULL;	
 	
