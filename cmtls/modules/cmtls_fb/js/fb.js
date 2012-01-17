@@ -26,7 +26,13 @@ window.fbAsyncInit = function() {
 		.removeClass('disabled');
 
 	// Init Facebook
-	FB.init({appId: Drupal.settings.cmtls.Facebook.appId, status: true, cookie: true, xfbml: false});
+	FB.init({
+		appId: Drupal.settings.cmtls.Facebook.appId,
+		status: true,
+		cookie: true,
+		xfbml: false,
+		oauth: true
+	});
 
 	// Subscribe to logout event
 	FB.Event.subscribe('auth.logout', function(response){
@@ -41,19 +47,19 @@ cmtlsFB.logUserIn = function(){
 	// Get Facebook login status
 	return FB.getLoginStatus(function(response){
 		// If we don't have a session
-		if(!response.session){
+		if(!response.authResponse){
 			// Try to log the user in with some extended permissions
 			return FB.login(function(response){
 				// If successful, redirect user to local authentication page
-				if(response.session){
-					cmtlsFB.redirect(response.session);
+				if(response.authResponse){
+					cmtlsFB.redirect(response.authResponse);
 				}else{
 					return false;
 				}
-			}, {perms: 'email'});
+			}, {scope: 'email'});
 		// If we have a session, go directly to local authentication page
 		}else{
-			cmtlsFB.redirect(response.session);
+			cmtlsFB.redirect(response.authResponse);
 		}
 	});
 

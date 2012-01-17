@@ -23,7 +23,7 @@ function cmtls_fb_menu()
 		'title' => 'Connect with Facebook',
 		'page callback' => 'cmtls_fb_login',
 		'page arguments' => array(),
-	    'access callback' => 'user_is_anonymous',
+		'access callback' => 'user_is_anonymous',
 		'type' => MENU_CALLBACK,
 	);
 	
@@ -255,8 +255,11 @@ function cmtls_fb_login(){
 function cmtls_fb_get_session(){
 	if(!isset($_SESSION['cmtls']['fb']) or empty($_SESSION['cmtls']['fb']) or $_SESSION['cmtls']['fb']['status'] == 'failed'){
 		$facebook = cmtls_fb_get_facebook();
+		
+		$fb_user = $facebook->getUser(); 
+		$session = array();
 
-		if($session = $facebook->getSession()){
+		if($fb_user){
 			$fb_user = $facebook->api('/me');
 
 			$session['euid'] = $fb_user['id'];
